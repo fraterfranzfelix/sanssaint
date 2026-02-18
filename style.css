@@ -13,8 +13,8 @@
 /* Font Import */
 @font-face {
     font-family: 'EB Garamond';
-    src: url('assets/EBGaramond-VariableFont_wght.ttf') format('truetype');
-    font-weight: 400 800; /* Supports variable weights */
+    src: url('assets/eb_garamond/EBGaramond-VariableFont_wght.ttf') format('truetype');
+    font-weight: 400 800;
     font-style: normal;
 }
 
@@ -172,64 +172,116 @@ body {
     height: auto;
 }
 
-/* --- 5. BUTTONS --- */
+/* --- 5. BUTTONS (Refined Neumorphism) --- */
 .button-wrapper {
     display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
+    flex-wrap: wrap; 
+    gap: 0.5rem;
     width: 100%;
 }
 
 .btn {
+    /* Layout & Sizing */
     flex: 1 0 150px; 
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 0.125rem 1.5rem;
+    padding: 0.25rem 2rem;
+    
+    /* Typography */
     font-family: var(--font-primary);
     font-size: 1rem;
-    font-weight: 500;
     text-decoration: none;
-    border: 1.5px solid transparent;
-    transition: all 0.3s ease;
     cursor: pointer;
-    text-align: center;
-    border-radius: 2rem;
-    letter-spacing: 0.03rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    
+    /* Base Styles */
+    border: none;
+    border-radius: 1rem;
+    outline: none;
+    
+    /* Animation for the "lift" */
+    transition: all 0.3s ease;
+}
+.btn:hover {
+    font-weight: 600;
+    letter-spacing: 0.025em;
 }
 
-/* Black Button (Explore) */
-.btn-black {
-    background-color: var(--noir-leger);
-    color: var(--blanc-leger);
-    border-color: var(--noir-leger);
-}
-
-.btn-black:hover {
-    background-color: var(--viola-violet);
-    color: var(--blanc-leger);
-    border-color: var(--blanc-leger);
-}
-
-/* White Button (Get in touch) */
+/* --- WHITE BUTTON (Get in touch) --- */
 .btn-white {
     background-color: var(--blanc-leger);
     color: var(--noir-leger);
-    border-color: var(--noir-leger);
+    
+    /* Subtle shadow: Light top-left, soft dark bottom-right */
+    box-shadow: 
+        -4px -4px 10px rgba(255,255,255, 0.8),
+        4px 4px 10px rgba(0,0,0, 0.1);
 }
 
 .btn-white:hover {
-    background-color: var(--noir-leger);
-    color: var(--blanc-leger); 
-    border-color: var(--blanc-leger);
+    /* Lifts up slightly */
+    transform: translateY(-2px);
+    
+    /* Shadow expands and softens to show height */
+    box-shadow: 
+        -6px -6px 14px rgba(255,255,255, 0.9),
+        6px 6px 14px rgba(0,0,0, 0.15);
 }
 
-/* --- 6. RESPONSIVENESS (MOBILE) --- */
+/* --- BLACK BUTTON (Explore) --- */
+.btn-black {
+    background-color: var(--noir-leger);
+    color: var(--blanc-leger);
+    
+    /* Dark mode neumorphism: Darker shadow bottom-right, lighter highlight top-left */
+    box-shadow: 
+        -4px -4px 10px rgba(255,255,255, 0.05),
+        4px 4px 10px rgba(0,0,0, 0.3);
+}
+
+.btn-black:hover {
+    transform: translateY(-2px);
+    
+    box-shadow: 
+        -6px -6px 14px rgba(255,255,255, 0.08),
+        6px 6px 14px rgba(0,0,0, 0.4);
+}
+
+/* --- 6. RESPONSIVENESS --- */
+/* Tablet Breakpoint (Max width 960px) */
 @media (max-width: 960px) {
     .center-container {
-        width: 66.66%; /* 2/3 width on mobile */
+        width: 50%; /* Jumps to half width */
     }
+}
+
+/* Mobile Breakpoint (Max width 768px) */
+@media (max-width: 768px) {
+    .center-container {
+        width: 66.66%; /* Jumps to two-thirds width */
+    }
+}
+
+/* --- HERO FOOTER --- */
+.hero-footer {
+    position: absolute;
+    bottom: 2rem; /* Margin from the bottom edge */
+    left: 0;
+    width: 100%;
+    font-weight: 500;
     
-    /* Removed .button-wrapper and .btn rules from here 
-       because Flexbox now handles the stacking automatically. */
+    text-align: center;
+    font-family: var(--font-primary);
+    font-size: 0.67rem;
+    
+    color: var(--noir-leger); /* White text to contrast with dark painting */
+    
+    /* Ensure it sits above the background/back-particles */
+    z-index: 10; 
+}
+
+.hero-footer p {
+    margin: 0; /* Remove default paragraph margins for tighter grouping */
 }
