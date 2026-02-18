@@ -1,39 +1,57 @@
 document.addEventListener('DOMContentLoaded', () => {
     
-    // 1. Check for mouse support (prevents running on mobile touchscreens)
+    // 1. Check if user has a mouse (disable on mobile)
     const hasMouse = window.matchMedia('(pointer: fine)').matches;
 
     if (hasMouse) {
-        const heroSection = document.getElementById('hero');
-        const bgLayer = document.getElementById('hero-bg');
-        const particlesBack = document.getElementById('particles-back');
-        const particlesFront = document.getElementById('particles-front');
-
-        heroSection.addEventListener('mousemove', (e) => {
+        
+        // 2. Define the layers we want to move
+        // We look for the generic class AND specific background classes
+        const selectors = [
+            '.parallax-layer', 
+            '.bg-layer-creation', 
+            '.bg-layer-eden',
+            '.particles-back',
+            '.particles-front'
+        ];
+        
+        // 3. Global Mouse Move Listener
+        // We listen on the whole document so it works for all sections
+        document.addEventListener('mousemove', (e) => {
+            
             const x = e.clientX;
             const y = e.clientY;
             
-            // Calculate center of screen
+            // Calculate distance from center of screen
             const centerX = window.innerWidth / 2;
             const centerY = window.innerHeight / 2;
-
-            // Calculate distance from center (delta)
+            
             const deltaX = x - centerX;
             const deltaY = y - centerY;
 
-            // Apply Parallax: 
-            // - Dividing by larger numbers means SLOWER movement (Background)
-            // - Dividing by smaller numbers means FASTER movement (Foreground)
-            // - Negative values move layers opposite to mouse (Natural feel)
-            
-            // Background moves very slowly (far away)
-            bgLayer.style.transform = `translate(${deltaX / -50}px, ${deltaY / -50}px)`;
+            // Find all valid layers currently in the DOM
+            const layers = document.querySelectorAll(selectors.join(', '));
 
-            // Back particles move slightly faster
-            particlesBack.style.transform = `translate(${deltaX / -35}px, ${deltaY / -35}px)`;
+            layers.forEach(layer => {
+                const speed = getSpeed(layer);
+                const xMove = deltaX / speed;
+                const yMove = deltaY / speed;
 
-            // Front particles move the fastest (closest to camera)
-            particlesFront.style.transform = `translate(${deltaX / -15}px, ${deltaY / -15}px)`;
+                layer.style.transform = `translate(${xMove}px, ${yMove}px)`;
+            });
         });
     }
 });
+
+/**
+ * Helper: Determines how fast a layer should move based on its class.
+ * Higher number = Slower movement (Further away)
+ * Lower number = Faster movement (Closer)
+ */
+function getSpeed(layer) {
+    if (layer.classList.contains('particles-front')) return -15; // Closest
+    if (layer.classList.contains('particles-back')) return -35;
+    if (layer.classList.contains('bg-layer-creation')) return -60; // Furthest (Section 2)
+    if (layer.classList.contains('bg-layer-eden')) return -60;    // Furthest (Section 2)
+    return -50; // Default for Hero Background
+}
