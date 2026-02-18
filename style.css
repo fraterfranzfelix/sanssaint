@@ -1,0 +1,235 @@
+/* --- 1. VARIABLES & SETUP --- */
+:root {
+    /* Corporate Colors */
+    --viola-violet: #785adc;
+    --malve-magenta: #fa8ca0;
+    --blanc-leger: #eaeaea;
+    --noir-leger: #151515;
+
+    /* Corporate Font */
+    --font-primary: 'EB Garamond', serif;
+}
+
+/* Font Import */
+@font-face {
+    font-family: 'EB Garamond';
+    src: url('assets/EBGaramond-VariableFont_wght.ttf') format('truetype');
+    font-weight: 400 800; /* Supports variable weights */
+    font-style: normal;
+}
+
+/* Global Reset */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--font-primary);
+    color: var(--noir-leger);
+    background-color: var(--blanc-leger);
+    overflow: hidden; /* Hide scrollbar for the body, let main handle scrolling */
+}
+
+/* --- 2. LAYOUT & SCROLL SNAP --- */
+/* This creates the "slide" effect where pages snap to 100vh height */
+.scroll-container {
+    height: 100vh;
+    width: 100vw;
+    overflow-y: scroll;
+    scroll-snap-type: y mandatory;
+    scroll-behavior: smooth;
+}
+
+.section {
+    position: relative;
+    height: 100vh; /* 1080px equivalent */
+    width: 100%;
+    scroll-snap-align: start;
+    
+    /* Flexbox to center content by default */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* --- HERO SPECIFICS & LAYERS --- */
+.hero-section {
+    position: relative;
+    overflow: hidden; /* Keeps the moving layers inside the box */
+}
+
+/* Common style for all moving layers */
+.parallax-layer {
+    position: absolute;
+    top: -5%;
+    left: -5%;
+    width: 110%; /* Slightly larger than screen to allow movement without showing edges */
+    height: 110%;
+    pointer-events: none; /* KEY: Mouse ignores these layers completely */
+}
+
+/* The Background Image */
+.bg-layer {
+    z-index: 1; /* Lowest level */
+    background-image: -webkit-image-set(
+        url('assets/01_caspar_david_friedrich_abtei_im_eichwald.avif') 1x,
+        url('assets/01_caspar_david_friedrich_abtei_im_eichwald.jpeg') 1x
+    );
+    background-image: image-set(
+        url('assets/01_caspar_david_friedrich_abtei_im_eichwald.avif') type('image/avif'),
+        url('assets/01_caspar_david_friedrich_abtei_im_eichwald.jpeg') type('image/jpeg')
+    );
+    background-size: cover;
+    background-position: center;
+}
+
+/* Ensure content sits between the particle layers */
+.relative-content {
+    position: relative;
+    z-index: 10; /* Above bg and back particles, below front particles */
+}
+
+/* --- PARTICLES SETUP --- */
+.particles-back {
+    z-index: 5;
+    /* Create dots */
+    background-image: radial-gradient(var(--blanc-leger) 1px, transparent 2px),
+                      radial-gradient(var(--blanc-leger) 1px, transparent 2px);
+    background-size: 200px 200px, 300px 300px;
+    background-position: 0 0, 40px 60px;
+    
+    opacity: 1;
+    filter: blur(1px);
+    
+    /* ANIMATION: Slower, slight drift */
+    animation: wind-back 33s linear infinite;
+}
+
+.particles-front {
+    z-index: 20;
+    /* Create slightly larger dots */
+    background-image: radial-gradient(var(--blanc-leger) 3px, transparent 4px),
+                      radial-gradient(var(--blanc-leger) 2px, transparent 3px);
+    background-size: 500px 500px, 400px 400px;
+    background-position: 0 0, 60px 90px;
+    
+    opacity: 1;
+    filter: blur(0.5px);
+    
+    /* ANIMATION: Faster, strong drift */
+    animation: wind-front 12s linear infinite;
+}
+
+/* --- WIND ANIMATIONS --- */
+
+/* Back Layer: Gentle breeze (Drifts slightly right) */
+@keyframes wind-back {
+    0% {
+        background-position: 0 0, 40px 60px;
+    }
+    50% {
+        /* Midway point adds a slight curve to the fall */
+        background-position: 20px 500px, 60px 560px;
+    }
+    100% {
+        background-position: 50px 1000px, 90px 1060px;
+    }
+}
+
+/* Front Layer: Strong Gust (Drifts hard right) */
+@keyframes wind-front {
+    0% {
+        background-position: 0 0, 60px 90px;
+    }
+    25% {
+        /* Sudden gust to the right */
+        background-position: 50px 250px, 110px 340px;
+    }
+    75% {
+        /* Wind dies down slightly */
+        background-position: 120px 750px, 180px 840px;
+    }
+    100% {
+        background-position: 200px 1000px, 260px 1090px;
+    }
+}
+
+/* --- 4. MIDDLE CONTAINER --- */
+.center-container {
+    width: 33.33%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 2rem;
+}
+
+.hero-logo {
+    width: 100%;
+    margin-bottom: 2rem;
+    height: auto;
+}
+
+/* --- 5. BUTTONS --- */
+.button-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    width: 100%;
+}
+
+.btn {
+    flex: 1 0 150px; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0.125rem 1.5rem;
+    font-family: var(--font-primary);
+    font-size: 1rem;
+    font-weight: 500;
+    text-decoration: none;
+    border: 1.5px solid transparent;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    text-align: center;
+    border-radius: 2rem;
+    letter-spacing: 0.03rem;
+}
+
+/* Black Button (Explore) */
+.btn-black {
+    background-color: var(--noir-leger);
+    color: var(--blanc-leger);
+    border-color: var(--noir-leger);
+}
+
+.btn-black:hover {
+    background-color: var(--viola-violet);
+    color: var(--blanc-leger);
+    border-color: var(--blanc-leger);
+}
+
+/* White Button (Get in touch) */
+.btn-white {
+    background-color: var(--blanc-leger);
+    color: var(--noir-leger);
+    border-color: var(--noir-leger);
+}
+
+.btn-white:hover {
+    background-color: var(--noir-leger);
+    color: var(--blanc-leger); 
+    border-color: var(--blanc-leger);
+}
+
+/* --- 6. RESPONSIVENESS (MOBILE) --- */
+@media (max-width: 960px) {
+    .center-container {
+        width: 66.66%; /* 2/3 width on mobile */
+    }
+    
+    /* Removed .button-wrapper and .btn rules from here 
+       because Flexbox now handles the stacking automatically. */
+}
