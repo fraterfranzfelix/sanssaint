@@ -1,35 +1,28 @@
 document.addEventListener('DOMContentLoaded', () => {
-    
-    // 1. Check if user has a mouse (disable on mobile)
+
+    // Disable parallax on touch devices (no mouse cursor to track)
     const hasMouse = window.matchMedia('(pointer: fine)').matches;
 
     if (hasMouse) {
-        
-        // 2. Define the layers we want to move
-        // We look for the generic class AND specific background classes
+
+        // Layers to move. The angel wrapper is handled separately below
+        // because it needs its centering transform (-50%/-50%) preserved.
         const selectors = [
-            '.parallax-layer', 
-            '.bg-layer-creation', 
+            '.parallax-layer',
+            '.bg-layer-creation',
             '.bg-layer-eden',
-            '.particles-back',
-            '.particles-front'
+            '.center-image-wrapper'
         ];
-        
-        // 3. Global Mouse Move Listener
-        // We listen on the whole document so it works for all sections
+
+        const angelWrapper = document.querySelector('.center-image-wrapper');
+
         document.addEventListener('mousemove', (e) => {
-            
-            const x = e.clientX;
-            const y = e.clientY;
-            
-            // Calculate distance from center of screen
+
             const centerX = window.innerWidth / 2;
             const centerY = window.innerHeight / 2;
-            
-            const deltaX = x - centerX;
-            const deltaY = y - centerY;
+            const deltaX  = e.clientX - centerX;
+            const deltaY  = e.clientY - centerY;
 
-            // Find all valid layers currently in the DOM
             const layers = document.querySelectorAll(selectors.join(', '));
 
             layers.forEach(layer => {
@@ -37,21 +30,31 @@ document.addEventListener('DOMContentLoaded', () => {
                 const xMove = deltaX / speed;
                 const yMove = deltaY / speed;
 
-                layer.style.transform = `translate(${xMove}px, ${yMove}px)`;
+                if (layer === angelWrapper) {
+                    // Compose parallax movement on top of the CSS centering transform
+                    // so the image stays centered while still reacting to mouse input.
+                    layer.style.transform =
+                        `translate(calc(-50% + ${xMove}px), calc(-50% + ${yMove}px))`;
+                } else {
+                    layer.style.transform = `translate(${xMove}px, ${yMove}px)`;
+                }
             });
         });
     }
 });
 
 /**
- * Helper: Determines how fast a layer should move based on its class.
- * Higher number = Slower movement (Further away)
- * Lower number = Faster movement (Closer)
+ * Returns the parallax speed divisor for a given layer.
+ * Higher value  → slower movement (feels further away).
+ * Lower value   → faster movement (feels closer).
+ * Negative values invert direction for a counter-parallax effect.
  */
 function getSpeed(layer) {
-    if (layer.classList.contains('particles-front')) return -15; // Closest
-    if (layer.classList.contains('particles-back')) return -35;
-    if (layer.classList.contains('bg-layer-creation')) return -60; // Furthest (Section 2)
-    if (layer.classList.contains('bg-layer-eden')) return -60;    // Furthest (Section 2)
-    return -50; // Default for Hero Background
+    if (layer.classList.contains('particles-front'))      return -15;  // Closest
+    if (layer.classList.contains('weapons-layer'))        return -25;
+    if (layer.classList.contains('center-image-wrapper')) return -30;  // Angel — between weapons and back particles
+    if (layer.classList.contains('particles-back'))       return -35;
+    if (layer.classList.contains('bg-layer-creation'))    return -60;
+    if (layer.classList.contains('bg-layer-eden'))        return -60;
+    return -50; // Default: hero background
 }

@@ -1,16 +1,37 @@
-/* --- 1. VARIABLES & SETUP --- */
+/* =============================================================================
+   STYLESHEET INDEX
+   1. Variables & Setup
+   2. Layout & Scrolling
+   3. Hero Section
+      3a. Parallax Layers
+      3b. Particle Animations
+      3c. Center Container
+      3d. Buttons
+      3e. Hero Footer
+      3f. Weapons Layers
+   4. Section 2: Split Panels
+      4a. Panel Configuration
+      4b. Background Images
+      4c. Gradient Overlays
+      4d. Rule of Thirds Grid
+      4e. Typography
+      4f. Center Image (Angel)
+   5. Responsive Breakpoints
+============================================================================= */
+
+
+/* =============================================================================
+   1. VARIABLES & SETUP
+============================================================================= */
+
 :root {
-    /* Corporate Colors */
     --viola-violet: #785adc;
     --malve-magenta: #fa8ca0;
     --blanc-leger: #eaeaea;
     --noir-leger: #151515;
-
-    /* Corporate Font */
     --font-primary: 'EB Garamond', serif;
 }
 
-/* Font Import */
 @font-face {
     font-family: 'EB Garamond';
     src: url('assets/eb_garamond/EBGaramond-VariableFont_wght.ttf') format('truetype');
@@ -18,7 +39,6 @@
     font-style: normal;
 }
 
-/* Global Reset */
 * {
     box-sizing: border-box;
     margin: 0;
@@ -29,11 +49,15 @@ body {
     font-family: var(--font-primary);
     color: var(--noir-leger);
     background-color: var(--blanc-leger);
-    overflow: hidden; /* Hide scrollbar for the body, let main handle scrolling */
+    overflow: hidden;
 }
 
-/* --- 2. LAYOUT & SCROLL SNAP --- */
-/* This creates the "slide" effect where pages snap to 100vh height */
+
+/* =============================================================================
+   2. LAYOUT & SCROLLING
+============================================================================= */
+
+/* Full-viewport scroll container with animated scrolling */
 .scroll-container {
     height: 100vh;
     width: 100vw;
@@ -43,35 +67,40 @@ body {
 
 .section {
     position: relative;
-    height: 100vh; /* 1080px equivalent */
+    height: 100vh;
     width: 100%;
-    scroll-snap-align: start;
-    
-    /* Flexbox to center content by default */
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
-/* --- HERO SPECIFICS & LAYERS --- */
+
+/* =============================================================================
+   3. HERO SECTION
+============================================================================= */
+
 .hero-section {
     position: relative;
-    overflow: hidden; /* Keeps the moving layers inside the box */
+    overflow: hidden;
 }
 
-/* Common style for all moving layers */
+
+/* --- 3a. Parallax Layers -------------------------------------------------- */
+
+/* All moving layers share these base rules.
+   Sized at 110% to prevent edge gaps during movement. */
 .parallax-layer {
     position: absolute;
     top: -5%;
     left: -5%;
-    width: 110%; /* Slightly larger than screen to allow movement without showing edges */
+    width: 110%;
     height: 110%;
-    pointer-events: none; /* KEY: Mouse ignores these layers completely */
+    pointer-events: none;
 }
 
-/* The Background Image */
+/* Background painting — lowest z-index */
 .bg-layer {
-    z-index: 1; /* Lowest level */
+    z-index: 1;
     background-image: -webkit-image-set(
         url('assets/01_caspar_david_friedrich_abtei_im_eichwald.avif') 1x,
         url('assets/01_caspar_david_friedrich_abtei_im_eichwald.jpeg') 1x
@@ -84,85 +113,67 @@ body {
     background-position: center;
 }
 
-/* Ensure content sits between the particle layers */
+/* Ensures hero content sits between the back and front particle layers */
 .relative-content {
     position: relative;
-    z-index: 10; /* Above bg and back particles, below front particles */
+    z-index: 10;
 }
 
-/* --- PARTICLES SETUP --- */
+
+/* --- 3b. Particle Animations ---------------------------------------------- */
+
+/* Smaller, blurred dots — drift slowly */
 .particles-back {
     z-index: 5;
-    /* Create dots */
     background-image: radial-gradient(var(--blanc-leger) 1px, transparent 2px),
                       radial-gradient(var(--blanc-leger) 1px, transparent 2px);
     background-size: 200px 200px, 300px 300px;
     background-position: 0 0, 40px 60px;
-    
     opacity: 1;
     filter: blur(1px);
-    
-    /* ANIMATION: Slower, slight drift */
     animation: wind-back 33s linear infinite;
 }
 
+/* Larger, sharper dots — drift faster */
 .particles-front {
     z-index: 20;
-    /* Create slightly larger dots */
     background-image: radial-gradient(var(--blanc-leger) 3px, transparent 4px),
                       radial-gradient(var(--blanc-leger) 2px, transparent 3px);
     background-size: 500px 500px, 400px 400px;
     background-position: 0 0, 60px 90px;
-    
     opacity: 1;
     filter: blur(0.5px);
-    
-    /* ANIMATION: Faster, strong drift */
     animation: wind-front 12s linear infinite;
 }
 
-/* --- WIND ANIMATIONS --- */
-
-/* Back Layer: Gentle breeze (Drifts slightly right) */
+/* Gentle drift with a slight rightward curve */
 @keyframes wind-back {
-    0% {
-        background-position: 0 0, 40px 60px;
-    }
-    50% {
-        /* Midway point adds a slight curve to the fall */
-        background-position: 20px 500px, 60px 560px;
-    }
-    100% {
-        background-position: 50px 1000px, 90px 1060px;
-    }
+    0%   { background-position: 0 0, 40px 60px; }
+    50%  { background-position: 20px 500px, 60px 560px; }
+    100% { background-position: 50px 1000px, 90px 1060px; }
 }
 
-/* Front Layer: Strong Gust (Drifts hard right) */
+/* Stronger gust with variable speed mid-flight */
 @keyframes wind-front {
-    0% {
-        background-position: 0 0, 60px 90px;
-    }
-    25% {
-        /* Sudden gust to the right */
-        background-position: 50px 250px, 110px 340px;
-    }
-    75% {
-        /* Wind dies down slightly */
-        background-position: 120px 750px, 180px 840px;
-    }
-    100% {
-        background-position: 200px 1000px, 260px 1090px;
-    }
+    0%   { background-position: 0 0, 60px 90px; }
+    25%  { background-position: 50px 250px, 110px 340px; }
+    75%  { background-position: 120px 750px, 180px 840px; }
+    100% { background-position: 200px 1000px, 260px 1090px; }
 }
 
-/* --- 4. MIDDLE CONTAINER --- */
+
+/* --- 3c. Center Container ------------------------------------------------- */
+
+/* Width glides from 33.33% on wide screens to 50% at 960px,
+   eliminating the discrete 960px breakpoint entirely. */
 .center-container {
-    width: 33.33%;
+    width: clamp(33.33%, calc(33.33% + (1400px - 100vw) * 0.037886), 50%);
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
     padding: 2rem;
+    transition: width 0.4s ease;
 }
 
 .hero-logo {
@@ -171,121 +182,136 @@ body {
     height: auto;
 }
 
-/* --- 5. BUTTONS (Refined Neumorphism) --- */
+
+/* --- 3d. Buttons ---------------------------------------------------------- */
+
 .button-wrapper {
     display: flex;
-    flex-wrap: wrap; 
+    flex-wrap: wrap;
     gap: 0.5rem;
     width: 100%;
 }
 
 .btn {
-    /* Layout & Sizing */
-    flex: 1 0 150px; 
+    flex: 1 0 150px;
     display: flex;
     justify-content: center;
     align-items: center;
     padding: 0.25rem 2rem;
-    
-    /* Typography */
     font-family: var(--font-primary);
     font-size: 1rem;
-    text-decoration: none;
-    cursor: pointer;
     font-weight: 500;
     letter-spacing: 0.02em;
-    
-    /* Base Styles */
+    text-decoration: none;
+    cursor: pointer;
     border: none;
     border-radius: 1rem;
     outline: none;
-    
-    /* Animation for the "lift" */
     transition: all 0.3s ease;
 }
+
 .btn:hover {
     font-weight: 600;
     letter-spacing: 0.025em;
 }
 
-/* --- WHITE BUTTON (Get in touch) --- */
+/* Light neumorphic button */
 .btn-white {
     background-color: var(--blanc-leger);
     color: var(--noir-leger);
-    
-    /* Subtle shadow: Light top-left, soft dark bottom-right */
-    box-shadow: 
+    box-shadow:
         -4px -4px 10px rgba(255,255,255, 0.8),
-        4px 4px 10px rgba(0,0,0, 0.1);
+         4px  4px 10px rgba(0,0,0, 0.1);
 }
 
 .btn-white:hover {
-    /* Lifts up slightly */
     transform: translateY(-2px);
-    
-    /* Shadow expands and softens to show height */
-    box-shadow: 
+    box-shadow:
         -6px -6px 14px rgba(255,255,255, 0.9),
-        6px 6px 14px rgba(0,0,0, 0.15);
+         6px  6px 14px rgba(0,0,0, 0.15);
 }
 
-/* --- BLACK BUTTON (Explore) --- */
+/* Dark neumorphic button */
 .btn-black {
     background-color: var(--noir-leger);
     color: var(--blanc-leger);
-    
-    /* Dark mode neumorphism: Darker shadow bottom-right, lighter highlight top-left */
-    box-shadow: 
+    box-shadow:
         -4px -4px 10px rgba(255,255,255, 0.05),
-        4px 4px 10px rgba(0,0,0, 0.3);
+         4px  4px 10px rgba(0,0,0, 0.3);
 }
 
 .btn-black:hover {
     transform: translateY(-2px);
-    
-    box-shadow: 
+    box-shadow:
         -6px -6px 14px rgba(255,255,255, 0.08),
-        6px 6px 14px rgba(0,0,0, 0.4);
+         6px  6px 14px rgba(0,0,0, 0.4);
 }
 
-/* --- 6. RESPONSIVENESS --- */
-/* Tablet Breakpoint (Max width 960px) */
-@media (max-width: 960px) {
-    .center-container {
-        width: 50%; /* Jumps to half width */
-    }
-}
 
-/* Mobile Breakpoint (Max width 768px) */
-@media (max-width: 768px) {
-    .center-container {
-        width: 66.66%; /* Jumps to two-thirds width */
-    }
-}
+/* --- 3e. Hero Footer ------------------------------------------------------ */
 
-/* --- HERO FOOTER --- */
 .hero-footer {
     position: absolute;
-    bottom: 2rem; /* Margin from the bottom edge */
+    bottom: 2rem;
     left: 0;
     width: 100%;
-    font-weight: 500;
-    
     text-align: center;
     font-family: var(--font-primary);
     font-size: 0.67rem;
-    
-    color: var(--noir-leger); /* White text to contrast with dark painting */
-    
-    /* Ensure it sits above the background/back-particles */
-    z-index: 10; 
+    font-weight: 500;
+    color: var(--noir-leger);
+    z-index: 10;
 }
 
 .hero-footer p {
-    margin: 0; /* Remove default paragraph margins for tighter grouping */
+    margin: 0;
 }
 
-/* --- SECTION 2: SPLIT PANELS --- */
+
+/* --- 3f. Weapons Layers --------------------------------------------------- */
+
+/* Width scales continuously from 54% (wide) to 66.67% (narrow), so the swords
+   glide inward as the viewport shrinks rather than snapping between stages.
+   Height only reduces below 900px and is transitioned to feel smooth. */
+.weapons-layer {
+    top: auto;
+    bottom: 0;
+    height: 110%;
+    width: clamp(54%, calc(54% + (1400px - 100vw) * 0.020047), 66.67%);
+    z-index: 7;
+    transition: height 0.4s ease;
+}
+
+.weapons-layer picture,
+.weapons-layer img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: contain;
+}
+
+.weapons-left {
+    left: 0;
+}
+
+.weapons-left img {
+    object-position: left bottom;
+}
+
+.weapons-right {
+    left: auto;
+    right: 0;
+}
+
+.weapons-right img {
+    object-position: right bottom;
+}
+
+
+/* =============================================================================
+   4. SECTION 2: SPLIT PANELS
+============================================================================= */
+
 .split-section {
     display: flex;
     flex-direction: row;
@@ -298,43 +324,41 @@ body {
 .panel {
     position: relative;
     height: 100%;
-    overflow: hidden; /* Clips the parallax movement */
+    overflow: hidden;
 }
 
-/* --- LEFT PANEL CONFIGURATION --- */
+
+/* --- 4a. Panel Configuration ---------------------------------------------- */
+
+/* Left panel extends 20px beyond 50% so it tucks cleanly behind the right panel */
 .panel-left {
-    /* Logic: Make it 50% wide PLUS the 20px needed to hide behind the right panel.
-       Then pull the next element over by -20px.
-    */
-    flex: 0 0 calc(50% + 20px); 
+    flex: 0 0 calc(50% + 20px);
     max-width: calc(50% + 20px);
-    margin-right: -20px; 
-    z-index: 1; /* Sits underneath */
+    margin-right: -20px;
+    z-index: 1;
 }
 
-/* --- RIGHT PANEL CONFIGURATION --- */
+/* Right panel sits on top with a rounded top-left corner */
 .panel-right {
     flex: 0 0 50%;
     max-width: 50%;
-    z-index: 2; /* Sits on top */
-    
-    /* The Rounded Corner */
+    z-index: 2;
     border-top-left-radius: 20px;
-    /* IMPORTANT: This ensures the background image gets clipped by the radius */
     -webkit-mask-image: -webkit-radial-gradient(white, black);
     mask-image: radial-gradient(white, black);
-    overflow: hidden; 
+    overflow: hidden;
 }
 
 
-/* --- BACKGROUND IMAGES (Parallax Ready) --- */
+/* --- 4b. Background Images ------------------------------------------------ */
+
+/* Both layers are oversized to allow parallax movement without edge gaps */
 .bg-layer-creation {
-    /* 115% size to allow parallax movement */
-    width: 115% !important; 
+    width: 115% !important;
     height: 115% !important;
-    left: -7.5% !important; 
+    left: -7.5% !important;
     top: -7.5% !important;
-    
+    background-image: -webkit-image-set(url('assets/03_gustave_dore_creation.jpeg') 1x);
     background-image: image-set(
         url('assets/03_gustave_dore_creation.avif') type('image/avif'),
         url('assets/03_gustave_dore_creation.jpeg') type('image/jpeg')
@@ -346,9 +370,9 @@ body {
 .bg-layer-eden {
     width: 115% !important;
     height: 115% !important;
-    left: -7.5% !important; 
+    left: -7.5% !important;
     top: -7.5% !important;
-    
+    background-image: -webkit-image-set(url('assets/04_gustave_dore_jacobs_dream.jpeg') 1x);
     background-image: image-set(
         url('assets/04_gustave_dore_jacobs_dream.avif') type('image/avif'),
         url('assets/04_gustave_dore_jacobs_dream.jpeg') type('image/jpeg')
@@ -357,73 +381,74 @@ body {
     background-position: center;
 }
 
-/* --- SEAMLESS GRADIENTS (Left Panel) --- */
+
+/* --- 4c. Gradient Overlays ------------------------------------------------ */
+
+/* Fade edges of the left panel into the page background color */
 .gradient-overlay {
     position: absolute;
     left: 0;
     width: 100%;
-    height: 2rem; /* Requested height */
-    z-index: 5; /* Above background, below text */
+    height: 2rem;
+    z-index: 5;
     pointer-events: none;
 }
 
 .gradient-top {
     top: 0;
-    /* Fades from solid Blanc léger (top) to transparent */
     background: linear-gradient(to bottom, var(--blanc-leger), transparent);
 }
 
 .gradient-bottom {
     bottom: 0;
-    /* Fades from transparent to solid Blanc léger (bottom) */
     background: linear-gradient(to top, var(--blanc-leger), transparent);
 }
 
-/* --- RULE OF THIRDS GRID --- */
+
+/* --- 4d. Rule of Thirds Grid ---------------------------------------------- */
+
+/* Three equal columns keep text anchored to the middle third of each panel.
+   Column ratio is transitioned so grid tightening at breakpoints feels gradual. */
 .thirds-grid {
     position: relative;
     z-index: 10;
     width: 100%;
     height: 100%;
     display: grid;
-    
-    /* STRICT RULE OF THIRDS: 
-       Three equal columns. The middle column is exactly 33.33% of the panel width. 
-    */
-    grid-template-columns: 1fr 1fr 1fr; 
+    grid-template-columns: 1fr 1fr 1fr;
     grid-template-rows: 1fr auto 1fr;
     align-items: center;
+    transition: grid-template-columns 0.4s ease;
 }
 
 .grid-center-content {
     grid-column: 2;
     grid-row: 2;
-    white-space: nowrap; 
-    
-    /* Center the text block horizontally within the middle grid cell */
-    justify-self: center; 
-    width: 100%; /* Ensure it occupies the full middle cell width if needed */
-    
-    /* Base Typography */
+    justify-self: center;
+    width: 100%;
+    white-space: nowrap;
     font-family: var(--font-primary);
     font-size: 1rem;
     font-weight: 500;
-    line-height: 1.5; 
+    line-height: 1.5;
 }
 
-/* Alignment Utilities */
-.text-left { text-align: left; }
+
+/* --- 4e. Typography ------------------------------------------------------- */
+
+/* Alignment utilities */
+.text-left  { text-align: left; }
 .align-right { text-align: right; }
 
-/* Colors */
-.text-noir { color: var(--noir-leger); }
+/* Color utilities */
+.text-noir  { color: var(--noir-leger); }
 .text-blanc { color: var(--blanc-leger); }
 
-/* --- TYPOGRAPHY HIGHLIGHTS --- */
+/* Branded highlights */
 .highlight-viola {
     color: var(--viola-violet);
     font-weight: 800;
-    font-variant: small-caps; 
+    font-variant: small-caps;
 }
 
 .highlight-malve {
@@ -434,47 +459,90 @@ body {
 
 .citation {
     font-size: 0.67rem;
-    display: inline-block; 
+    display: inline-block;
     opacity: 0.9;
 }
 
 
-/* --- RESPONSIVENESS (Adjusting Grid Ratios) --- */
+/* --- 4f. Center Image (Angel) --------------------------------------------- */
 
-/* 1. Intermediate Squeeze: Reduce padding to 25% */
-/* (1fr 2fr 1fr) = Sides are 25%, Center is 50% */
+/* Absolutely centered within the split section, hovering above both panels.
+   JS parallax composes its translate on top of the base -50%/-50% centering.
+   Height is transitioned so breakpoint resizes feel smooth. Transform is
+   intentionally excluded from the transition to keep JS parallax responsive. */
+.center-image-wrapper {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    height: 85.71%;
+    z-index: 15;
+    pointer-events: none;
+    transition: height 0.4s ease;
+}
+
+.center-angel-img {
+    height: 100%;
+    width: auto;
+    object-fit: contain;
+    /* Neumorphic-style shadow: soft light from top-left, soft dark from bottom-right */
+    filter:
+        drop-shadow(-4px -4px 12px rgba(255, 255, 255, 0.6))
+        drop-shadow( 4px  4px 12px rgba(0, 0, 0, 0.12));
+}
+
+
+/* =============================================================================
+   5. RESPONSIVE BREAKPOINTS
+
+   Fluid sizing via clamp() handles the continuous range, so only four hard
+   breakpoints remain: two for the grid ratio, one for weapons height, and the
+   full mobile stack at 768px. All discrete property changes are transitioned
+   so they animate rather than snap when the threshold is crossed.
+============================================================================= */
+
+/* (≤ 1300px) Grid tightens — side padding narrows from 33% to 25% */
 @media (max-width: 1300px) {
-    .thirds-grid { 
-        grid-template-columns: 1fr 2fr 1fr; 
-    }
+    .thirds-grid          { grid-template-columns: 1fr 2fr 1fr; }
+    .center-image-wrapper { height: 70%; }
 }
 
-/* 2. Tight Squeeze: Reduce padding to 16.65% */
-/* (1fr 4fr 1fr) = Sides are ~16.6%, Center is ~66.6% */
+/* (≤ 1000px) Grid tightens further — side padding narrows to ~16.6% */
 @media (max-width: 1000px) {
-    .thirds-grid { 
-        grid-template-columns: 1fr 4fr 1fr; 
-    }
+    .thirds-grid          { grid-template-columns: 1fr 4fr 1fr; }
+    .center-image-wrapper { height: 58%; }
 }
 
-/* 3. Mobile Stack */
+/* (≤ 900px) Weapons start to reduce height to give the hero logo room */
+@media (max-width: 900px) {
+    .weapons-layer { height: 95%; }
+}
+
+/* (≤ 768px) Full mobile stack — the one intentional hard layout change */
 @media (max-width: 768px) {
-    .split-section {
-        flex-direction: column; 
-    }
-    
+    .center-container { width: 66.66%; }
+
+    .split-section { flex-direction: column; }
+
     .panel {
         width: 100%;
         height: 50vh;
         flex: auto;
         max-width: 100%;
-        margin: 0; 
+        margin: 0;
         border-radius: 0;
     }
-    
-    /* On mobile, we return to the spacious 1fr 1fr 1fr 
-       because the panel is now full screen width */
-    .thirds-grid { 
-        grid-template-columns: 1fr 1fr 1fr; 
+
+    /* Full panel width restores the spacious 1/3 grid margins */
+    .thirds-grid { grid-template-columns: 1fr 1fr 1fr; }
+
+    /* Angel shifts left so 2/3 is visible; height bumped up slightly for presence */
+    .center-image-wrapper {
+        left: 0;
+        height: 65%;
+        transform: translate(-33.33%, -50%);
     }
+
+    /* Weapons reduce height for the tighter stacked viewport */
+    .weapons-layer { height: 80%; }
 }
