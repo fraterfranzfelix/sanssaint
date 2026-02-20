@@ -299,7 +299,9 @@ body {
 }
 
 /* Outer edges glide off-screen from 0 (at 1400px) to −12.5% (at 900px).
-   The formula resolves to 0 on wide screens and is clamped at −12.5% below 900px. */
+   The formula resolves to 0 on wide screens and is clamped at −12.5% below 900px.
+   Combined with the 75% mobile width cap, this allows up to ~50% image overlap
+   at the narrowest sizes before the secondary height-reduction strategy takes over. */
 .weapons-left {
     left: clamp(-12.5%, calc((100vw - 1400px) * 0.225), 0%);
 }
@@ -550,13 +552,15 @@ body {
     /* Full panel width restores the spacious 1/3 grid margins */
     .thirds-grid { grid-template-columns: 1fr 1fr 1fr; }
 
-    /* Angel shifts left so 2/3 is visible; height bumped up slightly for presence */
+    /* Angel shifts left so only ~45% is visible by default — enough to feel
+       present without blocking text. Parallax (tilt or cursor) reveals the rest. */
     .center-image-wrapper {
         left: 0;
         height: 65%;
-        transform: translate(-33.33%, -50%);
+        transform: translate(-55%, -50%);
     }
 
-    /* Weapons yield to percentage sizing on narrow mobile viewports */
-    .weapons-layer { width: 66.67%; height: 80%; }
+    /* Weapons yield to percentage sizing on narrow mobile viewports.
+       75% width allows up to ~50% overlap between the two images. */
+    .weapons-layer { width: 75%; height: 80%; }
 }

@@ -18,18 +18,20 @@ const angelWrapper = document.querySelector('.center-image-wrapper');
 
 /**
  * Returns the parallax speed divisor for a given layer.
- * Higher value  → slower movement (feels further away).
- * Lower value   → faster movement (feels closer).
- * Negative values invert direction for a counter-parallax effect.
+ * Higher absolute value → slower movement (feels further away).
+ * Lower absolute value  → faster movement (feels closer).
+ * Negative values = counter-parallax (moves opposite to input).
+ * Positive values = normal parallax (moves with input) — used for the
+ * three background paintings to give a sense of depth behind the content.
  */
 function getSpeed(layer) {
     if (layer.classList.contains('particles-front'))      return -15;
     if (layer.classList.contains('weapons-layer'))        return -25;
     if (layer.classList.contains('center-image-wrapper')) return -30;
     if (layer.classList.contains('particles-back'))       return -35;
-    if (layer.classList.contains('bg-layer-creation'))    return -60;
-    if (layer.classList.contains('bg-layer-eden'))        return -60;
-    return -50;
+    if (layer.classList.contains('bg-layer-creation'))    return  60;  // Inverted
+    if (layer.classList.contains('bg-layer-eden'))        return  60;  // Inverted
+    return  50;  // Default: hero background — inverted
 }
 
 /**
@@ -119,9 +121,10 @@ function initTiltParallax() {
     let smoothY = 0;
     const SMOOTHING = 0.12; // 0 = instant / no smoothing. 1 = never moves.
 
-    // Tilt angles (degrees) beyond which the output is clamped. Prevents extreme
-    // device angles (e.g. setting the phone face-down) from breaking the layout.
-    const MAX_TILT = 20;
+    // Tilt angles (degrees) beyond which the output is clamped. Halving this
+    // doubles the sensitivity — the same physical tilt produces twice the
+    // parallax displacement. Raise it again if movement feels too aggressive.
+    const MAX_TILT = 10;
 
     window.addEventListener('deviceorientation', (e) => {
 
