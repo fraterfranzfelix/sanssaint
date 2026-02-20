@@ -270,16 +270,24 @@ body {
 
 /* --- 3f. Weapons Layers --------------------------------------------------- */
 
-/* Width scales continuously from 54% (wide) to 66.67% (narrow), so the swords
-   glide inward as the viewport shrinks rather than snapping between stages.
-   Height only reduces below 900px and is transitioned to feel smooth. */
+/* Primary strategy — position absorbs viewport changes, not size:
+     Width is locked at 700px (= exactly 50vw at the 1400px design baseline).
+     On wider screens it scales up proportionally as 50vw so the swords always
+     meet at the center with zero gap and zero overlap.
+     As the viewport narrows below 1400px, the image stays 700px wide; only the
+     outer edges slide off-screen (up to −12.5%) while the inner edges naturally
+     begin to overlap (up to ~30%). No resizing happens at all in this range.
+
+   Secondary strategy — only below 900px, where primary is exhausted:
+     Height and width start stepping down. Both properties are transitioned
+     so the reduction feels like a breath rather than a jump. */
 .weapons-layer {
     top: auto;
     bottom: 0;
     height: 110%;
-    width: clamp(54%, calc(54% + (1400px - 100vw) * 0.020047), 66.67%);
+    width: max(50vw, 700px);
     z-index: 7;
-    transition: height 0.4s ease;
+    transition: width 0.4s ease, height 0.4s ease;
 }
 
 .weapons-layer picture,
@@ -290,8 +298,10 @@ body {
     object-fit: contain;
 }
 
+/* Outer edges glide off-screen from 0 (at 1400px) to −12.5% (at 900px).
+   The formula resolves to 0 on wide screens and is clamped at −12.5% below 900px. */
 .weapons-left {
-    left: 0;
+    left: clamp(-12.5%, calc((100vw - 1400px) * 0.225), 0%);
 }
 
 .weapons-left img {
@@ -300,7 +310,7 @@ body {
 
 .weapons-right {
     left: auto;
-    right: 0;
+    right: clamp(-12.5%, calc((100vw - 1400px) * 0.225), 0%);
 }
 
 .weapons-right img {
@@ -495,10 +505,13 @@ body {
 /* =============================================================================
    5. RESPONSIVE BREAKPOINTS
 
-   Fluid sizing via clamp() handles the continuous range, so only four hard
-   breakpoints remain: two for the grid ratio, one for weapons height, and the
-   full mobile stack at 768px. All discrete property changes are transitioned
-   so they animate rather than snap when the threshold is crossed.
+   clamp() handles the continuous fluid range for weapons bleed and several
+   widths, so hard breakpoints are kept to a minimum. What remains:
+     — Two grid-ratio steps for the split panel text (1300px, 1000px)
+     — One secondary-strategy step for weapons height (900px)
+     — One full layout flip for mobile (768px)
+   Every discrete property change is transitioned so threshold crossings
+   feel like gentle animations rather than snaps.
 ============================================================================= */
 
 /* (≤ 1300px) Grid tightens — side padding narrows from 33% to 25% */
@@ -513,7 +526,8 @@ body {
     .center-image-wrapper { height: 58%; }
 }
 
-/* (≤ 900px) Weapons start to reduce height to give the hero logo room */
+/* (≤ 900px) Secondary strategy begins — primary bleed/overlap is exhausted.
+   Height steps down; width will follow only if absolutely necessary. */
 @media (max-width: 900px) {
     .weapons-layer { height: 95%; }
 }
@@ -543,6 +557,6 @@ body {
         transform: translate(-33.33%, -50%);
     }
 
-    /* Weapons reduce height for the tighter stacked viewport */
-    .weapons-layer { height: 80%; }
+    /* Weapons yield to percentage sizing on narrow mobile viewports */
+    .weapons-layer { width: 66.67%; height: 80%; }
 }
