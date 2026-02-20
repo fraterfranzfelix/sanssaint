@@ -7,6 +7,11 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
         initTiltParallax();
     }
+
+    measureEmDashWeight();
+    initWordmarkReveal();
+    initMuteToggle();
+    initLangDropdown();
 });
 
 
@@ -40,14 +45,14 @@ function getSpeed(layer) {
  *
  * The angel has two possible base states set by CSS:
  *   — Desktop (> 768px): translate(-50%, -50%)   — centered on both axes
- *   — Mobile  (≤ 768px): translate(-33.33%, -50%) — shifted left (left: 0)
+ *   — Mobile  (≤ 768px): translate(-55%, -50%)   — shifted left (left: 0)
  *
- * Without this awareness, the JS would overwrite the mobile CSS rule with -50%,
+ * Without this awareness, JS would overwrite the mobile CSS rule with -50%,
  * re-centering the angel and covering the panel text on narrow screens.
  *
- * Movement is also clamped here so the parallax can never push the angel fully
- * out of frame. The angel is intended to partially obscure text — revealing it
- * through parallax is the experience — but it should never vanish entirely.
+ * Movement is also clamped so the parallax can never push the angel fully
+ * out of frame. The angel is intended to partially obscure text — revealing
+ * it through parallax is the experience — but it should never vanish entirely.
  */
 function applyTransform(layer, xMove, yMove) {
     if (layer === angelWrapper) {
@@ -158,6 +163,181 @@ function initTiltParallax() {
         document.querySelectorAll(selectors.join(', ')).forEach(layer => {
             const speed = getSpeed(layer);
             applyTransform(layer, smoothX / speed, smoothY / speed);
+        });
+    });
+}
+
+
+/* =============================================================================
+   HEADER: EM DASH WEIGHT MEASUREMENT
+============================================================================= */
+
+/**
+ * Measures the actual stroke weight of EB Garamond's em dash glyph by rendering
+ * it onto an offscreen canvas and scanning the pixel data vertically.
+ *
+ * This sets --em-dash-weight on :root, which drives the height of all three
+ * parts of each header line (cap-left, body, cap-right). The result is exact
+ * regardless of system font rendering — no manual measurement or guesswork.
+ *
+ * Called after DOMContentLoaded; waits for document.fonts.ready so the custom
+ * font is guaranteed to be available before the canvas draws it.
+ */
+async function measureEmDashWeight() {
+    try {
+        await document.fonts.ready;
+
+        // Render at a large size for sub-pixel accuracy when dividing back down.
+        const testSize = 128;
+
+        const canvas  = document.createElement('canvas');
+        canvas.width  = Math.ceil(testSize * 2.5); // Wide enough for the em dash
+        canvas.height = Math.ceil(testSize * 1.2);  // Tall enough to contain any baseline shift
+        const ctx     = canvas.getContext('2d');
+
+        // White glyph on black background — easiest to threshold
+        ctx.fillStyle = '#000';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#fff';
+        ctx.font          = `400 ${testSize}px EB Garamond`;
+        ctx.textBaseline  = 'middle';
+        ctx.fillText('—', 0, canvas.height / 2);
+
+        // Find the center x of the drawn glyph to guarantee we're scanning
+        // through solid ink, not whitespace at either end
+        const emWidth = ctx.measureText('—').width;
+        const scanX   = Math.max(1, Math.floor(emWidth / 2));
+
+        const { data, width, height } = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+        // Scan the center column vertically for the topmost and bottommost lit pixel
+        let top = -1, bottom = -1;
+        for (let y = 0; y < height; y++) {
+            const r = data[(y * width + scanX) * 4]; // Red channel suffices for white pixels
+            if (r > 64) {
+                if (top    === -1) top    = y;
+                bottom = y;
+            }
+        }
+
+        if (top !== -1 && bottom !== -1) {
+            // strokePx / testSize gives the stroke height as a fraction of 1em,
+            // which expressed as rem is correct independent of the user's browser font size.
+            const strokeRem = (bottom - top + 1) / testSize;
+            document.documentElement.style.setProperty('--em-dash-weight', `${strokeRem}rem`);
+        }
+    } catch (err) {
+        // Font load failure or canvas unsupported — CSS fallback value (0.09rem) remains.
+        console.warn('Em dash weight measurement failed, using CSS fallback:', err);
+    }
+}
+
+
+/* =============================================================================
+   HEADER: WORDMARK SCROLL REVEAL
+============================================================================= */
+
+function initWordmarkReveal() {
+
+    const headerCenter    = document.getElementById('header-center');
+    const scrollContainer = document.querySelector('.scroll-container');
+
+    if (!headerCenter || !scrollContainer) return;
+
+    // The hero wholemark sits at 50vh (vertical center of section 1).
+    // The header's vertical midpoint is half of its 3rem height = 1.5rem.
+    // When scrollTop reaches (50vh − 1.5rem), the two logos are at the same
+    // screen position — this is the moment the center column expands and the
+    // line splits, creating the illusion that the logo snapped into the header.
+    // 1.5rem is computed from the live root font-size to stay correct across
+    // browser zoom levels.
+    function getRevealThreshold() {
+        const rootFontSize   = parseFloat(getComputedStyle(document.documentElement).fontSize);
+        const headerMidpoint = 1.5 * rootFontSize;
+        return (window.innerHeight * 0.5) - headerMidpoint;
+    }
+
+    function onScroll() {
+        const scrollTop = scrollContainer.scrollTop;
+        const threshold = getRevealThreshold();
+
+        if (scrollTop >= threshold) {
+            headerCenter.classList.add('is-visible');
+        } else {
+            headerCenter.classList.remove('is-visible');
+        }
+    }
+
+    scrollContainer.addEventListener('scroll', onScroll, { passive: true });
+    onScroll(); // Run once on load in case the page is refreshed mid-scroll
+}
+
+
+/* =============================================================================
+   HEADER: MUTE TOGGLE
+============================================================================= */
+
+function initMuteToggle() {
+
+    const btn  = document.getElementById('mute-btn');
+    const icon = document.getElementById('mute-icon');
+
+    if (!btn || !icon) return;
+
+    let muted = false;
+
+    btn.addEventListener('click', () => {
+        muted = !muted;
+
+        // Swap icon source and accessible label
+        icon.src = muted ? 'assets/08_sound_off_icon.svg' : 'assets/08_sound_on_icon.svg';
+        icon.alt = muted ? 'Sound off' : 'Sound on';
+        btn.setAttribute('aria-label', muted ? 'Unmute' : 'Mute');
+
+        // TODO: connect to the audio system when sound is implemented.
+        // e.g. audioEngine.mute(muted);
+    });
+}
+
+
+/* =============================================================================
+   HEADER: LANGUAGE DROPDOWN
+============================================================================= */
+
+function initLangDropdown() {
+
+    const toggle = document.getElementById('lang-toggle');
+    const menu   = document.getElementById('lang-menu');
+
+    if (!toggle || !menu) return;
+
+    // Open / close on toggle button click
+    toggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isOpen = menu.classList.toggle('is-open');
+        toggle.setAttribute('aria-expanded', isOpen);
+    });
+
+    // Close when clicking anywhere outside the dropdown
+    document.addEventListener('click', () => {
+        menu.classList.remove('is-open');
+        toggle.setAttribute('aria-expanded', false);
+    });
+
+    // Handle language selection
+    menu.querySelectorAll('a[data-lang]').forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const lang = link.dataset.lang;
+
+            // Update the toggle label to reflect the current selection
+            toggle.firstChild.textContent = lang.toUpperCase();
+
+            menu.classList.remove('is-open');
+            toggle.setAttribute('aria-expanded', false);
+
+            // TODO: trigger content translation when the French version is ready.
+            // e.g. setLanguage(lang);
         });
     });
 }

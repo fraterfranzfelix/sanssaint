@@ -1,22 +1,23 @@
 /* =============================================================================
    STYLESHEET INDEX
    1. Variables & Setup
-   2. Layout & Scrolling
-   3. Hero Section
-      3a. Parallax Layers
-      3b. Particle Animations
-      3c. Center Container
-      3d. Buttons
-      3e. Hero Footer
-      3f. Weapons Layers
-   4. Section 2: Split Panels
-      4a. Panel Configuration
-      4b. Background Images
-      4c. Gradient Overlays
-      4d. Rule of Thirds Grid
-      4e. Typography
-      4f. Center Image (Angel)
-   5. Responsive Breakpoints
+   2. Layout, Scrolling & Snap
+   3. Header
+   4. Hero Section
+      4a. Parallax Layers
+      4b. Particle Animations
+      4c. Center Container
+      4d. Buttons
+      4e. Hero Footer
+      4f. Weapons Layers
+   5. Section 2: Split Panels
+      5a. Panel Configuration
+      5b. Background Images
+      5c. Gradient Overlays
+      5d. Rule of Thirds Grid
+      5e. Typography
+      5f. Center Image (Angel)
+   6. Responsive Breakpoints
 ============================================================================= */
 
 
@@ -30,6 +31,10 @@
     --blanc-leger: #eaeaea;
     --noir-leger: #151515;
     --font-primary: 'EB Garamond', serif;
+
+    /* Em dash stroke weight — set precisely by JS canvas measurement after font load.
+       This fallback value is intentionally approximate and will be overridden at runtime. */
+    --em-dash-weight: 0.09rem;
 }
 
 @font-face {
@@ -54,21 +59,24 @@ body {
 
 
 /* =============================================================================
-   2. LAYOUT & SCROLLING
+   2. LAYOUT, SCROLLING & SNAP
 ============================================================================= */
 
-/* Full-viewport scroll container with animated scrolling */
+/* Sections snap to full-viewport increments for a curated slide experience.
+   smooth scroll-behavior animates the snap jump rather than cutting instantly. */
 .scroll-container {
     height: 100vh;
     width: 100vw;
     overflow-y: scroll;
     scroll-behavior: smooth;
+    scroll-snap-type: y mandatory;
 }
 
 .section {
     position: relative;
     height: 100vh;
     width: 100%;
+    scroll-snap-align: start;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -76,7 +84,291 @@ body {
 
 
 /* =============================================================================
-   3. HERO SECTION
+   3. HEADER
+============================================================================= */
+
+/* The header floats above all sections as a fixed overlay with no background.
+   mix-blend-mode: difference inverts content color against whatever is behind:
+   white content reads as near-white on dark backgrounds, near-black on light.
+
+   Structure: three equal flex columns — [left nav + line] [wordmark] [line + controls].
+   The two line halves are split SVGs of the same em dash path, each stretching
+   with preserveAspectRatio="none" to fill their column's remaining space while
+   keeping the serif caps at the outer edges undistorted.
+
+   When the wordmark is hidden (section 1), its center column collapses to
+   max-width: 0, and the two line halves grow to meet seamlessly in the middle.
+   When the wordmark appears, the column expands and the lines split apart.
+
+   IMPORTANT: All child images use filter: brightness(0) invert(1) to force
+   pure white output, which mix-blend-mode: difference requires to invert correctly.
+   This works regardless of the original asset color — no re-export needed. */
+.site-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3rem;
+    padding: 1rem 3rem;
+    z-index: 100;
+
+    display: flex;
+    align-items: center;
+
+    mix-blend-mode: difference;
+    color: white;
+
+    transition: padding 0.3s ease;
+}
+
+
+/* --- Outer columns -------------------------------------------------------- */
+
+/* Both outer columns are equal-flex so the center wordmark sits at exactly 50% */
+.header-col {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    min-width: 0;       /* Prevents flex children from overflowing */
+}
+
+.header-col-left {
+    gap: 3rem;          /* Space between nav items and the left line half */
+}
+
+.header-col-right {
+    gap: 3rem;          /* Space between the right line half and controls */
+    justify-content: flex-end;
+}
+
+
+/* --- Nav links ------------------------------------------------------------ */
+
+.header-nav {
+    display: flex;
+    align-items: center;
+    gap: 3rem;
+    list-style: none;
+    flex-shrink: 0;     /* Nav never shrinks — the line absorbs available space */
+}
+
+.header-nav a {
+    font-family: var(--font-primary);
+    font-size: 1rem;
+    font-weight: 400;
+    color: white;
+    text-decoration: none;
+    letter-spacing: 0.03em;
+    transition: font-weight 0.2s ease;
+}
+
+.header-nav a:hover {
+    font-weight: 600;
+    letter-spacing: 0.04em;
+}
+
+
+/* --- Em dash line halves -------------------------------------------------- */
+
+/* Each line is a three-part flex row: [cap-left] [body] [cap-right].
+   This gives every half-line its own complete pair of serif caps.
+   
+   The path's viewBox (0 0 73.05 8.4) is sliced into three non-overlapping zones:
+     Left cap:  x=0   → x=5     — the left serif, shown at natural proportions
+     Body:      x=4   → x=69.05 — the straight rectangular middle, allowed to stretch
+     Right cap: x=68  → x=73.05 — the right serif, shown at natural proportions
+   
+   The slight overlaps (4–5 on the left seam, 68–69.05 on the right) prevent
+   any hairline gap artifact between segments.
+   
+   Height for all three parts is driven by --em-dash-weight, which JS sets
+   precisely from a canvas measurement of the actual rendered font glyph. */
+.header-line {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    min-width: 0;
+}
+
+/* Left serif cap — fixed proportions, never stretched */
+.line-cap-left {
+    height: var(--em-dash-weight);
+    aspect-ratio: 5 / 8.4;   /* matches viewBox "0 0 5 8.4" */
+    flex-shrink: 0;
+    display: block;
+    overflow: visible;
+}
+
+/* Right serif cap — fixed proportions, never stretched */
+.line-cap-right {
+    height: var(--em-dash-weight);
+    aspect-ratio: 5.05 / 8.4;  /* matches viewBox "68 0 5.05 8.4" */
+    flex-shrink: 0;
+    display: block;
+    overflow: visible;
+}
+
+/* Body — pure rectangular section, stretched horizontally to fill remaining space */
+.line-body {
+    flex: 1;
+    height: var(--em-dash-weight);
+    display: block;
+    min-width: 0;
+}
+
+
+/* --- Center column: wordmark ---------------------------------------------- */
+
+/* Starts collapsed (max-width: 0, padding: 0) so the two line halves touch.
+   JS adds .is-visible once the hero wholemark scrolls up to meet the header,
+   creating the illusion that the logo snaps from center-screen into the header.
+   Both max-width and padding are transitioned so the gap opens smoothly.
+   box-sizing: border-box (global) means max-width constrains the total box
+   including padding — both collapse together to zero. */
+.header-center {
+    overflow: hidden;
+    flex-shrink: 0;
+    max-width: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    transition: max-width 0.45s ease, padding 0.45s ease;
+}
+
+.header-center.is-visible {
+    max-width: 16rem;   /* Generous upper bound: wordmark width + 2 × 1.5rem padding */
+    padding: 0 1.5rem;  /* Gap between each line end and the wordmark edges */
+}
+
+.header-wordmark {
+    height: 1rem;
+    width: auto;
+    display: block;
+    flex-shrink: 0;
+    filter: brightness(0) invert(1);
+
+    /* Fades in slightly after the gap begins to open */
+    opacity: 0;
+    transition: opacity 0.3s ease 0.15s;
+}
+
+.header-center.is-visible .header-wordmark {
+    opacity: 1;
+}
+
+
+/* --- Right controls ------------------------------------------------------- */
+
+.header-controls {
+    display: flex;
+    align-items: center;
+    gap: 3rem;
+    flex-shrink: 0;
+}
+
+/* Mute toggle button */
+.header-mute {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+.header-mute img {
+    height: 1rem;
+    width: auto;
+    filter: brightness(0) invert(1);
+}
+
+/* Language dropdown */
+.header-lang {
+    position: relative;
+}
+
+.header-lang-toggle {
+    font-family: var(--font-primary);
+    font-size: 1rem;
+    font-weight: 500;
+    color: white;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    letter-spacing: 0.02em;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    transition: font-weight 0.2s ease;
+}
+
+.header-lang-toggle:hover {
+    font-weight: 700;
+}
+
+.header-lang-toggle::after {
+    content: '▾';
+    font-size: 0.7rem;
+}
+
+.header-lang-dropdown {
+    position: absolute;
+    top: calc(100% + 0.75rem);
+    right: 0;
+    display: none;
+    flex-direction: column;
+    gap: 0.5rem;
+    list-style: none;
+}
+
+.header-lang-dropdown.is-open {
+    display: flex;
+}
+
+.header-lang-dropdown a {
+    font-family: var(--font-primary);
+    font-size: 1rem;
+    font-weight: 500;
+    color: white;
+    text-decoration: none;
+    white-space: nowrap;
+    letter-spacing: 0.02em;
+    transition: font-weight 0.2s ease;
+}
+
+.header-lang-dropdown a:hover {
+    font-weight: 700;
+}
+
+
+/* --- Responsive: tighter padding below 960px ------------------------------ */
+
+@media (max-width: 960px) {
+    .site-header {
+        padding: 1rem 2rem;
+    }
+
+    .header-col-left,
+    .header-col-right {
+        gap: 2rem;
+    }
+
+    .header-nav {
+        gap: 2rem;
+    }
+
+    .header-controls {
+        gap: 2rem;
+    }
+}
+
+/* --- Mobile (≤ 768px): header collapse placeholder ------------------------ */
+/* Full mobile dropdown menu to be implemented alongside the loading screen. */
+
+
+/* =============================================================================
+   4. HERO SECTION
 ============================================================================= */
 
 .hero-section {
@@ -499,7 +791,6 @@ body {
     object-fit: contain;
     /* Neumorphic-style shadow: soft light from top-left, soft dark from bottom-right */
     filter:
-        drop-shadow(-4px -4px 12px rgba(255, 255, 255, 0.6))
         drop-shadow( 4px  4px 12px rgba(0, 0, 0, 0.12));
 }
 
