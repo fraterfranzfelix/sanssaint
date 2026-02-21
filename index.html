@@ -6,11 +6,132 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
+
+    <meta name="description" content="Atelier Sans Saint, a creative agency est. 2025 by Franz-Felix in Trier.">
+    <meta name="author" content="Franz-Felix">
+
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.sanssaint.eu/">
+    <meta property="og:title" content="Atelier Sans Saint">
+    <meta property="og:description" content="Atelier Sans Saint, a creative agency est. 2025 by Franz-Felix in Trier.">
+    <meta property="og:site_name" content="Atelier Sans Saint">
+
     <title>Atelier Sans Saint</title>
+
     <!-- Favicon: browser selects based on system color scheme -->
     <link rel="icon" href="assets/09_sans_saint_favicon_light_mode.svg" media="(prefers-color-scheme: light)">
     <link rel="icon" href="assets/09_sans_saint_favicon_dark_mode.svg"  media="(prefers-color-scheme: dark)">
-    <link rel="preload" href="assets/eb_garamond/eb-garamond_variable_latin-ext.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="assets/eb_garamond/SlGUmQSNjdsmc35JDF1K5GR1SDk.woff2" as="font" type="font/woff2" crossorigin>
+
+    <style>
+        :root {
+            --noir-leger: #151515;
+            --blanc-leger: #eaeaea;
+            --malve-magenta: #fa8ca0;
+            --noir-tres-leger: #555555;
+        }
+
+        @font-face {
+    font-family: 'Not EB Garamond';
+    src: url('assets/eb_garamond/SlGUmQSNjdsmc35JDF1K5GR1SDk.woff2') format('woff2');
+    font-weight: 400 800;
+    font-style: normal;
+    font-display: block;
+}
+
+        #loading-screen {
+            font-family: 'Not EB Garamond', Garamond, serif;
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            background-color: var(--noir-leger);
+            display: flex;
+            flex-direction: column; 
+            gap: 1.5rem; 
+            justify-content: center;
+            align-items: center;
+            transition: opacity 1.2s ease-out; 
+        }
+
+        .loading-text {
+            text-align: center;
+            padding: 1rem;
+            transition: opacity 1s ease 0.1s;
+        }
+
+        #loading-screen.is-expanding .loading-text {
+            opacity: 0;
+        }
+
+        .loading-quote {
+            color: var(--blanc-leger);
+            font-size: 1rem;
+            font-weight: 400;
+            letter-spacing: 0.02rem;
+            line-height: 1.4;
+            margin-bottom: 1rem;
+        }
+
+        .quote-highlight {
+            color: var(--malve-magenta);
+            font-variant: small-caps;
+            font-weight: 700;
+        }
+
+        .loading-cta {
+            color: var(--noir-tres-leger); 
+            font-size: 1rem;
+            font-weight: 400;
+            letter-spacing: 0.02rem;
+            opacity: 0;
+            transition: opacity 3s ease 3s; 
+        }
+
+        #loading-screen.is-ready .loading-cta {
+            opacity: 1;
+        }
+
+        #loading-star {
+            height: 1rem;
+            width: 1rem;
+            color: var(--blanc-leger);
+            transform-origin: center;
+            animation: spin-jump 2.5s infinite; 
+            transition: scale 2s cubic-bezier(0.5, -0.3, 0.1, 1), opacity 1.2s ease-out;
+        }
+
+        @keyframes spin-jump {
+            0% {
+                transform: rotate(0deg);
+                animation-timing-function: cubic-bezier(0.5, -0.2, 0.4, 1.2);
+            }
+            60% {
+                transform: rotate(360deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        #loading-screen.is-ready {
+            cursor: pointer;
+        }
+
+        #loading-screen.is-ready #loading-star {
+            animation-play-state: paused; 
+        }
+
+        #loading-screen.is-expanding {
+            pointer-events: none; 
+        }
+
+        #loading-screen.is-expanding #loading-star {
+            scale: 300; 
+        }
+
+        /* Note: The .scroll-container reveal styles should remain in your main style.css 
+           since they deal with the layout once the loader is gone. */
+    </style>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>

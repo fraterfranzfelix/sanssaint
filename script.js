@@ -393,22 +393,35 @@ window.addEventListener('load', async () => {
 
     if (!loader || !star) return;
 
-    // FIX 1: Wait for the star to finish its current spin cycle before pausing.
-    // The { once: true } ensures this listener immediately destroys itself after firing.
+    // Wait for the star to finish its current spin cycle before pausing.
     star.addEventListener('animationiteration', () => {
         loader.classList.add('is-ready');
     }, { once: true });
 
     // 2. The user initiates the experience
-    loader.addEventListener('click', () => {
+    // Note: Added 'async' here to handle the iOS permission promise
+    loader.addEventListener('click', async () => {
         
+        // --- NEW: iOS 13+ Gyroscope Permission Request ---
+        // This MUST be inside a user gesture event listener like 'click'
+        if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+            try {
+                const permissionState = await DeviceOrientationEvent.requestPermission();
+                if (permissionState !== 'granted') {
+                    console.warn('Gyroscope permission denied. Tilt parallax disabled.');
+                }
+            } catch (error) {
+                console.error('Error requesting gyroscope access:', error);
+            }
+        }
+        // -------------------------------------------------
+
         loader.classList.add('is-expanding');
 
         if (window.audioEngine) {
             window.audioEngine.play();
         }
 
-        // FIX 2: Lowered drastically from 1700 to 900. 
         // We trigger the fade-out the moment the expanding star eclipses the viewport edges.
         setTimeout(() => {
             

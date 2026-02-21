@@ -29,8 +29,8 @@
     --malve-magenta: #fa8ca0;
     --blanc-leger: #eaeaea;
     --noir-leger: #151515;
-    --gris-leger: #9e9e9e;
-    --font-primary: 'EB Garamond', serif;
+    --noir-tres-leger: #555555;
+    --font-primary: 'EB Garamond', Garamond, serif;
 
     /* Em dash stroke weight — set precisely by JS canvas measurement after font load.
        This fallback value is intentionally approximate and will be overridden at runtime. */
@@ -39,18 +39,18 @@
 
 @font-face {
     font-family: 'EB Garamond';
-    src: url('assets/eb_garamond/eb-garamond_variable_latin-ext.woff2') format('woff2')
-    url('assets/eb_garamond/EBGaramond-VariableFont_wght.ttf') format('truetype');
+    src: url('assets/eb_garamond/EBGaramond-VariableFont_wght.ttf') format('truetype');
     font-weight: 400 800;
     font-style: normal;
+    font-display: swap;
 }
 
 @font-face {
-    font-family: 'EB Garamond Italic';
-    src: url('assets/eb_garamond/eb-garamond_variable_latin-ext_italic.woff2') format('woff2')
-    url('assets/eb_garamond/EBGaramond-VariableFont_wght_Italic.ttf') format('truetype');
+    font-family: 'EB Garamond';
+    src: url('assets/eb_garamond/EBGaramond-VariableFont_wght_Italic.ttf') format('truetype');
     font-weight: 400 800;
     font-style: italic;
+    font-display: swap;
 }
 
 * {
@@ -74,7 +74,7 @@ body {
 /* Sections snap to full-viewport increments for a curated slide experience.
    smooth scroll-behavior animates the snap jump rather than cutting instantly. */
 .scroll-container {
-    height: 100vh;
+    height: 100dvh;
     width: 100vw;
     overflow-y: scroll;
     scroll-behavior: smooth;
@@ -83,7 +83,7 @@ body {
 
 .section {
     position: relative;
-    height: 100vh;
+    height: 100dvh;
     width: 100%;
     scroll-snap-align: start;
     display: flex;
@@ -255,14 +255,20 @@ body {
     display: block;
     flex-shrink: 0;
     filter: brightness(0) invert(1);
-
-    /* Fades in slightly after the gap begins to open */
     opacity: 0;
-    transition: opacity 0.3s ease 0.15s;
+    
+    /* EXIT state (scrolling UP to hero): 
+       Fades out in 0.15s immediately with NO delay, 
+       disappearing before the container crushes it. */
+    transition: opacity 0.15s ease 0s;
 }
 
 .header-center.is-visible .header-wordmark {
     opacity: 1;
+    
+    /* ENTER state (scrolling DOWN to Section 2): 
+       Waits 0.15s for the gap to open, then fades in. */
+    transition: opacity 0.15s ease 0.15s;
 }
 
 
@@ -532,12 +538,15 @@ body {
     width: 100%;
 }
 
+/* 1. Base Button (Holds the Drop Shadow) */
 .btn {
+    position: relative; 
     flex: 1 0 150px;
+    height: 2rem;
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 0.25rem 2rem;
+    padding: 0 2rem;
     font-family: var(--font-primary);
     font-size: 1rem;
     font-weight: 500;
@@ -545,9 +554,41 @@ body {
     text-decoration: none;
     cursor: pointer;
     border: none;
-    border-radius: 1rem;
     outline: none;
+    background: transparent !important; 
     transition: all 0.3s ease;
+    z-index: 1;
+}
+
+/* 2. The Shape Layer (Holds the Mask and Background) */
+.btn::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1; 
+    /* UPDATED: Changed from background-color to background to support gradients */
+    background: var(--btn-bg, var(--noir-leger)); 
+    transition: all 0.3s ease;
+    
+    /* The Mathematically Perfect Vesica Piscis Mask */
+    -webkit-mask-image: 
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 86.6025 100'%3E%3Cpath d='M 86.6025 0 A 100 100 0 0 0 0 50 A 100 100 0 0 0 86.6025 100 Z'/%3E%3C/svg%3E"),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 86.6025 100'%3E%3Cpath d='M 0 0 A 100 100 0 0 1 86.6025 50 A 100 100 0 0 1 0 100 Z'/%3E%3C/svg%3E"),
+        linear-gradient(black, black);
+    mask-image: 
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 86.6025 100'%3E%3Cpath d='M 86.6025 0 A 100 100 0 0 0 0 50 A 100 100 0 0 0 86.6025 100 Z'/%3E%3C/svg%3E"),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 86.6025 100'%3E%3Cpath d='M 0 0 A 100 100 0 0 1 86.6025 50 A 100 100 0 0 1 0 100 Z'/%3E%3C/svg%3E"),
+        linear-gradient(black, black);
+
+    /* Caps are 1.732rem wide based on √3 math. */
+    -webkit-mask-size: 1.732rem 100%, 1.732rem 100%, calc(100% - 3.464rem + 1px) 100%;
+    mask-size: 1.732rem 100%, 1.732rem 100%, calc(100% - 3.464rem + 1px) 100%;
+
+    -webkit-mask-position: left center, right center, center;
+    mask-position: left center, right center, center;
+
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
 }
 
 .btn:hover {
@@ -555,36 +596,53 @@ body {
     letter-spacing: 0.025em;
 }
 
-/* Light neumorphic button */
+/* --- 3. Button Themes ----------------------------------------------------- */
+
 .btn-white {
-    background-color: var(--blanc-leger);
+    /* Layer 1 (Top): The 3D carved rim lighting (bright top-left, dark bottom-right)
+      Layer 2 (Bottom): Your original background gradient
+    */
+    --btn-bg: 
+        linear-gradient(145deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0) 8%, rgba(0, 0, 0, 0) 92%, rgba(0, 0, 0, 0.08) 100%),
+        linear-gradient(145deg, #fafafa, #d3d3d3);
+    
     color: var(--noir-leger);
-    box-shadow:
-        -4px -4px 10px rgba(255,255,255, 0.8),
-         4px  4px 10px rgba(0,0,0, 0.1);
+    
+    /* Neumorphic outer shadows */
+    filter: 
+        drop-shadow(0.4rem 0.4rem 0.8rem #c8c8c8) 
+        drop-shadow(-0.4rem -0.4rem 0.8rem #ffffff);
 }
 
 .btn-white:hover {
     transform: translateY(-2px);
-    box-shadow:
-        -6px -6px 14px rgba(255,255,255, 0.9),
-         6px  6px 14px rgba(0,0,0, 0.15);
+    filter: 
+        drop-shadow(0.5rem 0.5rem 1rem #b8b8b8) 
+        drop-shadow(-0.5rem -0.5rem 1rem #ffffff);
 }
 
-/* Dark neumorphic button */
 .btn-black {
-    background-color: var(--noir-leger);
+    /* Layer 1 (Top): Subtle rim lighting adjusted for a dark surface
+       Layer 2 (Bottom): Your original background gradient
+    */
+    --btn-bg: 
+        linear-gradient(145deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0) 8%, rgba(0, 0, 0, 0) 92%, rgba(0, 0, 0, 0.6) 100%),
+        linear-gradient(145deg, #161616, #131313); 
+    
     color: var(--blanc-leger);
-    box-shadow:
-        -4px -4px 10px rgba(255,255,255, 0.05),
-         4px  4px 10px rgba(0,0,0, 0.3);
+    
+    /* Reverted back to the light-background shadows */
+    filter: 
+        drop-shadow(0.4rem 0.4rem 0.8rem #8a8a8a) 
+        drop-shadow(-0.4rem -0.4rem 0.8rem #ffffff);
 }
 
 .btn-black:hover {
     transform: translateY(-2px);
-    box-shadow:
-        -6px -6px 14px rgba(255,255,255, 0.08),
-         6px  6px 14px rgba(0,0,0, 0.4);
+    /* Exaggerated shadows for the hover lift effect */
+    filter: 
+        drop-shadow(0.5rem 0.5rem 1rem #8a8a8a) 
+        drop-shadow(-0.5rem -0.5rem 1rem #ffffff);
 }
 
 
@@ -668,7 +726,7 @@ body {
     display: flex;
     flex-direction: row;
     width: 100vw;
-    height: 100vh;
+    height: 100dvh;
     overflow: hidden;
     position: relative;
 }
@@ -941,116 +999,36 @@ body {
     .weapons-layer { width: 75%; height: 80%; }
 }
 
+/* --- Mobile (≤ 768px): Minimal Editorial Header --- */
+@media (max-width: 768px) {
+    /* Hide the entire left column (links + left line) */
+    .header-col-left {
+        display: none;
+    }
+
+    /* Force the wordmark column to stay open and sit on the left */
+    .header-center,
+    .header-center.is-visible {
+        max-width: none; 
+        padding: 0;
+        padding-right: 1.5rem; 
+    }
+    
+    .header-center .header-wordmark {
+        opacity: 1; 
+    }
+
+    /* The right column stretches to fill the rest of the space, 
+       with its line connecting the wordmark to the controls */
+    .header-col-right {
+        flex: 1;
+        gap: 1.5rem; /* Tighter spacing for mobile screens */
+    }
+}
+
 /* =============================================================================
    LOADING SCREEN & REVEAL EFFECT (PHYSICS UPDATE)
 ============================================================================= */
-
-#loading-screen {
-    position: fixed;
-    inset: 0;
-    z-index: 9999;
-    background-color: var(--noir-leger);
-    display: flex;
-    /* NEW: Stack the star and text vertically */
-    flex-direction: column; 
-    /* NEW: Space between star and text */
-    gap: 1.5rem; 
-    justify-content: center;
-    align-items: center;
-    transition: opacity 1.2s ease-out; 
-}
-
-/* --- Loading Screen Typography --- */
-.loading-text {
-    text-align: center;
-    padding: 1rem;
-    /* Fades the text out instantly when the user clicks, preventing overlap with the explosion */
-    transition: opacity 1s ease 0.1s;
-}
-
-#loading-screen.is-expanding .loading-text {
-    opacity: 0;
-}
-
-.loading-quote {
-    color: var(--blanc-leger);
-    font-size: 1rem;
-    font-weight: 400;
-    letter-spacing: 0.02rem;
-    line-height: 1.4;
-    margin-bottom: 1rem;
-}
-
-.quote-highlight {
-    color: var(--malve-magenta);
-    font-variant: small-caps;
-    font-weight: 700;
-}
-
-.loading-cta {
-    /* Make sure --gris-leger is defined in your :root variables! */
-    color: var(--gris-leger); 
-    font-size: 1rem;
-    font-weight: 400;
-    letter-spacing: 0.02rem;
-    
-    /* Hidden by default */
-    opacity: 0;
-    /* 3-second ease-in as requested */
-    transition: opacity 3s ease 3s; 
-}
-
-/* When the JS adds .is-ready, trigger the 3-second fade in */
-#loading-screen.is-ready .loading-cta {
-    opacity: 1;
-}
-
-#loading-star {
-    height: 1rem;
-    width: 1rem;
-    color: var(--blanc-leger);
-    transform-origin: center;
-    
-    animation: spin-jump 2.5s infinite; 
-    
-    /* FIX 1: Change 'transform' to 'scale' in the transition */
-    transition: 
-        scale 2s cubic-bezier(0.5, -0.3, 0.1, 1), 
-        opacity 1.2s ease-out;
-}
-
-/* The Physics of the Spin */
-@keyframes spin-jump {
-    0% {
-        transform: rotate(0deg);
-        /* -0.2 creates the wind-up, 1.2 creates the over-spin overshoot */
-        animation-timing-function: cubic-bezier(0.5, -0.2, 0.4, 1.2);
-    }
-    60% {
-        transform: rotate(360deg);
-    }
-    100% {
-        transform: rotate(360deg);
-    }
-}
-
-/* --- State 1: Ready to Click --- */
-#loading-screen.is-ready {
-    cursor: pointer;
-}
-#loading-screen.is-ready #loading-star {
-    animation-play-state: paused; 
-}
-
-/* --- State 2: The Explosion --- */
-#loading-screen.is-expanding {
-    /* FIX 2: REMOVE background-color: transparent; completely! */
-    pointer-events: none; 
-}
-
-#loading-screen.is-expanding #loading-star {
-    scale: 300; 
-}
 
 /* --- State 3: The Website Reveal --- */
 .scroll-container {
