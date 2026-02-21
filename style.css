@@ -20,7 +20,6 @@
    6. Responsive Breakpoints
 ============================================================================= */
 
-
 /* =============================================================================
    1. VARIABLES & SETUP
 ============================================================================= */
@@ -30,6 +29,7 @@
     --malve-magenta: #fa8ca0;
     --blanc-leger: #eaeaea;
     --noir-leger: #151515;
+    --gris-leger: #9e9e9e;
     --font-primary: 'EB Garamond', serif;
 
     /* Em dash stroke weight — set precisely by JS canvas measurement after font load.
@@ -39,9 +39,18 @@
 
 @font-face {
     font-family: 'EB Garamond';
-    src: url('assets/eb_garamond/EBGaramond-VariableFont_wght.ttf') format('truetype');
+    src: url('assets/eb_garamond/eb-garamond_variable_latin-ext.woff2') format('woff2')
+    url('assets/eb_garamond/EBGaramond-VariableFont_wght.ttf') format('truetype');
     font-weight: 400 800;
     font-style: normal;
+}
+
+@font-face {
+    font-family: 'EB Garamond Italic';
+    src: url('assets/eb_garamond/eb-garamond_variable_latin-ext_italic.woff2') format('woff2')
+    url('assets/eb_garamond/EBGaramond-VariableFont_wght_Italic.ttf') format('truetype');
+    font-weight: 400 800;
+    font-style: italic;
 }
 
 * {
@@ -379,8 +388,6 @@ body {
 
 /* --- 3a. Parallax Layers -------------------------------------------------- */
 
-/* All moving layers share these base rules.
-   Sized at 110% to prevent edge gaps during movement. */
 .parallax-layer {
     position: absolute;
     top: -5%;
@@ -390,19 +397,34 @@ body {
     pointer-events: none;
 }
 
-/* Background painting — lowest z-index */
+/* 1. DEFAULT: Massive 4000px Original (For 4K monitors) */
 .bg-layer {
     z-index: 1;
+    background-size: cover;
+    background-position: center;
+    
     background-image: -webkit-image-set(
         url('assets/01_caspar_david_friedrich_abtei_im_eichwald.avif') 1x,
-        url('assets/01_caspar_david_friedrich_abtei_im_eichwald.jpeg') 1x
+        url('assets/01_caspar_david_friedrich_abtei_im_eichwald.jpg') 1x
     );
     background-image: image-set(
         url('assets/01_caspar_david_friedrich_abtei_im_eichwald.avif') type('image/avif'),
-        url('assets/01_caspar_david_friedrich_abtei_im_eichwald.jpeg') type('image/jpeg')
+        url('assets/01_caspar_david_friedrich_abtei_im_eichwald.jpg') type('image/jpg')
     );
-    background-size: cover;
-    background-position: center;
+}
+
+/* 2. LAPTOP / STANDARD DESKTOP: 1920px and below */
+@media (max-width: 1920px) {
+    .bg-layer {
+        background-image: -webkit-image-set(
+            url('assets/01_caspar_david_friedrich_abtei_im_eichwald_1920px.avif') 1x,
+            url('assets/01_caspar_david_friedrich_abtei_im_eichwald_1920px.jpg') 1x
+        );
+        background-image: image-set(
+            url('assets/01_caspar_david_friedrich_abtei_im_eichwald_1920px.avif') type('image/avif'),
+            url('assets/01_caspar_david_friedrich_abtei_im_eichwald_1920px.jpg') type('image/jpg')
+        );
+    }
 }
 
 /* Ensures hero content sits between the back and front particle layers */
@@ -412,45 +434,71 @@ body {
 }
 
 
-/* --- 3b. Particle Animations ---------------------------------------------- */
+/* --- 3b. Particle Animations (HARDWARE ACCELERATED) --- */
 
-/* Smaller, blurred dots — drift slowly */
-.particles-back {
+/* 1. The Parent Layers (These are moved by your JavaScript Parallax) */
+.particles-back, 
+.particles-front {
     z-index: 5;
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+}
+.particles-front { z-index: 20; }
+
+/* 2. The Pseudo-Elements (These handle the infinite GPU scrolling) */
+.particles-back::before {
+    content: "";
+    position: absolute;
+    /* Oversize the container backwards so we don't reveal a hard edge when it slides */
+    top: -1000px; 
+    left: -200px;
+    width: calc(100% + 200px);
+    height: calc(100% + 1000px);
+    
+    /* Unified sizes to exactly 200px to make the math perfect */
     background-image: radial-gradient(var(--blanc-leger) 1px, transparent 2px),
                       radial-gradient(var(--blanc-leger) 1px, transparent 2px);
-    background-size: 200px 200px, 300px 300px;
+    background-size: 200px 200px, 200px 200px;
     background-position: 0 0, 40px 60px;
+    
     opacity: 1;
     filter: blur(1px);
     animation: wind-back 33s linear infinite;
 }
 
-/* Larger, sharper dots — drift faster */
-.particles-front {
-    z-index: 20;
+.particles-front::before {
+    content: "";
+    position: absolute;
+    /* Oversize to hide edges during movement */
+    top: -1200px; 
+    left: -400px;
+    width: calc(100% + 400px);
+    height: calc(100% + 1200px);
+    
+    /* Unified sizes to exactly 400px */
     background-image: radial-gradient(var(--blanc-leger) 3px, transparent 4px),
                       radial-gradient(var(--blanc-leger) 2px, transparent 3px);
-    background-size: 500px 500px, 400px 400px;
+    background-size: 400px 400px, 400px 400px;
     background-position: 0 0, 60px 90px;
+    
     opacity: 1;
     filter: blur(0.5px);
-    animation: wind-front 12s linear infinite;
+    animation: wind-front 15s linear infinite;
 }
 
-/* Gentle drift with a slight rightward curve */
+/* 3. The Perfect GPU Loops */
+/* Back moves +200X and +1000Y (Both are perfect multiples of its 200px size) */
 @keyframes wind-back {
-    0%   { background-position: 0 0, 40px 60px; }
-    50%  { background-position: 20px 500px, 60px 560px; }
-    100% { background-position: 50px 1000px, 90px 1060px; }
+    0%   { transform: translate3d(0, 0, 0); }
+    100% { transform: translate3d(200px, 1000px, 0); }
 }
 
-/* Stronger gust with variable speed mid-flight */
+/* Front moves +400X and +1200Y (Both are perfect multiples of its 400px size) */
 @keyframes wind-front {
-    0%   { background-position: 0 0, 60px 90px; }
-    25%  { background-position: 50px 250px, 110px 340px; }
-    75%  { background-position: 120px 750px, 180px 840px; }
-    100% { background-position: 200px 1000px, 260px 1090px; }
+    0%   { transform: translate3d(0, 0, 0); }
+    100% { transform: translate3d(400px, 1200px, 0); }
 }
 
 
@@ -656,33 +704,70 @@ body {
 
 /* --- 4b. Background Images ------------------------------------------------ */
 
-/* Both layers are oversized to allow parallax movement without edge gaps */
-.bg-layer-creation {
-    width: 115% !important;
-    height: 115% !important;
-    left: -7.5% !important;
-    top: -7.5% !important;
-    background-image: -webkit-image-set(url('assets/03_gustave_dore_creation.jpeg') 1x);
-    background-image: image-set(
-        url('assets/03_gustave_dore_creation.avif') type('image/avif'),
-        url('assets/03_gustave_dore_creation.jpeg') type('image/jpeg')
-    );
-    background-size: cover;
-    background-position: center;
-}
-
+/* 1. DEFAULT (Base layout & 4K Original Images)
+   Both layers are oversized to allow parallax movement without edge gaps */
+.bg-layer-creation,
 .bg-layer-eden {
     width: 115% !important;
     height: 115% !important;
     left: -7.5% !important;
     top: -7.5% !important;
-    background-image: -webkit-image-set(url('assets/04_gustave_dore_jacobs_dream.jpeg') 1x);
-    background-image: image-set(
-        url('assets/04_gustave_dore_jacobs_dream.avif') type('image/avif'),
-        url('assets/04_gustave_dore_jacobs_dream.jpeg') type('image/jpeg')
-    );
     background-size: cover;
     background-position: center;
+}
+
+/* Base: Creation (4K) */
+.bg-layer-creation {
+    background-color: #eaeaea; /* TODO: Replace with an average color from the engraving */
+    background-image: -webkit-image-set(url('assets/03_gustave_dore_creation.jpg') 1x);
+    background-image: image-set(
+        url('assets/03_gustave_dore_creation.avif') type('image/avif'),
+        url('assets/03_gustave_dore_creation.jpg') type('image/jpg')
+    );
+}
+
+/* Base: Eden (4K) */
+.bg-layer-eden {
+    background-color: #151515; /* TODO: Replace with an average color from the engraving */
+    background-image: -webkit-image-set(url('assets/04_gustave_dore_jacobs_dream.jpg') 1x);
+    background-image: image-set(
+        url('assets/04_gustave_dore_jacobs_dream.avif') type('image/avif'),
+        url('assets/04_gustave_dore_jacobs_dream.jpg') type('image/jpg')
+    );
+}
+
+
+/* --- Responsive Backgrounds ----------------------------------------------- */
+
+/* 2. LAPTOP / STANDARD DESKTOP (1920px and below) */
+@media (max-width: 1920px) {
+    .bg-layer-creation {
+        background-image: -webkit-image-set(url('assets/03_gustave_dore_creation_1920px.jpg') 1x);
+        background-image: image-set(
+            url('assets/03_gustave_dore_creation_1920px.avif') type('image/avif'),
+            url('assets/03_gustave_dore_creation_1920px.jpg') type('image/jpg')
+        );
+    }
+
+    .bg-layer-eden {
+        background-image: -webkit-image-set(url('assets/04_gustave_dore_jacobs_dream_1920px.jpg') 1x);
+        background-image: image-set(
+            url('assets/04_gustave_dore_jacobs_dream_1920px.avif') type('image/avif'),
+            url('assets/04_gustave_dore_jacobs_dream_1920px.jpg') type('image/jpg')
+        );
+    }
+}
+
+
+/* 3. MOBILE (768px and below) */
+@media (max-width: 768px) {
+    .bg-layer-creation {
+        background-image: url('assets/03_gustave_dore_creation_768px.jpg');
+    }
+
+    .bg-layer-eden {
+        background-image: url('assets/04_gustave_dore_jacobs_dream_768px.jpg');
+    }
 }
 
 
@@ -854,4 +939,129 @@ body {
     /* Weapons yield to percentage sizing on narrow mobile viewports.
        75% width allows up to ~50% overlap between the two images. */
     .weapons-layer { width: 75%; height: 80%; }
+}
+
+/* =============================================================================
+   LOADING SCREEN & REVEAL EFFECT (PHYSICS UPDATE)
+============================================================================= */
+
+#loading-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background-color: var(--noir-leger);
+    display: flex;
+    /* NEW: Stack the star and text vertically */
+    flex-direction: column; 
+    /* NEW: Space between star and text */
+    gap: 1.5rem; 
+    justify-content: center;
+    align-items: center;
+    transition: opacity 1.2s ease-out; 
+}
+
+/* --- Loading Screen Typography --- */
+.loading-text {
+    text-align: center;
+    padding: 1rem;
+    /* Fades the text out instantly when the user clicks, preventing overlap with the explosion */
+    transition: opacity 1s ease 0.1s;
+}
+
+#loading-screen.is-expanding .loading-text {
+    opacity: 0;
+}
+
+.loading-quote {
+    color: var(--blanc-leger);
+    font-size: 1rem;
+    font-weight: 400;
+    letter-spacing: 0.02rem;
+    line-height: 1.4;
+    margin-bottom: 1rem;
+}
+
+.quote-highlight {
+    color: var(--malve-magenta);
+    font-variant: small-caps;
+    font-weight: 700;
+}
+
+.loading-cta {
+    /* Make sure --gris-leger is defined in your :root variables! */
+    color: var(--gris-leger); 
+    font-size: 1rem;
+    font-weight: 400;
+    letter-spacing: 0.02rem;
+    
+    /* Hidden by default */
+    opacity: 0;
+    /* 3-second ease-in as requested */
+    transition: opacity 3s ease 3s; 
+}
+
+/* When the JS adds .is-ready, trigger the 3-second fade in */
+#loading-screen.is-ready .loading-cta {
+    opacity: 1;
+}
+
+#loading-star {
+    height: 1rem;
+    width: 1rem;
+    color: var(--blanc-leger);
+    transform-origin: center;
+    
+    animation: spin-jump 2.5s infinite; 
+    
+    /* FIX 1: Change 'transform' to 'scale' in the transition */
+    transition: 
+        scale 2s cubic-bezier(0.5, -0.3, 0.1, 1), 
+        opacity 1.2s ease-out;
+}
+
+/* The Physics of the Spin */
+@keyframes spin-jump {
+    0% {
+        transform: rotate(0deg);
+        /* -0.2 creates the wind-up, 1.2 creates the over-spin overshoot */
+        animation-timing-function: cubic-bezier(0.5, -0.2, 0.4, 1.2);
+    }
+    60% {
+        transform: rotate(360deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* --- State 1: Ready to Click --- */
+#loading-screen.is-ready {
+    cursor: pointer;
+}
+#loading-screen.is-ready #loading-star {
+    animation-play-state: paused; 
+}
+
+/* --- State 2: The Explosion --- */
+#loading-screen.is-expanding {
+    /* FIX 2: REMOVE background-color: transparent; completely! */
+    pointer-events: none; 
+}
+
+#loading-screen.is-expanding #loading-star {
+    scale: 300; 
+}
+
+/* --- State 3: The Website Reveal --- */
+.scroll-container {
+    filter: blur(12px) brightness(1.5);
+    transform: scale(1.05); 
+    opacity: 0;
+    transition: filter 3s ease-out, transform 1.5s ease-out, opacity 1s ease-out;
+}
+
+body.is-revealed .scroll-container {
+    filter: blur(0) brightness(1);
+    transform: scale(1);
+    opacity: 1;
 }

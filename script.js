@@ -70,100 +70,138 @@ function applyTransform(layer, xMove, yMove) {
 
 
 /* =============================================================================
-   DESKTOP: MOUSE PARALLAX
+   DESKTOP: MOUSE PARALLAX (OPTIMIZED)
 ============================================================================= */
 
 function initMouseParallax() {
-
+    // 1. Cache the elements ONCE so the browser isn't searching the DOM 60 times a second
     const selectors = [
         '.parallax-layer',
         '.bg-layer-creation',
         '.bg-layer-eden',
         '.center-image-wrapper'
     ];
+    const layers = document.querySelectorAll(selectors.join(', '));
 
-    document.addEventListener('mousemove', (e) => {
+    // 2. Set up variables to hold our target coordinates and a lock (ticking)
+    let targetX = 0;
+    let targetY = 0;
+    let ticking = false;
 
-        const deltaX = e.clientX - window.innerWidth  / 2;
-        const deltaY = e.clientY - window.innerHeight / 2;
-
-        document.querySelectorAll(selectors.join(', ')).forEach(layer => {
+    // 3. The function that actually updates the screen
+    function updateScreen() {
+        layers.forEach(layer => {
             const speed = getSpeed(layer);
-            applyTransform(layer, deltaX / speed, deltaY / speed);
+            applyTransform(layer, targetX / speed, targetY / speed);
         });
+        
+        // Unlock the frame so the next mouse movement can queue up a new draw
+        ticking = false;
+    }
+
+    // 4. The event listener that tracks the mouse
+    document.addEventListener('mousemove', (e) => {
+        // Just do the math here
+        targetX = e.clientX - window.innerWidth / 2;
+        targetY = e.clientY - window.innerHeight / 2;
+
+        // If an animation frame isn't already queued up, queue one!
+        if (!ticking) {
+            window.requestAnimationFrame(updateScreen);
+            ticking = true;
+        }
     });
 }
 
 
 /* =============================================================================
-   MOBILE: TILT PARALLAX
+   MOBILE: TILT PARALLAX (OPTIMIZED)
 ============================================================================= */
 
 function initTiltParallax() {
 
     // TODO: On iOS 13+, DeviceOrientationEvent.requestPermission() must be called
-    // from a user gesture before this listener will fire. Wire this call up to the
-    // loading screen's "Enter" button when it is built, then remove this comment.
+    // from a user gesture before this listener will fire. 
 
+    // 1. Cache elements once
     const selectors = [
         '.parallax-layer',
         '.bg-layer-creation',
         '.bg-layer-eden',
         '.center-image-wrapper'
     ];
+    const layers = document.querySelectorAll(selectors.join(', '));
 
-    // Baseline tilt captured from the first sensor reading.
-    // All subsequent movement is measured as a delta from this point, so the
-    // user's natural resting angle (upright, lying down, etc.) always maps to
-    // the "center" position — no awkward starting offset.
     let baseGamma = null;
     let baseBeta  = null;
 
-    // Smoothed output values. Raw gyroscope data is jittery; blending each new
-    // reading toward the previous value (low-pass filter) removes the noise and
-    // makes the parallax feel fluid rather than nervous.
+    // These represent where the elements SHOULD be based on the tilt
+    let targetX = 0;
+    let targetY = 0;
+
+    // These represent where the elements CURRENTLY are
     let smoothX = 0;
     let smoothY = 0;
-    const SMOOTHING = 0.12; // 0 = instant / no smoothing. 1 = never moves.
-
-    // Tilt angles (degrees) beyond which the output is clamped. Halving this
-    // doubles the sensitivity — the same physical tilt produces twice the
-    // parallax displacement. Raise it again if movement feels too aggressive.
+    
+    const SMOOTHING = 0.12; 
     const MAX_TILT = 10;
+    
+    let ticking = false;
 
+    // 2. The animation loop that runs at 60 FPS
+    function updateScreen() {
+        // Move the smoothing math here. It ensures the easing looks buttery
+        // smooth because it calculates per-frame, not per-sensor-twitch.
+        smoothX += (targetX - smoothX) * SMOOTHING;
+        smoothY += (targetY - smoothY) * SMOOTHING;
+
+        layers.forEach(layer => {
+            const speed = getSpeed(layer);
+            applyTransform(layer, smoothX / speed, smoothY / speed);
+        });
+
+        // Optimization: If the current position is extremely close to the target, 
+        // stop requesting frames to save battery. Otherwise, keep animating.
+        const diffX = Math.abs(targetX - smoothX);
+        const diffY = Math.abs(targetY - smoothY);
+
+        if (diffX > 0.05 || diffY > 0.05) {
+            window.requestAnimationFrame(updateScreen);
+        } else {
+            // The elements have settled. Unlock the loop.
+            ticking = false;
+        }
+    }
+
+    // 3. The event listener that tracks the gyroscope
     window.addEventListener('deviceorientation', (e) => {
 
-        // gamma: left/right tilt (−90° to +90°)
-        // beta:  front/back tilt (−180° to +180°)
         const gamma = e.gamma ?? 0;
         const beta  = e.beta  ?? 0;
 
-        // Capture baseline on first reading, then skip this frame.
         if (baseGamma === null) {
             baseGamma = gamma;
             baseBeta  = beta;
             return;
         }
 
-        // Delta from calibrated resting position, clamped to the allowed range.
         const rawX = Math.max(-MAX_TILT, Math.min(MAX_TILT, gamma - baseGamma));
         const rawY = Math.max(-MAX_TILT, Math.min(MAX_TILT, beta  - baseBeta));
 
-        // Normalise to −1 … +1, then scale to match the pixel range that the
-        // mouse parallax produces when the cursor is at the screen edge.
         const normX  = rawX / MAX_TILT;
         const normY  = rawY / MAX_TILT;
         const rangeX = window.innerWidth  / 2;
         const rangeY = window.innerHeight / 2;
 
-        // Low-pass filter: nudge smoothed value toward the new reading each frame.
-        smoothX += (normX * rangeX - smoothX) * SMOOTHING;
-        smoothY += (normY * rangeY - smoothY) * SMOOTHING;
+        // Update the target coordinates
+        targetX = normX * rangeX;
+        targetY = normY * rangeY;
 
-        document.querySelectorAll(selectors.join(', ')).forEach(layer => {
-            const speed = getSpeed(layer);
-            applyTransform(layer, smoothX / speed, smoothY / speed);
-        });
+        // If the animation loop is resting, wake it up
+        if (!ticking) {
+            ticking = true;
+            window.requestAnimationFrame(updateScreen);
+        }
     });
 }
 
@@ -278,7 +316,6 @@ function initWordmarkReveal() {
 ============================================================================= */
 
 function initMuteToggle() {
-
     const btn  = document.getElementById('mute-btn');
     const icon = document.getElementById('mute-icon');
 
@@ -289,13 +326,14 @@ function initMuteToggle() {
     btn.addEventListener('click', () => {
         muted = !muted;
 
-        // Swap icon source and accessible label
         icon.src = muted ? 'assets/08_sound_off_icon.svg' : 'assets/08_sound_on_icon.svg';
         icon.alt = muted ? 'Sound off' : 'Sound on';
         btn.setAttribute('aria-label', muted ? 'Unmute' : 'Mute');
 
-        // TODO: connect to the audio system when sound is implemented.
-        // e.g. audioEngine.mute(muted);
+        // NEW: Tell the audio engine to mute/unmute
+        if (window.audioEngine) {
+            window.audioEngine.toggleMute(muted);
+        }
     });
 }
 
@@ -341,3 +379,46 @@ function initLangDropdown() {
         });
     });
 }
+
+/* =============================================================================
+   LOADING SCREEN ORCHESTRATION
+============================================================================= */
+
+window.addEventListener('load', async () => {
+    
+    await document.fonts.ready;
+
+    const loader = document.getElementById('loading-screen');
+    const star = document.getElementById('loading-star');
+
+    if (!loader || !star) return;
+
+    // FIX 1: Wait for the star to finish its current spin cycle before pausing.
+    // The { once: true } ensures this listener immediately destroys itself after firing.
+    star.addEventListener('animationiteration', () => {
+        loader.classList.add('is-ready');
+    }, { once: true });
+
+    // 2. The user initiates the experience
+    loader.addEventListener('click', () => {
+        
+        loader.classList.add('is-expanding');
+
+        if (window.audioEngine) {
+            window.audioEngine.play();
+        }
+
+        // FIX 2: Lowered drastically from 1700 to 900. 
+        // We trigger the fade-out the moment the expanding star eclipses the viewport edges.
+        setTimeout(() => {
+            
+            document.body.classList.add('is-revealed');
+            loader.style.opacity = '0'; 
+
+            setTimeout(() => {
+                loader.remove();
+            }, 1200);
+
+        }, 1000);
+    });
+});

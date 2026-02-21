@@ -10,10 +10,11 @@
     <!-- Favicon: browser selects based on system color scheme -->
     <link rel="icon" href="assets/09_sans_saint_favicon_light_mode.svg" media="(prefers-color-scheme: light)">
     <link rel="icon" href="assets/09_sans_saint_favicon_dark_mode.svg"  media="(prefers-color-scheme: dark)">
+    <link rel="preload" href="assets/eb_garamond/eb-garamond_variable_latin-ext.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
+    
     <!-- =====================================================================
          HEADER
          Fixed overlay — no background, mix-blend-mode: difference.
@@ -144,6 +145,16 @@
 
     </header>
 
+    <div id="loading-screen" aria-label="Loading site">
+    <svg id="loading-star" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 215.41 215.4">
+        <path fill="currentColor" d="M125.48.13v-.13h-35.56c0,58.93-29.13,88.79-87.02,89.81H0v35.59c59.87,0,89.88,29.98,89.92,89.89v.11h35.56c0-58.93,29.12-88.79,87.02-89.81h2.91v-35.59c-59.87,0-89.87-29.97-89.92-89.88h-.01Z"/>
+    </svg>
+
+    <div class="loading-text">
+        <p class="loading-quote">“Acquire all <span class="quote-highlight">hope,</span><br>ye who enter here.”</p>
+        <p class="loading-cta">Click anywhere to enter…</p>
+    </div>
+</div>
 
     <!-- =====================================================================
          MAIN SCROLL CONTAINER
@@ -246,11 +257,18 @@
             </div>
 
             <div class="center-image-wrapper">
-                <picture>
-                    <source srcset="assets/07_ai_generated_angel_2.avif" type="image/avif">
-                    <img src="assets/07_ai_generated_angel_2.png" alt="Angel" class="center-angel-img">
-                </picture>
-            </div>
+    <picture>
+        <source media="(max-width: 768px)" type="image/avif" srcset="assets/07_ai_generated_angel_2_768px.avif">
+        <source media="(max-width: 768px)" type="image/png" srcset="assets/07_ai_generated_angel_2_768px.png">
+
+        <source media="(max-width: 1920px)" type="image/avif" srcset="assets/07_ai_generated_angel_2_1920px.avif">
+        <source media="(max-width: 1920px)" type="image/png" srcset="assets/07_ai_generated_angel_2_1920px.png">
+
+        <source type="image/avif" srcset="assets/07_ai_generated_angel_2.avif">
+        
+        <img src="assets/07_ai_generated_angel_2.png" alt="Angel" class="center-angel-img">
+    </picture>
+</div>
 
         </section>
 
@@ -261,6 +279,7 @@
 
     </main>
 
+    <script src="sound.js"></script>
     <script src="script.js"></script>
 
 </body>
