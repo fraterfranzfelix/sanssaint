@@ -31,6 +31,7 @@ const angelWrapper = document.querySelector('.center-image-wrapper');
  */
 function getSpeed(layer) {
     if (layer.classList.contains('particles-front'))      return -15;
+    if (layer.classList.contains('weapons-also-right'))   return -35;
     if (layer.classList.contains('weapons-layer'))        return -25;
     if (layer.classList.contains('center-image-wrapper')) return -30;
     if (layer.classList.contains('particles-back'))       return -35;
@@ -326,7 +327,7 @@ function initMuteToggle() {
     btn.addEventListener('click', () => {
         muted = !muted;
 
-        icon.src = muted ? 'assets/08_sound_off_icon.svg' : 'assets/08_sound_on_icon.svg';
+        icon.src = muted ? 'assets/icons/03_sound_off_icon.svg' : 'assets/icons/04_sound_on_icon.svg';
         icon.alt = muted ? 'Sound off' : 'Sound on';
         btn.setAttribute('aria-label', muted ? 'Unmute' : 'Mute');
 
@@ -402,6 +403,8 @@ window.addEventListener('load', async () => {
     // Note: Added 'async' here to handle the iOS permission promise
     loader.addEventListener('click', async () => {
         
+document.getElementById('mute-btn').removeAttribute('disabled');
+
         // --- NEW: iOS 13+ Gyroscope Permission Request ---
         // This MUST be inside a user gesture event listener like 'click'
         if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {

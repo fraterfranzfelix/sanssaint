@@ -19,9 +19,9 @@
     <title>Atelier Sans Saint</title>
 
     <!-- Favicon: browser selects based on system color scheme -->
-    <link rel="icon" href="assets/09_sans_saint_favicon_light_mode.svg" media="(prefers-color-scheme: light)">
-    <link rel="icon" href="assets/09_sans_saint_favicon_dark_mode.svg"  media="(prefers-color-scheme: dark)">
-    <link rel="preload" href="assets/eb_garamond/SlGUmQSNjdsmc35JDF1K5GR1SDk.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="icon" href="assets/icons/06_sans_saint_favicon_light_mode.svg" media="(prefers-color-scheme: light)">
+    <link rel="icon" href="assets/icons/05_sans_saint_favicon_dark_mode.svg"  media="(prefers-color-scheme: dark)">
+    <link rel="preload" href="assets/eb_garamond/SlGUmQSNjdsmc35JDF1K5GR7SDktYw.woff2" as="font" type="font/woff2" crossorigin>
 
     <style>
         :root {
@@ -33,7 +33,7 @@
 
         @font-face {
     font-family: 'Not EB Garamond';
-    src: url('assets/eb_garamond/SlGUmQSNjdsmc35JDF1K5GR1SDk.woff2') format('woff2');
+    src: url('assets/eb_garamond/SlGUmQSNjdsmc35JDF1K5GR7SDktYw.woff2') format('woff2');
     font-weight: 400 800;
     font-style: normal;
     font-display: block;
@@ -75,7 +75,8 @@
         .quote-highlight {
             color: var(--malve-magenta);
             font-variant: small-caps;
-            font-weight: 700;
+            letter-spacing: 0.03rem;
+            font-weight: 800;
         }
 
         .loading-cta {
@@ -129,10 +130,33 @@
             scale: 300; 
         }
 
+        .loading-cta {
+    font-size: 0;
+}
+
+.loading-cta::after {
+    content: 'Click anywhere to enter\2026';
+    font-size: 1rem;
+    color: var(--noir-tres-leger);
+}
+
+@media (pointer: coarse) {
+    .loading-cta::after {
+        content: 'Tap anywhere to enter\2026';
+    }
+}
+
         /* Note: The .scroll-container reveal styles should remain in your main style.css 
            since they deal with the layout once the loader is gone. */
     </style>
     <link rel="stylesheet" href="style.css">
+
+    <noscript>
+            <style>
+                #loading-screen { display: none; }
+                .scroll-container { filter: none; opacity: 1; transform: none; }
+            </style>
+        </noscript>
 </head>
 <body>
     
@@ -198,7 +222,7 @@
         <!-- Center column: wordmark — collapses on section 1, expands on section 2+ -->
         <div class="header-center" id="header-center">
             <img
-                src="assets/02_sans_saint_logos_wordmark.svg"
+                src="assets/icons/02_sans_saint_logos_wordmark.svg"
                 alt="Sans Saint"
                 class="header-wordmark"
                 id="header-wordmark"
@@ -242,16 +266,16 @@
             <!-- Mute button + language dropdown -->
             <div class="header-controls">
 
-                <button class="header-mute" id="mute-btn" aria-label="Toggle sound">
+                <button class="header-mute" id="mute-btn" aria-label="Toggle sound" disabled>
                     <img
-                        src="assets/08_sound_on_icon.svg"
+                        src="assets/icons/04_sound_on_icon.svg"
                         alt="Sound on"
                         id="mute-icon"
                     >
                 </button>
 
                 <div class="header-lang" id="lang-dropdown">
-                    <button class="header-lang-toggle" id="lang-toggle" aria-haspopup="listbox">
+                    <button class="header-lang-toggle" id="lang-toggle" aria-haspopup="listbox" aria-expanded="false">
                         EN
                     </button>
                     <ul class="header-lang-dropdown" id="lang-menu" role="listbox">
@@ -272,7 +296,7 @@
     </svg>
 
     <div class="loading-text">
-        <p class="loading-quote">“Acquire all <span class="quote-highlight">hope,</span><br>ye who enter here.”</p>
+        <p class="loading-quote">“Acquire all <span class="quote-highlight">Hope,</span><br>ye who enter here.”</p>
         <p class="loading-cta">Click anywhere to enter…</p>
     </div>
 </div>
@@ -291,20 +315,28 @@
 
             <div class="parallax-layer weapons-layer weapons-left">
                 <picture>
-                    <source srcset="assets/06_ai_generated_weapons_left.avif" type="image/avif">
-                    <img src="assets/06_ai_generated_weapons_left.png" alt="Swords Left">
+                    <source srcset="assets/images/05_ai_generated_weapons_left.avif" type="image/avif">
+                    <img src="assets/images/05_ai_generated_weapons_left.png" alt="Swords Left">
                 </picture>
             </div>
 
+            <div class="parallax-layer weapons-layer weapons-also-right">
+    <picture>
+        <img src="assets/images/08_ai_generated_weapons_also_right.avif" 
+             onerror="this.src='assets/images/08_ai_generated_weapons_also_right.png'"
+             alt="Swords Also Right">
+    </picture>
+</div>
+
             <div class="parallax-layer weapons-layer weapons-right">
                 <picture>
-                    <source srcset="assets/06_ai_generated_weapons_right.avif" type="image/avif">
-                    <img src="assets/06_ai_generated_weapons_right.png" alt="Swords Right">
+                    <source srcset="assets/images/06_ai_generated_weapons_right.avif" type="image/avif">
+                    <img src="assets/images/06_ai_generated_weapons_right.png" alt="Swords Right">
                 </picture>
             </div>
 
             <div class="center-container relative-content">
-                <img src="assets/02_sans_saint_logos_wholemark.svg" alt="Company Logo" class="hero-logo">
+                <img src="assets/icons/01_sans_saint_logos_wholemark.svg" alt="Company Logo" class="hero-logo">
                 <div class="button-wrapper">
                     <a href="#creation" class="btn btn-black">Explore</a>
                     <a href="#contact" class="btn btn-white">Get in touch</a>
@@ -379,15 +411,15 @@
 
             <div class="center-image-wrapper">
     <picture>
-        <source media="(max-width: 768px)" type="image/avif" srcset="assets/07_ai_generated_angel_2_768px.avif">
-        <source media="(max-width: 768px)" type="image/png" srcset="assets/07_ai_generated_angel_2_768px.png">
+        <source media="(max-width: 768px)" type="image/avif" srcset="assets/images/07_ai_generated_angel_2_768px.avif">
+        <source media="(max-width: 768px)" type="image/png" srcset="assets/images/07_ai_generated_angel_2_768px.png">
 
-        <source media="(max-width: 1920px)" type="image/avif" srcset="assets/07_ai_generated_angel_2_1920px.avif">
-        <source media="(max-width: 1920px)" type="image/png" srcset="assets/07_ai_generated_angel_2_1920px.png">
+        <source media="(max-width: 1920px)" type="image/avif" srcset="assets/images/07_ai_generated_angel_2_1920px.avif">
+        <source media="(max-width: 1920px)" type="image/png" srcset="assets/images/07_ai_generated_angel_2_1920px.png">
 
-        <source type="image/avif" srcset="assets/07_ai_generated_angel_2.avif">
+        <source type="image/avif" srcset="assets/images/07_ai_generated_angel_2.avif">
         
-        <img src="assets/07_ai_generated_angel_2.png" alt="Angel" class="center-angel-img">
+        <img src="assets/images/07_ai_generated_angel_2.png" alt="Angel" class="center-angel-img">
     </picture>
 </div>
 

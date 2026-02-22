@@ -125,6 +125,7 @@ body {
     align-items: center;
 
     mix-blend-mode: difference;
+    -webkit-font-smoothing: antialiased;
     color: white;
 
     transition: padding 0.3s ease;
@@ -410,12 +411,12 @@ body {
     background-position: center;
     
     background-image: -webkit-image-set(
-        url('assets/01_caspar_david_friedrich_abtei_im_eichwald.avif') 1x,
-        url('assets/01_caspar_david_friedrich_abtei_im_eichwald.jpg') 1x
+        url('assets/images/images/01_caspar_david_friedrich_abtei_im_eichwald.avif') 1x,
+        url('assets/images/01_caspar_david_friedrich_abtei_im_eichwald.jpg') 1x
     );
     background-image: image-set(
-        url('assets/01_caspar_david_friedrich_abtei_im_eichwald.avif') type('image/avif'),
-        url('assets/01_caspar_david_friedrich_abtei_im_eichwald.jpg') type('image/jpg')
+        url('assets/images/01_caspar_david_friedrich_abtei_im_eichwald.avif') type('image/avif'),
+        url('assets/images/01_caspar_david_friedrich_abtei_im_eichwald.jpg') type('image/jpg')
     );
 }
 
@@ -423,12 +424,12 @@ body {
 @media (max-width: 1920px) {
     .bg-layer {
         background-image: -webkit-image-set(
-            url('assets/01_caspar_david_friedrich_abtei_im_eichwald_1920px.avif') 1x,
-            url('assets/01_caspar_david_friedrich_abtei_im_eichwald_1920px.jpg') 1x
+            url('assets/images/01_caspar_david_friedrich_abtei_im_eichwald_1920px.avif') 1x,
+            url('assets/images/01_caspar_david_friedrich_abtei_im_eichwald_1920px.jpg') 1x
         );
         background-image: image-set(
-            url('assets/01_caspar_david_friedrich_abtei_im_eichwald_1920px.avif') type('image/avif'),
-            url('assets/01_caspar_david_friedrich_abtei_im_eichwald_1920px.jpg') type('image/jpg')
+            url('assets/images/01_caspar_david_friedrich_abtei_im_eichwald_1920px.avif') type('image/avif'),
+            url('assets/images/01_caspar_david_friedrich_abtei_im_eichwald_1920px.jpg') type('image/jpg')
         );
     }
 }
@@ -581,14 +582,17 @@ body {
         linear-gradient(black, black);
 
     /* Caps are 1.732rem wide based on √3 math. */
-    -webkit-mask-size: 1.732rem 100%, 1.732rem 100%, calc(100% - 3.464rem + 1px) 100%;
-    mask-size: 1.732rem 100%, 1.732rem 100%, calc(100% - 3.464rem + 1px) 100%;
+    -webkit-mask-size: 1.732rem 100%, 1.732rem 100%, calc(100% - 3.464rem + 8px) 100%;
+mask-size:         1.732rem 100%, 1.732rem 100%, calc(100% - 3.464rem + 8px) 100%;
 
-    -webkit-mask-position: left center, right center, center;
-    mask-position: left center, right center, center;
+-webkit-mask-position: left center, right center, center;
+mask-position:         left center, right center, center;
 
-    -webkit-mask-repeat: no-repeat;
-    mask-repeat: no-repeat;
+-webkit-mask-repeat: no-repeat;
+mask-repeat:         no-repeat;
+
+-webkit-mask-composite: source-over, source-over;
+mask-composite:         add, add;
 }
 
 .btn:hover {
@@ -717,6 +721,16 @@ body {
     object-position: right bottom;
 }
 
+.weapons-also-right {
+    left: auto;
+    right: clamp(-12.5%, calc((100vw - 1400px) * 0.225), 0%);
+    z-index: 6;
+}
+
+.weapons-also-right img {
+    object-position: right bottom;
+}
+
 
 /* =============================================================================
    4. SECTION 2: SPLIT PANELS
@@ -777,20 +791,20 @@ body {
 /* Base: Creation (4K) */
 .bg-layer-creation {
     background-color: #eaeaea; /* TODO: Replace with an average color from the engraving */
-    background-image: -webkit-image-set(url('assets/03_gustave_dore_creation.jpg') 1x);
+    background-image: -webkit-image-set(url('assets/images/03_gustave_dore_creation.jpg') 1x);
     background-image: image-set(
-        url('assets/03_gustave_dore_creation.avif') type('image/avif'),
-        url('assets/03_gustave_dore_creation.jpg') type('image/jpg')
+        url('assets/images/03_gustave_dore_creation.avif') type('image/avif'),
+        url('assets/images/03_gustave_dore_creation.jpg') type('image/jpg')
     );
 }
 
 /* Base: Eden (4K) */
 .bg-layer-eden {
     background-color: #151515; /* TODO: Replace with an average color from the engraving */
-    background-image: -webkit-image-set(url('assets/04_gustave_dore_jacobs_dream.jpg') 1x);
+    background-image: -webkit-image-set(url('assets/images/04_gustave_dore_jacobs_dream.jpg') 1x);
     background-image: image-set(
-        url('assets/04_gustave_dore_jacobs_dream.avif') type('image/avif'),
-        url('assets/04_gustave_dore_jacobs_dream.jpg') type('image/jpg')
+        url('assets/images/04_gustave_dore_jacobs_dream.avif') type('image/avif'),
+        url('assets/images/04_gustave_dore_jacobs_dream.jpg') type('image/jpg')
     );
 }
 
@@ -800,18 +814,18 @@ body {
 /* 2. LAPTOP / STANDARD DESKTOP (1920px and below) */
 @media (max-width: 1920px) {
     .bg-layer-creation {
-        background-image: -webkit-image-set(url('assets/03_gustave_dore_creation_1920px.jpg') 1x);
+        background-image: -webkit-image-set(url('assets/images/03_gustave_dore_creation_1920px.jpg') 1x);
         background-image: image-set(
-            url('assets/03_gustave_dore_creation_1920px.avif') type('image/avif'),
-            url('assets/03_gustave_dore_creation_1920px.jpg') type('image/jpg')
+            url('assets/images/03_gustave_dore_creation_1920px.avif') type('image/avif'),
+            url('assets/images/03_gustave_dore_creation_1920px.jpg') type('image/jpg')
         );
     }
 
     .bg-layer-eden {
-        background-image: -webkit-image-set(url('assets/04_gustave_dore_jacobs_dream_1920px.jpg') 1x);
+        background-image: -webkit-image-set(url('assets/images/04_gustave_dore_jacobs_dream_1920px.jpg') 1x);
         background-image: image-set(
-            url('assets/04_gustave_dore_jacobs_dream_1920px.avif') type('image/avif'),
-            url('assets/04_gustave_dore_jacobs_dream_1920px.jpg') type('image/jpg')
+            url('assets/images/04_gustave_dore_jacobs_dream_1920px.avif') type('image/avif'),
+            url('assets/images/04_gustave_dore_jacobs_dream_1920px.jpg') type('image/jpg')
         );
     }
 }
@@ -820,11 +834,11 @@ body {
 /* 3. MOBILE (768px and below) */
 @media (max-width: 768px) {
     .bg-layer-creation {
-        background-image: url('assets/03_gustave_dore_creation_768px.jpg');
+        background-image: url('assets/images/03_gustave_dore_creation_768px.jpg');
     }
 
     .bg-layer-eden {
-        background-image: url('assets/04_gustave_dore_jacobs_dream_768px.jpg');
+        background-image: url('assets/images/04_gustave_dore_jacobs_dream_768px.jpg');
     }
 }
 
@@ -1001,28 +1015,20 @@ body {
 
 /* --- Mobile (≤ 768px): Minimal Editorial Header --- */
 @media (max-width: 768px) {
-    /* Hide the entire left column (links + left line) */
     .header-col-left {
         display: none;
     }
 
-    /* Force the wordmark column to stay open and sit on the left */
-    .header-center,
+    /* Only override max-width when the wordmark is actually visible */
     .header-center.is-visible {
-        max-width: none; 
+        max-width: none;
         padding: 0;
-        padding-right: 1.5rem; 
-    }
-    
-    .header-center .header-wordmark {
-        opacity: 1; 
+        padding-right: 1.5rem;
     }
 
-    /* The right column stretches to fill the rest of the space, 
-       with its line connecting the wordmark to the controls */
     .header-col-right {
         flex: 1;
-        gap: 1.5rem; /* Tighter spacing for mobile screens */
+        gap: 1.5rem;
     }
 }
 
@@ -1042,4 +1048,9 @@ body.is-revealed .scroll-container {
     filter: blur(0) brightness(1);
     transform: scale(1);
     opacity: 1;
+}
+
+.header-mute:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
 }
