@@ -21,7 +21,8 @@
     <!-- Favicon: browser selects based on system color scheme -->
     <link rel="icon" href="assets/icons/06_sans_saint_favicon_light_mode.svg" media="(prefers-color-scheme: light)">
     <link rel="icon" href="assets/icons/05_sans_saint_favicon_dark_mode.svg"  media="(prefers-color-scheme: dark)">
-    <link rel="preload" href="assets/eb_garamond/SlGUmQSNjdsmc35JDF1K5GR7SDktYw.woff2" as="font" type="font/woff2" fetchpriority="high" crossorigin>
+    <link rel="preload" href="assets/eb_garamond/loading-regular.woff2" as="font" type="font/woff2" fetchpriority="high" crossorigin>
+<link rel="preload" href="assets/eb_garamond/loading-extrabold.woff2" as="font" type="font/woff2" fetchpriority="high" crossorigin>
 
     <style>
         :root {
@@ -33,10 +34,20 @@
 
         @font-face {
     font-family: 'Not EB Garamond';
-    src: url('assets/eb_garamond/SlGUmQSNjdsmc35JDF1K5GR7SDktYw.woff2') format('woff2');
-    font-weight: 400 800;
+    src: url('assets/eb_garamond/loading-regular.woff2') format('woff2'),
+         url('assets/eb_garamond/loading-regular.ttf') format('truetype');
+    font-weight: 400;
     font-style: normal;
-    font-display: swap;
+    font-display: block;
+}
+
+@font-face {
+    font-family: 'Not EB Garamond';
+    src: url('assets/eb_garamond/loading-extrabold.woff2') format('woff2'),
+         url('assets/eb_garamond/loading-extrabold.ttf') format('truetype');
+    font-weight: 800;
+    font-style: normal;
+    font-display: block;
 }
 
         #loading-screen {
@@ -141,7 +152,7 @@
 }
 
 html[lang="fr"] .loading-cta::after {
-    content: "Cliquez n'importe où pour entrer\2026";
+    content: "Cliquez n’importe où pour entrer\2026";
 }
 
 @media (pointer: coarse) {
@@ -150,7 +161,7 @@ html[lang="fr"] .loading-cta::after {
     }
 
     html[lang="fr"] .loading-cta::after {
-        content: "Touchez n'importe où pour entrer\2026";
+        content: "Touchez n’importe où pour entrer\2026";
     }
 }
 

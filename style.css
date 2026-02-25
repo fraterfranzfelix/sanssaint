@@ -104,18 +104,20 @@ html.high-contrast {
 
 @font-face {
     font-family: 'EB Garamond';
-    src: url('assets/eb_garamond/EBGaramond-VariableFont_wght.ttf') format('truetype');
+    src: url('assets/eb_garamond/EBGaramond-VariableFont_wght.woff2') format('woff2'),
+         url('assets/eb_garamond/EBGaramond-VariableFont_wght.ttf') format('truetype');
     font-weight: 400 800;
     font-style: normal;
-    font-display: swap;
+    font-display: block;
 }
 
 @font-face {
     font-family: 'EB Garamond';
-    src: url('assets/eb_garamond/EBGaramond-VariableFont_wght_Italic.ttf') format('truetype');
+    src: url('assets/eb_garamond/EBGaramond-Italic-VariableFont_wght.woff2') format('woff2'),
+         url('assets/eb_garamond/EBGaramond-Italic-VariableFont_wght.ttf') format('truetype');
     font-weight: 400 800;
     font-style: italic;
-    font-display: swap;
+    font-display: block;
 }
 
 * {
