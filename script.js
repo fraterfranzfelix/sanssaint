@@ -12,6 +12,8 @@ document.addEventListener('DOMContentLoaded', () => {
     initWordmarkReveal();
     initMuteToggle();
     initLangDropdown();
+    initSettingsPanel();
+    initLanguage();
 });
 
 
@@ -32,11 +34,11 @@ const angelWrapper = document.querySelector('.center-image-wrapper');
 function getSpeed(layer) {
     if (layer.classList.contains('particles-front'))      return -15;
     if (layer.classList.contains('weapons-also-right'))   return -35;
-    if (layer.classList.contains('weapons-layer'))        return -25;
-    if (layer.classList.contains('center-image-wrapper')) return -30;
+    if (layer.classList.contains('weapons-layer'))        return -15;
+    if (layer.classList.contains('center-image-wrapper')) return -35;
     if (layer.classList.contains('particles-back'))       return -35;
-    if (layer.classList.contains('bg-layer-creation'))    return  60;  // Inverted
-    if (layer.classList.contains('bg-layer-eden'))        return  60;  // Inverted
+    if (layer.classList.contains('bg-layer-creation'))    return  50;  // Inverted
+    if (layer.classList.contains('bg-layer-eden'))        return  50;  // Inverted
     return  50;  // Default: hero background — inverted
 }
 
@@ -340,44 +342,131 @@ function initMuteToggle() {
 
 
 /* =============================================================================
+   LANGUAGE & TRANSLATION
+============================================================================= */
+
+/**
+ * Fetches the JSON file for the current language and applies it to the DOM.
+ * Called once on DOMContentLoaded, and again each time the user switches language.
+ *
+ * If the file doesn't exist yet (e.g. fr.json during development), the fetch
+ * fails silently and the existing hardcoded HTML content is left untouched —
+ * so the English fallback remains visible rather than breaking.
+ */
+async function initLanguage() {
+    const lang = document.documentElement.lang || 'en';
+
+    try {
+        const response = await fetch(`assets/lang/${lang}.json`);
+        if (!response.ok) throw new Error(`${lang}.json returned ${response.status}`);
+        const data = await response.json();
+        applyTranslation(data);
+    } catch (err) {
+        // Expected during development when a language file doesn't exist yet.
+        console.info(`Language file '${lang}.json' not loaded — keeping existing content.`, err.message);
+    }
+}
+
+/**
+ * Walks the DOM for translation hooks and writes values from the language data.
+ *
+ *   data-i18n="key.subkey"       → sets element.innerHTML  (text + inline spans)
+ *   data-i18n-src="key.subkey"   → sets element.src         (logo swap)
+ *   data-i18n-aria="key.subkey"  → sets element.aria-label  (button labels)
+ */
+function applyTranslation(data) {
+
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const value = getNestedValue(data, el.dataset.i18n);
+        if (value !== undefined) el.innerHTML = value;
+    });
+
+    document.querySelectorAll('[data-i18n-src]').forEach(el => {
+        const value = getNestedValue(data, el.dataset.i18nSrc);
+        if (value !== undefined) el.src = value;
+    });
+
+    document.querySelectorAll('[data-i18n-aria]').forEach(el => {
+        const value = getNestedValue(data, el.dataset.i18nAria);
+        if (value !== undefined) el.setAttribute('aria-label', value);
+    });
+}
+
+/**
+ * Reads a dot-separated key path from a nested object.
+ * e.g. getNestedValue(data, 'creation.quote') → data.creation.quote
+ * Returns undefined if any segment of the path doesn't exist.
+ */
+function getNestedValue(obj, path) {
+    return path.split('.').reduce((acc, key) => acc?.[key], obj);
+}
+
+
+/* =============================================================================
    HEADER: LANGUAGE DROPDOWN
 ============================================================================= */
 
 function initLangDropdown() {
 
-    const toggle = document.getElementById('lang-toggle');
-    const menu   = document.getElementById('lang-menu');
+    const current = document.getElementById('lang-current');
+    const menu    = document.getElementById('lang-menu');
 
-    if (!toggle || !menu) return;
+    if (!menu || !current) return;
 
-    // Open / close on toggle button click
-    toggle.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const isOpen = menu.classList.toggle('is-open');
-        toggle.setAttribute('aria-expanded', isOpen);
-    });
-
-    // Close when clicking anywhere outside the dropdown
-    document.addEventListener('click', () => {
-        menu.classList.remove('is-open');
-        toggle.setAttribute('aria-expanded', false);
-    });
-
-    // Handle language selection
+    // Open/close is handled purely by CSS :hover on .header-lang.
+    // This function handles selection, persistence, and triggering translation.
     menu.querySelectorAll('a[data-lang]').forEach(link => {
         link.addEventListener('click', (e) => {
             e.preventDefault();
             const lang = link.dataset.lang;
 
-            // Update the toggle label to reflect the current selection
-            toggle.firstChild.textContent = lang.toUpperCase();
+            // Persist so the inline <head> script picks it up on the next visit
+            // and sets document.documentElement.lang before first paint.
+            localStorage.setItem('sanssaint-lang', lang);
 
-            menu.classList.remove('is-open');
-            toggle.setAttribute('aria-expanded', false);
+            // Update <html lang> so CSS selectors (loading screen CTA variants)
+            // and the next initLanguage() call both use the new language.
+            document.documentElement.lang = lang;
 
-            // TODO: trigger content translation when the French version is ready.
-            // e.g. setLanguage(lang);
+            // Update the visible language code in the header toggle.
+            current.textContent = lang.toUpperCase();
+
+            // Fetch and apply the new language file.
+            initLanguage();
         });
+    });
+}
+
+
+/* =============================================================================
+   HEADER: SETTINGS PANEL
+============================================================================= */
+
+function initSettingsPanel() {
+
+    const contrastBox = document.getElementById('setting-contrast');
+
+    if (!contrastBox) return;
+
+    // Open/close is handled purely by CSS :hover on .header-settings.
+    // This function only handles preference restoration and the contrast toggle.
+
+    // --- Restore saved preference ---
+    // The class on <html> is already applied by the inline script in <head>.
+    // We just need to sync the checkbox to match.
+    if (localStorage.getItem('sanssaint-contrast') === 'high') {
+        contrastBox.checked = true;
+    }
+
+    // --- Contrast toggle ---
+    contrastBox.addEventListener('change', () => {
+        if (contrastBox.checked) {
+            document.documentElement.classList.add('high-contrast');
+            localStorage.setItem('sanssaint-contrast', 'high');
+        } else {
+            document.documentElement.classList.remove('high-contrast');
+            localStorage.setItem('sanssaint-contrast', 'normal');
+        }
     });
 }
 

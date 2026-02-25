@@ -21,7 +21,7 @@
     <!-- Favicon: browser selects based on system color scheme -->
     <link rel="icon" href="assets/icons/06_sans_saint_favicon_light_mode.svg" media="(prefers-color-scheme: light)">
     <link rel="icon" href="assets/icons/05_sans_saint_favicon_dark_mode.svg"  media="(prefers-color-scheme: dark)">
-    <link rel="preload" href="assets/eb_garamond/SlGUmQSNjdsmc35JDF1K5GR7SDktYw.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="assets/eb_garamond/SlGUmQSNjdsmc35JDF1K5GR7SDktYw.woff2" as="font" type="font/woff2" fetchpriority="high" crossorigin>
 
     <style>
         :root {
@@ -36,7 +36,7 @@
     src: url('assets/eb_garamond/SlGUmQSNjdsmc35JDF1K5GR7SDktYw.woff2') format('woff2');
     font-weight: 400 800;
     font-style: normal;
-    font-display: block;
+    font-display: swap;
 }
 
         #loading-screen {
@@ -140,16 +140,54 @@
     color: var(--noir-tres-leger);
 }
 
+html[lang="fr"] .loading-cta::after {
+    content: "Cliquez n'importe où pour entrer\2026";
+}
+
 @media (pointer: coarse) {
     .loading-cta::after {
         content: 'Tap anywhere to enter\2026';
+    }
+
+    html[lang="fr"] .loading-cta::after {
+        content: "Touchez n'importe où pour entrer\2026";
     }
 }
 
         /* Note: The .scroll-container reveal styles should remain in your main style.css 
            since they deal with the layout once the loader is gone. */
+
+        /* High-contrast override — applied here so it takes effect on the loading screen
+           for returning users who have already enabled it. Mirrored in style.css. */
+        html.high-contrast {
+            --noir-leger:  #000000;
+            --blanc-leger: #ffffff;
+        }
     </style>
-    <link rel="stylesheet" href="style.css">
+
+    <!-- Runs before first paint to apply saved preferences and detect language.
+         Order: saved user override → browser preference → default English. -->
+    <script>
+        (function () {
+
+            // Contrast
+            if (localStorage.getItem('sanssaint-contrast') === 'high') {
+                document.documentElement.classList.add('high-contrast');
+            }
+
+            // Language detection
+            // A saved choice (from the language dropdown) always takes precedence.
+            // Otherwise, read the browser's primary language and use French if it
+            // starts with 'fr' — anything else falls back to English.
+            const saved   = localStorage.getItem('sanssaint-lang');
+            const browser = (navigator.language || '').toLowerCase();
+            const lang    = saved || (browser.startsWith('fr') ? 'fr' : 'en');
+
+            document.documentElement.lang = lang;
+
+        })();
+    </script>
+    <link rel="stylesheet" href="style.css" media="print" onload="this.media='all'">
 
     <noscript>
             <style>
@@ -178,8 +216,8 @@
 
             <nav>
                 <ul class="header-nav">
-                    <li><a href="#portfolio">Portfolio</a></li>
-                    <li><a href="#contact">Contact</a></li>
+                    <li><a href="#portfolio" data-i18n="nav.portfolio">Portfolio</a></li>
+                    <li><a href="#contact"   data-i18n="nav.contact">Contact</a></li>
                 </ul>
             </nav>
 
@@ -226,6 +264,7 @@
                 alt="Sans Saint"
                 class="header-wordmark"
                 id="header-wordmark"
+                fetchpriority="low"
             >
         </div>
 
@@ -271,17 +310,35 @@
                         src="assets/icons/04_sound_on_icon.svg"
                         alt="Sound on"
                         id="mute-icon"
+                        fetchpriority="low"
                     >
                 </button>
 
                 <div class="header-lang" id="lang-dropdown">
-                    <button class="header-lang-toggle" id="lang-toggle" aria-haspopup="listbox" aria-expanded="false">
-                        EN
+                    <button class="header-lang-toggle" id="lang-toggle" aria-haspopup="listbox" aria-expanded="false" aria-label="Select language">
+                        <img src="assets/icons/08_language_icon.svg" alt="" aria-hidden="true" fetchpriority="low">
+                        <span id="lang-current">EN</span>
                     </button>
                     <ul class="header-lang-dropdown" id="lang-menu" role="listbox">
                         <li><a href="#" data-lang="en">English</a></li>
                         <li><a href="#" data-lang="fr">Français</a></li>
                     </ul>
+                </div>
+
+                <!-- Settings panel -->
+                <div class="header-settings" id="settings-panel">
+                    <button class="header-settings-toggle" id="settings-toggle" aria-haspopup="true" aria-expanded="false" aria-label="Display settings">
+                        <img src="assets/icons/07_settings_icon.svg" alt="" aria-hidden="true" fetchpriority="low">
+                    </button>
+                    <div class="header-settings-menu" id="settings-menu" role="dialog" aria-label="Display settings">
+                        <label class="settings-item" for="setting-contrast">
+                            <span class="settings-label">More contrast</span>
+                            <span class="settings-toggle-track">
+                                <input type="checkbox" id="setting-contrast" class="settings-checkbox">
+                                <span class="settings-toggle-thumb" aria-hidden="true"></span>
+                            </span>
+                        </label>
+                    </div>
                 </div>
 
             </div>
@@ -296,10 +353,25 @@
     </svg>
 
     <div class="loading-text">
-        <p class="loading-quote">“Acquire all <span class="quote-highlight">Hope,</span><br>ye who enter here.”</p>
-        <p class="loading-cta">Click anywhere to enter…</p>
+        <p class="loading-quote" id="loading-quote">“Acquire all <span class="quote-highlight">Hope,</span><br>ye who enter here.”</p>
+        <p class="loading-cta"></p>
     </div>
 </div>
+
+    <!-- Swaps the loading screen quote for the detected language.
+         Runs synchronously here — font-display: block means no text is painted
+         until the font arrives, so this executes before anything is visible. -->
+    <script>
+        (function () {
+            var quotes = {
+                en: '“Acquire all <span class="quote-highlight">Hope,</span><br>ye who enter here.”',
+                fr: '« Acquérez toute <span class="quote-highlight">Espérance,</span><br>vous qui entrez ici. »'
+            };
+            var lang = document.documentElement.lang;
+            var el   = document.getElementById('loading-quote');
+            if (el && quotes[lang]) el.innerHTML = quotes[lang];
+        })();
+    </script>
 
     <!-- =====================================================================
          MAIN SCROLL CONTAINER
@@ -316,7 +388,8 @@
             <div class="parallax-layer weapons-layer weapons-left">
                 <picture>
                     <source srcset="assets/images/05_ai_generated_weapons_left.avif" type="image/avif">
-                    <img src="assets/images/05_ai_generated_weapons_left.png" alt="Swords Left">
+                    <img src="assets/images/05_ai_generated_weapons_left.png" alt="Swords Left"
+                    fetchpriority="low">
                 </picture>
             </div>
 
@@ -324,29 +397,29 @@
     <picture>
         <img src="assets/images/08_ai_generated_weapons_also_right.avif" 
              onerror="this.src='assets/images/08_ai_generated_weapons_also_right.png'"
-             alt="Swords Also Right">
+             alt="Swords Also Right" fetchpriority="low">
     </picture>
 </div>
 
             <div class="parallax-layer weapons-layer weapons-right">
                 <picture>
                     <source srcset="assets/images/06_ai_generated_weapons_right.avif" type="image/avif">
-                    <img src="assets/images/06_ai_generated_weapons_right.png" alt="Swords Right">
+                    <img src="assets/images/06_ai_generated_weapons_right.png" alt="Swords Right" fetchpriority="low">
                 </picture>
             </div>
 
             <div class="center-container relative-content">
-                <img src="assets/icons/01_sans_saint_logos_wholemark.svg" alt="Company Logo" class="hero-logo">
+                <img src="assets/icons/01_sans_saint_logos_wholemark.svg" alt="Company Logo" class="hero-logo" fetchpriority="low" data-i18n-src="wholemark">
                 <div class="button-wrapper">
-                    <a href="#creation" class="btn btn-black">Explore</a>
-                    <a href="#contact" class="btn btn-white">Get in touch</a>
+                    <a href="#creation" class="btn btn-black" data-i18n="hero.explore">Explore</a>
+                    <a href="#contact" class="btn btn-white" data-i18n="hero.contact_btn">Get in touch</a>
                 </div>
             </div>
 
             <div class="hero-footer relative-content">
-                <p>Est. 2025 by Franz-Felix in Trier.</p>
-                <p>© 2025–2026 SANS SAINT. All rights reserved.</p>
-                <p>Do not replicate without permission.</p>
+                <p data-i18n="hero.footer_established">Est. 2025 by Franz-Felix in Trier.</p>
+                <p data-i18n="hero.footer_copyright">© 2025–2026 SANS SAINT. All rights reserved.</p>
+                <p data-i18n="hero.footer_rights">Do not replicate without permission.</p>
             </div>
 
             <div class="parallax-layer particles-front" id="particles-front"></div>
@@ -364,7 +437,7 @@
 
                 <div class="thirds-grid">
                     <div class="grid-center-content text-noir text-left">
-                        <p>
+                        <p data-i18n="creation.quote">
                             "Art must make ... attractive<br>
                             the world of the spirit,<br>
                             of the invisible,<br>
@@ -373,8 +446,7 @@
 
                         <br>
 
-                        <p>
-                            St. John Paul II<br>
+                        <p data-i18n="creation.attribution">St. John Paul II<br>
                             <span class="citation">Letter to Artists, Apr 4, 1999</span>
                         </p>
                     </div>
@@ -386,23 +458,20 @@
 
                 <div class="thirds-grid">
                     <div class="grid-center-content text-blanc text-left">
-                        <p>
-                            <span class="highlight-malve">Sans Saint</span> emerged<br>
+                        <p data-i18n="creation.panel_right_1"><span class="highlight-malve">Sans Saint</span> emerged<br>
                             out of the city of Trier<br>
                             in the Jubilee Year of 2025
                         </p>
 
                         <br>
 
-                        <p class="align-right">
-                            — shaped by tradition,<br>
+                        <p class="align-right" data-i18n="creation.panel_right_2">— shaped by tradition,<br>
                             ready to reform.
                         </p>
 
                         <br>
 
-                        <p>
-                            We want to make art that is<br>
+                        <p data-i18n="creation.panel_right_3">We want to make art that is<br>
                             eternal, ethereal, ever-present.
                         </p>
                     </div>
@@ -419,15 +488,44 @@
 
         <source type="image/avif" srcset="assets/images/07_ai_generated_angel_2.avif">
         
-        <img src="assets/images/07_ai_generated_angel_2.png" alt="Angel" class="center-angel-img">
+        <img src="assets/images/07_ai_generated_angel_2.png" alt="Angel" class="center-angel-img" fetchpriority="low">
     </picture>
 </div>
 
         </section>
 
 
-        <!-- Section 3: Placeholder -->
         <section class="section" id="portfolio">
+        </section>
+
+        <section class="section slideshow-section" id="portfolio-slideshow">
+            
+            <div class="slideshow-image-wrapper">
+                <picture class="parallax-layer slideshow-parallax">
+                    <source media="(max-width: 1920px)" type="image/avif" srcset="portfolio/2025_sed_vivam/01_sed_vivam_thumbnail_1920px.avif">
+                    <source media="(max-width: 1920px)" type="image/jpeg" srcset="portfolio/2025_sed_vivam/01_sed_vivam_thumbnail_1920px.jpeg">
+                    
+                    <source type="image/avif" srcset="portfolio/2025_sed_vivam/01_sed_vivam_thumbnail.avif">
+                    <img src="portfolio/2025_sed_vivam/01_sed_vivam_thumbnail.jpeg" fetchpriority="low" alt="Sed Vivam I Thumbnail" class="slideshow-img">
+                </picture>
+            </div>
+
+            <div class="slideshow-nav">
+                
+                <p class="slideshow-title" data-i18n="slideshow.title">
+                    1/1. <span class="title-highlight">Sed Vivam I</span> – A photo series – 2025
+                </p>
+
+                <div class="slideshow-controls">
+                    <div class="button-wrapper button-wrapper-slideshow">
+                        <button class="btn btn-white btn-arrow" aria-label="Previous project" data-i18n-aria="slideshow.prev_aria">&#x2190;</button>
+                        <a href="#sed-vivam" class="btn btn-black btn-main" data-i18n="slideshow.see_more">See more</a>
+                        <button class="btn btn-white btn-arrow" aria-label="Next project" data-i18n-aria="slideshow.next_aria">&#x2192;</button>
+                    </div>
+                </div>
+
+            </div>
+            
         </section>
 
     </main>

@@ -1,0 +1,31 @@
+{
+    "wholemark": "assets/icons/09_sans_saint_logos_wholemark_french.svg",
+
+    "nav": {
+        "portfolio": "Portfolio",
+        "contact":   "Contact"
+    },
+
+    "hero": {
+        "explore":            "Explorer",
+        "contact_btn":        "Nous contacter",
+        "footer_established": "Fondé en 2025 par François-Félicien à Trèves.",
+        "footer_copyright":   "\u00a9 2025\u20132026 SANS SAINT. Tous droits réservés.",
+        "footer_rights":      "Ne pas reproduire sans autorisation."
+    },
+
+    "creation": {
+        "quote":         "\"L'art doit rendre attrayant<br>le monde de l'esprit,<br>de l'invisible,<br>de <span class=\"highlight-viola\">Dieu.</span>\"",
+        "attribution":   "Saint Jean-Paul II<br><span class=\"citation\">Lettre aux artistes, Apr 4, 1999</span>",
+        "panel_right_1": "<span class=\"highlight-malve\">Sans Saint</span> a émergé<br>de la ville de Trèves<br>en l'Année Jubilaire de 2025",
+        "panel_right_2": "\u2014 façonné par la tradition,<br>prêt à réformer.",
+        "panel_right_3": "Nous voulons créer un art qui soit<br>eternal, éternel, éthéré, omniprésent."
+    },
+
+    "slideshow": {
+        "title":     "1/1. <span class=\"title-highlight\">Sed Vivam I</span> \u2013 Une série de photos \u2013 2025",
+        "see_more":  "Voir plus",
+        "prev_aria": "Projet précédent",
+        "next_aria": "Projet suivant"
+    }
+}

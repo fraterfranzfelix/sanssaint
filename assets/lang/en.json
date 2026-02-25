@@ -1,0 +1,31 @@
+{
+    "wholemark": "assets/icons/01_sans_saint_logos_wholemark.svg",
+
+    "nav": {
+        "portfolio": "Portfolio",
+        "contact":   "Contact"
+    },
+
+    "hero": {
+        "explore":            "Explore",
+        "contact_btn":        "Get in touch",
+        "footer_established": "Est. 2025 by Franz-Felix in Trier.",
+        "footer_copyright":   "\u00a9 2025\u20132026 SANS SAINT. All rights reserved.",
+        "footer_rights":      "Do not replicate without permission."
+    },
+
+    "creation": {
+        "quote":         "\"Art must make attractive<br>the world of the spirit,<br>of the invisible,<br>of <span class=\"highlight-viola\">God.</span>\"",
+        "attribution":   "St. John Paul II<br><span class=\"citation\">Letter to Artists, Apr 4, 1999</span>",
+        "panel_right_1": "<span class=\"highlight-malve\">Sans Saint</span> emerged<br>out of the city of Trier<br>in the Jubilee Year of 2025",
+        "panel_right_2": "\u2014 shaped by tradition,<br>ready to reform.",
+        "panel_right_3": "We want to make art that is<br>eternal, ethereal, ever-present."
+    },
+
+    "slideshow": {
+        "title":     "1/1. <span class=\"title-highlight\">Sed Vivam I</span> \u2013 A photo series \u2013 2025",
+        "see_more":  "See more",
+        "prev_aria": "Previous project",
+        "next_aria": "Next project"
+    }
+}

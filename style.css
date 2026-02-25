@@ -1,41 +1,106 @@
 /* =============================================================================
    STYLESHEET INDEX
-   1. Variables & Setup
-   2. Layout, Scrolling & Snap
-   3. Header
-   4. Hero Section
-      4a. Parallax Layers
-      4b. Particle Animations
-      4c. Center Container
-      4d. Buttons
-      4e. Hero Footer
-      4f. Weapons Layers
-   5. Section 2: Split Panels
-      5a. Panel Configuration
-      5b. Background Images
-      5c. Gradient Overlays
-      5d. Rule of Thirds Grid
-      5e. Typography
-      5f. Center Image (Angel)
-   6. Responsive Breakpoints
+   1. Variables & Design Tokens
+   2. Reset & Base Styles
+   3. Layout, Scrolling & Snap
+   4. Header
+   5. Hero Section
+      5a. Parallax Layers
+      5b. Particle Animations
+      5c. Center Container
+      5d. Buttons
+      5e. Hero Footer
+      5f. Weapons Layers
+   6. Section 2: Split Panels
+      6a. Panel Configuration
+      6b. Background Images
+      6c. Gradient Overlays
+      6d. Rule of Thirds Grid
+      6e. Typography
+      6f. Center Image (Angel)
+   7. Responsive Breakpoints
+   8. Loading Screen & Reveal Effect
+   9. Section 4: Slideshow
 ============================================================================= */
 
+
 /* =============================================================================
-   1. VARIABLES & SETUP
+   1. VARIABLES & DESIGN TOKENS
 ============================================================================= */
 
 :root {
-    --viola-violet: #785adc;
-    --malve-magenta: #fa8ca0;
-    --blanc-leger: #eaeaea;
-    --noir-leger: #151515;
+
+    /* --- Color Palette -------------------------------------------------------- */
+
+    --viola-violet:   #785adc;
+    --malve-magenta:  #fa8ca0;
+    --blanc-leger:    #eaeaea;
+    --noir-leger:     #151515;
     --noir-tres-leger: #555555;
+
+
+    /* --- Typography ----------------------------------------------------------- */
+
     --font-primary: 'EB Garamond', Garamond, serif;
 
     /* Em dash stroke weight — set precisely by JS canvas measurement after font load.
        This fallback value is intentionally approximate and will be overridden at runtime. */
     --em-dash-weight: 0.09rem;
+
+
+    /* --- Highlights ----------------------------------------------------------- */
+
+    /* Shared typographic style for all branded highlights.
+       Color is set per-class (.highlight-viola / .highlight-malve) since it varies.
+       letter-spacing is intentionally absent here — .quote-highlight and
+       .title-highlight add their own; the main highlights in body copy do not. */
+    --highlight-weight:  800;
+
+
+    /* --- Buttons -------------------------------------------------------------- */
+
+    /* White button: for use on light (#eaeaea) backgrounds.
+       Layer 1 — bright top-left rim, subtle dark bottom-right rim.
+       Layer 2 — soft off-white to light-grey gradient. */
+    --btn-white-bg:
+        linear-gradient(145deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0) 8%, rgba(0, 0, 0, 0) 92%, rgba(0, 0, 0, 0.08) 100%),
+        linear-gradient(145deg, #fafafa, #d3d3d3);
+    --btn-white-shadow:
+        drop-shadow( 0.4rem  0.4rem 0.8rem #c8c8c8)
+        drop-shadow(-0.4rem -0.4rem 0.8rem #ffffff);
+    --btn-white-shadow-hover:
+        drop-shadow( 0.5rem  0.5rem 1rem   #b8b8b8)
+        drop-shadow(-0.5rem -0.5rem 1rem   #ffffff);
+
+    /* Black button: for use on light (#eaeaea) backgrounds.
+       Layer 1 — subtle white rim top-left, deep shadow bottom-right.
+       Layer 2 — near-black gradient for the body. */
+    --btn-black-bg:
+        linear-gradient(145deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0) 8%, rgba(0, 0, 0, 0) 92%, rgba(0, 0, 0, 0.6) 100%),
+        linear-gradient(145deg, #161616, #131313);
+    --btn-black-shadow:
+        drop-shadow( 0.4rem  0.4rem 0.8rem #8a8a8a)
+        drop-shadow(-0.4rem -0.4rem 0.8rem #ffffff);
+    --btn-black-shadow-hover:
+        drop-shadow( 0.5rem  0.5rem 1rem   #8a8a8a)
+        drop-shadow(-0.5rem -0.5rem 1rem   #ffffff);
+
 }
+
+
+/* High-contrast mode — toggled by adding .high-contrast to <html>.
+   Replaces the soft off-whites and near-blacks with pure #ffffff and #000000.
+   The same rule is duplicated in the inline <style> in index.html so it applies
+   to the loading screen for returning users before style.css has loaded. */
+html.high-contrast {
+    --blanc-leger: #ffffff;
+    --noir-leger:  #000000;
+}
+
+
+/* =============================================================================
+   2. RESET & BASE STYLES
+============================================================================= */
 
 @font-face {
     font-family: 'EB Garamond';
@@ -68,11 +133,11 @@ body {
 
 
 /* =============================================================================
-   2. LAYOUT, SCROLLING & SNAP
+   3. LAYOUT, SCROLLING & SNAP
 ============================================================================= */
 
 /* Sections snap to full-viewport increments for a curated slide experience.
-   smooth scroll-behavior animates the snap jump rather than cutting instantly. */
+   scroll-behavior: smooth animates the snap jump rather than cutting instantly. */
 .scroll-container {
     height: 100dvh;
     width: 100vw;
@@ -93,10 +158,9 @@ body {
 
 
 /* =============================================================================
-   3. HEADER
-============================================================================= */
-
-/* The header floats above all sections as a fixed overlay with no background.
+   4. HEADER
+   
+   The header floats above all sections as a fixed overlay with no background.
    mix-blend-mode: difference inverts content color against whatever is behind:
    white content reads as near-white on dark backgrounds, near-black on light.
 
@@ -111,7 +175,9 @@ body {
 
    IMPORTANT: All child images use filter: brightness(0) invert(1) to force
    pure white output, which mix-blend-mode: difference requires to invert correctly.
-   This works regardless of the original asset color — no re-export needed. */
+   This works regardless of the original asset color — no re-export needed.
+============================================================================= */
+
 .site-header {
     position: fixed;
     top: 0;
@@ -165,7 +231,7 @@ body {
 .header-nav a {
     font-family: var(--font-primary);
     font-size: 1rem;
-    font-weight: 400;
+    font-weight: 600;
     color: white;
     text-decoration: none;
     letter-spacing: 0.03em;
@@ -173,7 +239,7 @@ body {
 }
 
 .header-nav a:hover {
-    font-weight: 600;
+    font-weight: 800;
     letter-spacing: 0.04em;
 }
 
@@ -203,7 +269,7 @@ body {
 /* Left serif cap — fixed proportions, never stretched */
 .line-cap-left {
     height: var(--em-dash-weight);
-    aspect-ratio: 5 / 8.4;   /* matches viewBox "0 0 5 8.4" */
+    aspect-ratio: 5 / 8.4;     /* matches viewBox "0 0 5 8.4" */
     flex-shrink: 0;
     display: block;
     overflow: visible;
@@ -257,17 +323,17 @@ body {
     flex-shrink: 0;
     filter: brightness(0) invert(1);
     opacity: 0;
-    
-    /* EXIT state (scrolling UP to hero): 
-       Fades out in 0.15s immediately with NO delay, 
+
+    /* EXIT state (scrolling UP to hero):
+       Fades out in 0.15s immediately with NO delay,
        disappearing before the container crushes it. */
     transition: opacity 0.15s ease 0s;
 }
 
 .header-center.is-visible .header-wordmark {
     opacity: 1;
-    
-    /* ENTER state (scrolling DOWN to Section 2): 
+
+    /* ENTER state (scrolling DOWN to Section 2):
        Waits 0.15s for the gap to open, then fades in. */
     transition: opacity 0.15s ease 0.15s;
 }
@@ -298,6 +364,11 @@ body {
     filter: brightness(0) invert(1);
 }
 
+.header-mute:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
 /* Language dropdown */
 .header-lang {
     position: relative;
@@ -319,26 +390,38 @@ body {
     transition: font-weight 0.2s ease;
 }
 
+.header-lang-toggle img {
+    height: 1rem;
+    width: auto;
+    filter: brightness(0) invert(1);
+    flex-shrink: 0;
+}
+
 .header-lang-toggle:hover {
     font-weight: 700;
 }
 
-.header-lang-toggle::after {
-    content: '▾';
-    font-size: 0.7rem;
-}
+/* No chevron — the language icon is self-explanatory */
 
+/* The gap between button and menu lives as padding-top inside the menu,
+   keeping the hover zone continuous so the menu doesn't close in transit. */
 .header-lang-dropdown {
     position: absolute;
-    top: calc(100% + 0.75rem);
+    top: 100%;
     right: 0;
     display: none;
     flex-direction: column;
     gap: 0.5rem;
     list-style: none;
+    padding: 0.75rem 1rem;
+    background: var(--blanc-leger);
+    white-space: nowrap;
+    mix-blend-mode: normal;
+    z-index: 200;
 }
 
-.header-lang-dropdown.is-open {
+/* Opens on hover of the parent wrapper, not a click */
+.header-lang:hover .header-lang-dropdown {
     display: flex;
 }
 
@@ -346,7 +429,7 @@ body {
     font-family: var(--font-primary);
     font-size: 1rem;
     font-weight: 500;
-    color: white;
+    color: var(--noir-leger);
     text-decoration: none;
     white-space: nowrap;
     letter-spacing: 0.02em;
@@ -355,6 +438,111 @@ body {
 
 .header-lang-dropdown a:hover {
     font-weight: 700;
+}
+
+
+/* --- Settings panel ------------------------------------------------------- */
+
+.header-settings {
+    position: relative;
+}
+
+/* The toggle button mirrors the mute and lang buttons exactly */
+.header-settings-toggle {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.header-settings-toggle img {
+    height: 1rem;
+    width: auto;
+    filter: brightness(0) invert(1);
+    flex-shrink: 0;
+}
+
+/* Gap lives as padding-top so the hover zone is continuous */
+.header-settings-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    display: none;
+    flex-direction: column;
+    gap: 0.75rem;
+    list-style: none;
+    padding: 0.75rem 1rem;
+    background: var(--blanc-leger);
+    white-space: nowrap;
+    mix-blend-mode: normal;
+    z-index: 200;
+}
+
+/* Opens on hover of the parent wrapper */
+.header-settings:hover .header-settings-menu {
+    display: flex;
+}
+
+/* Each row: label on the left, toggle switch on the right */
+.settings-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    cursor: pointer;
+}
+
+.settings-label {
+    font-family: var(--font-primary);
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--noir-leger);
+    letter-spacing: 0.02em;
+    user-select: none;
+}
+
+/* Toggle switch — the visible track */
+.settings-toggle-track {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    width: 2rem;
+    height: 1rem;
+    border-radius: 0.5rem;
+    background: rgba(0, 0, 0, 0.15);
+    flex-shrink: 0;
+    transition: background 0.2s ease;
+}
+
+/* The actual checkbox is hidden — the track and thumb are purely visual */
+.settings-checkbox {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+/* The sliding thumb */
+.settings-toggle-thumb {
+    position: absolute;
+    left: 0.125rem;
+    width: 0.75rem;
+    height: 0.75rem;
+    border-radius: 50%;
+    background: var(--noir-leger);
+    transition: transform 0.2s ease;
+}
+
+/* Checked state: track lights up in Malve, thumb slides right */
+.settings-checkbox:checked ~ .settings-toggle-thumb {
+    transform: translateX(1rem);
+}
+
+.settings-item:has(.settings-checkbox:checked) .settings-toggle-track {
+    background: var(--malve-magenta);
 }
 
 
@@ -379,12 +567,9 @@ body {
     }
 }
 
-/* --- Mobile (≤ 768px): header collapse placeholder ------------------------ */
-/* Full mobile dropdown menu to be implemented alongside the loading screen. */
-
 
 /* =============================================================================
-   4. HERO SECTION
+   5. HERO SECTION
 ============================================================================= */
 
 .hero-section {
@@ -393,7 +578,7 @@ body {
 }
 
 
-/* --- 3a. Parallax Layers -------------------------------------------------- */
+/* --- 5a. Parallax Layers -------------------------------------------------- */
 
 .parallax-layer {
     position: absolute;
@@ -404,14 +589,14 @@ body {
     pointer-events: none;
 }
 
-/* 1. DEFAULT: Massive 4000px Original (For 4K monitors) */
+/* 1. DEFAULT: Massive 4000px original (for 4K monitors) */
 .bg-layer {
     z-index: 1;
     background-size: cover;
     background-position: center;
-    
+
     background-image: -webkit-image-set(
-        url('assets/images/images/01_caspar_david_friedrich_abtei_im_eichwald.avif') 1x,
+        url('assets/images/01_caspar_david_friedrich_abtei_im_eichwald.avif') 1x,
         url('assets/images/01_caspar_david_friedrich_abtei_im_eichwald.jpg') 1x
     );
     background-image: image-set(
@@ -441,35 +626,39 @@ body {
 }
 
 
-/* --- 3b. Particle Animations (HARDWARE ACCELERATED) --- */
+/* --- 5b. Particle Animations (Hardware Accelerated) ----------------------- */
 
-/* 1. The Parent Layers (These are moved by your JavaScript Parallax) */
-.particles-back, 
+/* 1. The parent layers — moved by JavaScript parallax */
+.particles-back,
 .particles-front {
     z-index: 5;
     position: absolute;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
     pointer-events: none;
 }
+
 .particles-front { z-index: 20; }
 
-/* 2. The Pseudo-Elements (These handle the infinite GPU scrolling) */
+/* 2. The pseudo-elements — handle the infinite GPU scrolling */
 .particles-back::before {
     content: "";
     position: absolute;
-    /* Oversize the container backwards so we don't reveal a hard edge when it slides */
-    top: -1000px; 
+    /* Oversize the container so we don't reveal a hard edge when it slides */
+    top: -1000px;
     left: -200px;
     width: calc(100% + 200px);
     height: calc(100% + 1000px);
-    
-    /* Unified sizes to exactly 200px to make the math perfect */
-    background-image: radial-gradient(var(--blanc-leger) 1px, transparent 2px),
-                      radial-gradient(var(--blanc-leger) 1px, transparent 2px);
+
+    /* Unified sizes of exactly 200px to make the loop math perfect */
+    background-image:
+        radial-gradient(var(--blanc-leger) 1px, transparent 2px),
+        radial-gradient(var(--blanc-leger) 1px, transparent 2px);
     background-size: 200px 200px, 200px 200px;
     background-position: 0 0, 40px 60px;
-    
+
     opacity: 1;
     filter: blur(1px);
     animation: wind-back 33s linear infinite;
@@ -479,37 +668,38 @@ body {
     content: "";
     position: absolute;
     /* Oversize to hide edges during movement */
-    top: -1200px; 
+    top: -1200px;
     left: -400px;
     width: calc(100% + 400px);
     height: calc(100% + 1200px);
-    
-    /* Unified sizes to exactly 400px */
-    background-image: radial-gradient(var(--blanc-leger) 3px, transparent 4px),
-                      radial-gradient(var(--blanc-leger) 2px, transparent 3px);
+
+    /* Unified sizes of exactly 400px */
+    background-image:
+        radial-gradient(var(--blanc-leger) 3px, transparent 4px),
+        radial-gradient(var(--blanc-leger) 2px, transparent 3px);
     background-size: 400px 400px, 400px 400px;
     background-position: 0 0, 60px 90px;
-    
+
     opacity: 1;
     filter: blur(0.5px);
     animation: wind-front 15s linear infinite;
 }
 
-/* 3. The Perfect GPU Loops */
-/* Back moves +200X and +1000Y (Both are perfect multiples of its 200px size) */
+/* 3. The perfect GPU loops */
+/* Back moves +200X and +1000Y — both exact multiples of its 200px tile size */
 @keyframes wind-back {
     0%   { transform: translate3d(0, 0, 0); }
     100% { transform: translate3d(200px, 1000px, 0); }
 }
 
-/* Front moves +400X and +1200Y (Both are perfect multiples of its 400px size) */
+/* Front moves +400X and +1200Y — both exact multiples of its 400px tile size */
 @keyframes wind-front {
     0%   { transform: translate3d(0, 0, 0); }
     100% { transform: translate3d(400px, 1200px, 0); }
 }
 
 
-/* --- 3c. Center Container ------------------------------------------------- */
+/* --- 5c. Center Container ------------------------------------------------- */
 
 /* Width glides from 33.33% on wide screens to 50% at 960px,
    eliminating the discrete 960px breakpoint entirely. */
@@ -525,12 +715,12 @@ body {
 
 .hero-logo {
     width: 100%;
-    margin-bottom: 2rem;
     height: auto;
+    margin-bottom: 2rem;
 }
 
 
-/* --- 3d. Buttons ---------------------------------------------------------- */
+/* --- 5d. Buttons ---------------------------------------------------------- */
 
 .button-wrapper {
     display: flex;
@@ -539,9 +729,9 @@ body {
     width: 100%;
 }
 
-/* 1. Base Button (Holds the Drop Shadow) */
+/* 1. Base button — holds the drop shadow and shared typography */
 .btn {
-    position: relative; 
+    position: relative;
     flex: 1 0 150px;
     height: 2rem;
     display: flex;
@@ -556,43 +746,42 @@ body {
     cursor: pointer;
     border: none;
     outline: none;
-    background: transparent !important; 
+    background: transparent !important;
     transition: all 0.3s ease;
     z-index: 1;
 }
 
-/* 2. The Shape Layer (Holds the Mask and Background) */
+/* 2. Shape layer — holds the vesica piscis mask and the background gradient */
 .btn::before {
     content: "";
     position: absolute;
     inset: 0;
-    z-index: -1; 
-    /* UPDATED: Changed from background-color to background to support gradients */
-    background: var(--btn-bg, var(--noir-leger)); 
+    z-index: -1;
+    background: var(--btn-bg, var(--noir-leger));
     transition: all 0.3s ease;
-    
-    /* The Mathematically Perfect Vesica Piscis Mask */
-    -webkit-mask-image: 
+
+    /* The mathematically perfect vesica piscis mask.
+       Caps are 1.732rem wide (= √3), matching the circle arc geometry. */
+    -webkit-mask-image:
         url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 86.6025 100'%3E%3Cpath d='M 86.6025 0 A 100 100 0 0 0 0 50 A 100 100 0 0 0 86.6025 100 Z'/%3E%3C/svg%3E"),
         url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 86.6025 100'%3E%3Cpath d='M 0 0 A 100 100 0 0 1 86.6025 50 A 100 100 0 0 1 0 100 Z'/%3E%3C/svg%3E"),
         linear-gradient(black, black);
-    mask-image: 
+    mask-image:
         url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 86.6025 100'%3E%3Cpath d='M 86.6025 0 A 100 100 0 0 0 0 50 A 100 100 0 0 0 86.6025 100 Z'/%3E%3C/svg%3E"),
         url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 86.6025 100'%3E%3Cpath d='M 0 0 A 100 100 0 0 1 86.6025 50 A 100 100 0 0 1 0 100 Z'/%3E%3C/svg%3E"),
         linear-gradient(black, black);
 
-    /* Caps are 1.732rem wide based on √3 math. */
     -webkit-mask-size: 1.732rem 100%, 1.732rem 100%, calc(100% - 3.464rem + 8px) 100%;
-mask-size:         1.732rem 100%, 1.732rem 100%, calc(100% - 3.464rem + 8px) 100%;
+    mask-size:         1.732rem 100%, 1.732rem 100%, calc(100% - 3.464rem + 8px) 100%;
 
--webkit-mask-position: left center, right center, center;
-mask-position:         left center, right center, center;
+    -webkit-mask-position: left center, right center, center;
+    mask-position:         left center, right center, center;
 
--webkit-mask-repeat: no-repeat;
-mask-repeat:         no-repeat;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat:         no-repeat;
 
--webkit-mask-composite: source-over, source-over;
-mask-composite:         add, add;
+    -webkit-mask-composite: source-over, source-over;
+    mask-composite:         add, add;
 }
 
 .btn:hover {
@@ -600,57 +789,34 @@ mask-composite:         add, add;
     letter-spacing: 0.025em;
 }
 
-/* --- 3. Button Themes ----------------------------------------------------- */
+/* 3. Button themes --------------------------------------------------------- */
 
+/* White button */
 .btn-white {
-    /* Layer 1 (Top): The 3D carved rim lighting (bright top-left, dark bottom-right)
-      Layer 2 (Bottom): Your original background gradient
-    */
-    --btn-bg: 
-        linear-gradient(145deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0) 8%, rgba(0, 0, 0, 0) 92%, rgba(0, 0, 0, 0.08) 100%),
-        linear-gradient(145deg, #fafafa, #d3d3d3);
-    
+    --btn-bg: var(--btn-white-bg);
     color: var(--noir-leger);
-    
-    /* Neumorphic outer shadows */
-    filter: 
-        drop-shadow(0.4rem 0.4rem 0.8rem #c8c8c8) 
-        drop-shadow(-0.4rem -0.4rem 0.8rem #ffffff);
+    filter: var(--btn-white-shadow);
 }
 
 .btn-white:hover {
     transform: translateY(-2px);
-    filter: 
-        drop-shadow(0.5rem 0.5rem 1rem #b8b8b8) 
-        drop-shadow(-0.5rem -0.5rem 1rem #ffffff);
+    filter: var(--btn-white-shadow-hover);
 }
 
+/* Black button */
 .btn-black {
-    /* Layer 1 (Top): Subtle rim lighting adjusted for a dark surface
-       Layer 2 (Bottom): Your original background gradient
-    */
-    --btn-bg: 
-        linear-gradient(145deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0) 8%, rgba(0, 0, 0, 0) 92%, rgba(0, 0, 0, 0.6) 100%),
-        linear-gradient(145deg, #161616, #131313); 
-    
+    --btn-bg: var(--btn-black-bg);
     color: var(--blanc-leger);
-    
-    /* Reverted back to the light-background shadows */
-    filter: 
-        drop-shadow(0.4rem 0.4rem 0.8rem #8a8a8a) 
-        drop-shadow(-0.4rem -0.4rem 0.8rem #ffffff);
+    filter: var(--btn-black-shadow);
 }
 
 .btn-black:hover {
     transform: translateY(-2px);
-    /* Exaggerated shadows for the hover lift effect */
-    filter: 
-        drop-shadow(0.5rem 0.5rem 1rem #8a8a8a) 
-        drop-shadow(-0.5rem -0.5rem 1rem #ffffff);
+    filter: var(--btn-black-shadow-hover);
 }
 
 
-/* --- 3e. Hero Footer ------------------------------------------------------ */
+/* --- 5e. Hero Footer ------------------------------------------------------ */
 
 .hero-footer {
     position: absolute;
@@ -660,7 +826,7 @@ mask-composite:         add, add;
     text-align: center;
     font-family: var(--font-primary);
     font-size: 0.67rem;
-    font-weight: 500;
+    font-weight: 400;
     color: var(--noir-leger);
     z-index: 10;
 }
@@ -670,7 +836,7 @@ mask-composite:         add, add;
 }
 
 
-/* --- 3f. Weapons Layers --------------------------------------------------- */
+/* --- 5f. Weapons Layers --------------------------------------------------- */
 
 /* Primary strategy — position absorbs viewport changes, not size:
      Width is locked at 700px (= exactly 50vw at the 1400px design baseline).
@@ -701,9 +867,7 @@ mask-composite:         add, add;
 }
 
 /* Outer edges glide off-screen from 0 (at 1400px) to −12.5% (at 900px).
-   The formula resolves to 0 on wide screens and is clamped at −12.5% below 900px.
-   Combined with the 75% mobile width cap, this allows up to ~50% image overlap
-   at the narrowest sizes before the secondary height-reduction strategy takes over. */
+   The formula resolves to 0 on wide screens and is clamped at −12.5% below 900px. */
 .weapons-left {
     left: clamp(-12.5%, calc((100vw - 1400px) * 0.225), 0%);
 }
@@ -733,7 +897,7 @@ mask-composite:         add, add;
 
 
 /* =============================================================================
-   4. SECTION 2: SPLIT PANELS
+   6. SECTION 2: SPLIT PANELS
 ============================================================================= */
 
 .split-section {
@@ -752,7 +916,7 @@ mask-composite:         add, add;
 }
 
 
-/* --- 4a. Panel Configuration ---------------------------------------------- */
+/* --- 6a. Panel Configuration ---------------------------------------------- */
 
 /* Left panel extends 20px beyond 50% so it tucks cleanly behind the right panel */
 .panel-left {
@@ -774,10 +938,10 @@ mask-composite:         add, add;
 }
 
 
-/* --- 4b. Background Images ------------------------------------------------ */
+/* --- 6b. Background Images ------------------------------------------------ */
 
-/* 1. DEFAULT (Base layout & 4K Original Images)
-   Both layers are oversized to allow parallax movement without edge gaps */
+/* 1. DEFAULT (Base layout & 4K original images)
+   Both layers are oversized to allow parallax movement without edge gaps. */
 .bg-layer-creation,
 .bg-layer-eden {
     width: 115% !important;
@@ -808,9 +972,6 @@ mask-composite:         add, add;
     );
 }
 
-
-/* --- Responsive Backgrounds ----------------------------------------------- */
-
 /* 2. LAPTOP / STANDARD DESKTOP (1920px and below) */
 @media (max-width: 1920px) {
     .bg-layer-creation {
@@ -830,7 +991,6 @@ mask-composite:         add, add;
     }
 }
 
-
 /* 3. MOBILE (768px and below) */
 @media (max-width: 768px) {
     .bg-layer-creation {
@@ -843,7 +1003,7 @@ mask-composite:         add, add;
 }
 
 
-/* --- 4c. Gradient Overlays ------------------------------------------------ */
+/* --- 6c. Gradient Overlays ------------------------------------------------ */
 
 /* Fade edges of the left panel into the page background color */
 .gradient-overlay {
@@ -866,7 +1026,7 @@ mask-composite:         add, add;
 }
 
 
-/* --- 4d. Rule of Thirds Grid ---------------------------------------------- */
+/* --- 6d. Rule of Thirds Grid ---------------------------------------------- */
 
 /* Three equal columns keep text anchored to the middle third of each panel.
    Column ratio is transitioned so grid tightening at breakpoints feels gradual. */
@@ -890,31 +1050,31 @@ mask-composite:         add, add;
     white-space: nowrap;
     font-family: var(--font-primary);
     font-size: 1rem;
-    font-weight: 500;
+    font-weight: 400;
     line-height: 1.5;
 }
 
 
-/* --- 4e. Typography ------------------------------------------------------- */
+/* --- 6e. Typography ------------------------------------------------------- */
 
 /* Alignment utilities */
-.text-left  { text-align: left; }
+.text-left   { text-align: left; }
 .align-right { text-align: right; }
 
 /* Color utilities */
 .text-noir  { color: var(--noir-leger); }
 .text-blanc { color: var(--blanc-leger); }
 
-/* Branded highlights */
+/* Branded highlights — color varies per class; weight is shared via variable */
 .highlight-viola {
     color: var(--viola-violet);
-    font-weight: 800;
+    font-weight: var(--highlight-weight);
     font-variant: small-caps;
 }
 
 .highlight-malve {
     color: var(--malve-magenta);
-    font-weight: 800;
+    font-weight: var(--highlight-weight);
     font-variant: small-caps;
 }
 
@@ -925,7 +1085,7 @@ mask-composite:         add, add;
 }
 
 
-/* --- 4f. Center Image (Angel) --------------------------------------------- */
+/* --- 6f. Center Image (Angel) --------------------------------------------- */
 
 /* Absolutely centered within the split section, hovering above both panels.
    JS parallax composes its translate on top of the base -50%/-50% centering.
@@ -946,20 +1106,18 @@ mask-composite:         add, add;
     height: 100%;
     width: auto;
     object-fit: contain;
-    /* Neumorphic-style shadow: soft light from top-left, soft dark from bottom-right */
-    filter:
-        drop-shadow( 4px  4px 12px rgba(0, 0, 0, 0.12));
+    filter: drop-shadow(4px 4px 12px rgba(0, 0, 0, 0.12));
 }
 
 
 /* =============================================================================
-   5. RESPONSIVE BREAKPOINTS
+   7. RESPONSIVE BREAKPOINTS
 
    clamp() handles the continuous fluid range for weapons bleed and several
    widths, so hard breakpoints are kept to a minimum. What remains:
      — Two grid-ratio steps for the split panel text (1300px, 1000px)
      — One secondary-strategy step for weapons height (900px)
-     — One full layout flip for mobile (768px)
+     — One full layout flip for mobile (768px) — covers both layout and header
    Every discrete property change is transitioned so threshold crossings
    feel like gentle animations rather than snaps.
 ============================================================================= */
@@ -976,14 +1134,15 @@ mask-composite:         add, add;
     .center-image-wrapper { height: 58%; }
 }
 
-/* (≤ 900px) Secondary strategy begins — primary bleed/overlap is exhausted.
-   Height steps down; width will follow only if absolutely necessary. */
+/* (≤ 900px) Secondary strategy begins — primary bleed/overlap is exhausted */
 @media (max-width: 900px) {
     .weapons-layer { height: 95%; }
 }
 
-/* (≤ 768px) Full mobile stack — the one intentional hard layout change */
+/* (≤ 768px) Full mobile stack — layout flip and header collapse */
 @media (max-width: 768px) {
+
+    /* Layout */
     .center-container { width: 66.66%; }
 
     .split-section { flex-direction: column; }
@@ -1011,10 +1170,8 @@ mask-composite:         add, add;
     /* Weapons yield to percentage sizing on narrow mobile viewports.
        75% width allows up to ~50% overlap between the two images. */
     .weapons-layer { width: 75%; height: 80%; }
-}
 
-/* --- Mobile (≤ 768px): Minimal Editorial Header --- */
-@media (max-width: 768px) {
+    /* Header: minimal editorial layout — left column hidden, wordmark takes over */
     .header-col-left {
         display: none;
     }
@@ -1030,27 +1187,151 @@ mask-composite:         add, add;
         flex: 1;
         gap: 1.5rem;
     }
+
 }
 
+
 /* =============================================================================
-   LOADING SCREEN & REVEAL EFFECT (PHYSICS UPDATE)
+   8. LOADING SCREEN & REVEAL EFFECT
+
+   The .scroll-container starts in a blurred, scaled, invisible state so that
+   the loading screen has something atmospheric to expand into. Once the user
+   clicks through, body.is-revealed is added and the site animates in.
 ============================================================================= */
 
-/* --- State 3: The Website Reveal --- */
+/* Initial hidden state — applied at all times until reveal */
 .scroll-container {
     filter: blur(12px) brightness(1.5);
-    transform: scale(1.05); 
+    transform: scale(1.05);
     opacity: 0;
     transition: filter 3s ease-out, transform 1.5s ease-out, opacity 1s ease-out;
 }
 
+/* Revealed state — triggered by JS adding .is-revealed to <body> */
 body.is-revealed .scroll-container {
     filter: blur(0) brightness(1);
     transform: scale(1);
     opacity: 1;
 }
 
-.header-mute:disabled {
-    opacity: 0.3;
-    cursor: not-allowed;
+
+/* =============================================================================
+   9. SECTION 4: SLIDESHOW
+============================================================================= */
+
+.slideshow-section {
+    background-color: var(--blanc-leger);
+    display: flex;
+    flex-direction: column;
+    width: 100vw;
+    height: 100dvh;
+    padding: 3rem 1rem 0 1rem; /* 3rem top clears the fixed header exactly */
+}
+
+/* Image fills the remaining vertical space above the navigation strip */
+.slideshow-image-wrapper {
+    flex-grow: 1;
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Oversized to give parallax room to move without revealing edges */
+.slideshow-image-wrapper picture {
+    width: 110%;
+    height: 110%;
+    display: block;
+}
+
+.slideshow-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
+
+/* --- Navigation & Typography ---------------------------------------------- */
+
+.slideshow-nav {
+    padding: 1rem 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    flex-shrink: 0;
+    width: 100%;
+}
+
+.slideshow-title {
+    font-family: var(--font-primary);
+    font-weight: 400;
+    font-size: 1rem;
+    color: var(--noir-leger);
+    margin: 0;
+    text-align: center;
+}
+
+/* Title highlight — same typographic style as .highlight-viola */
+.title-highlight {
+    font-variant: small-caps;
+    color: var(--viola-violet);
+    letter-spacing: 0.03rem;
+    font-weight: var(--highlight-weight);
+}
+
+/* Width mirrors the hero container's clamp so controls feel visually aligned */
+.slideshow-controls {
+    width: clamp(33.33%, calc(33.33% + (1400px - 100vw) * 0.037886), 50%);
+    padding: 0 2rem;
+    transition: width 0.4s ease;
+}
+
+.button-wrapper-slideshow {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    width: 100%;
+}
+
+/* Arrow buttons: 1 share each */
+.btn-arrow {
+    flex: 1 0 0;
+    min-width: 3.5rem;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* "See more" button: 2 shares — twice an arrow.
+   min-width: max-content sets the floor to the exact text width,
+   so stacking triggers the moment text would otherwise break. */
+.btn-main {
+    flex: 2 0 0;
+    min-width: max-content;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+
+/* --- Mobile Breakpoint ---------------------------------------------------- */
+
+@media (max-width: 768px) {
+    .slideshow-controls {
+        width: 66.66%; /* Matches the hero's mobile container width */
+    }
+
+    /* Arrows stack side by side on top, "See more" drops below */
+    .btn-arrow {
+        flex: 1 1 calc(50% - 0.25rem);
+    }
+
+    .btn-main {
+        flex: 1 1 100%;
+        order: 3;
+    }
 }
