@@ -9,9 +9,8 @@
     "hero": {
         "explore":            "Explorer",
         "contact_btn":        "Nous contacter",
-        "footer_established": "Fondé en 2025 par François-Félicien à Trèves.",
-        "footer_copyright":   "\u00a9 2025\u20132026 SANS SAINT. Tous droits réservés.",
-        "footer_rights":      "Ne pas reproduire sans autorisation."
+        "footer_established": "Fondé en 2025 dans la ville de Trèves.",
+        "footer_copyright":   "\u00a9 2025\u20132026 SANS SAINT. Tous droits réservés."
     },
 
     "creation": {
@@ -27,5 +26,16 @@
         "see_more":  "Voir plus",
         "prev_aria": "Projet précédent",
         "next_aria": "Projet suivant"
+    },
+
+    "portfolio": {
+        "heading_top":    "Port-",
+        "heading_bottom": "folio",
+        "download_title": "TRAVAUX SÉLECTIONNÉS",
+        "download_file":  "Franz-Felix_Schwan_Portfolio_v2.pdf",
+        "download":       "Télécharger",
+        "visit_title":    "Instagram",
+        "visit_url":      "www.instagram.com/sanssaintco/",
+        "visit":          "Visiter"
     }
 }

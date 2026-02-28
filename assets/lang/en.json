@@ -9,9 +9,8 @@
     "hero": {
         "explore":            "Explore",
         "contact_btn":        "Get in touch",
-        "footer_established": "Est. 2025 by Franz-Felix in Trier.",
-        "footer_copyright":   "\u00a9 2025\u20132026 SANS SAINT. All rights reserved.",
-        "footer_rights":      "Do not replicate without permission."
+        "footer_established": "Est. 2025 in the city of Trier.",
+        "footer_copyright":   "\u00a9 2025\u20132026 SANS SAINT. All rights reserved."
     },
 
     "creation": {
@@ -27,5 +26,16 @@
         "see_more":  "See more",
         "prev_aria": "Previous project",
         "next_aria": "Next project"
+    },
+
+    "portfolio": {
+        "heading_top":    "Port-",
+        "heading_bottom": "folio",
+        "download_title": "SELECTED WORKS",
+        "download_file":  "Franz-Felix_Schwan_Portfolio_v2.pdf",
+        "download":       "Download",
+        "visit_title":    "Instagram",
+        "visit_url":      "www.instagram.com/sanssaintco/",
+        "visit":          "Visit"
     }
 }

@@ -21,8 +21,8 @@
     <!-- Favicon: browser selects based on system color scheme -->
     <link rel="icon" href="assets/icons/06_sans_saint_favicon_light_mode.svg" media="(prefers-color-scheme: light)">
     <link rel="icon" href="assets/icons/05_sans_saint_favicon_dark_mode.svg"  media="(prefers-color-scheme: dark)">
-    <link rel="preload" href="assets/eb_garamond/loading-regular.woff2" as="font" type="font/woff2" fetchpriority="high" crossorigin>
-<link rel="preload" href="assets/eb_garamond/loading-extrabold.woff2" as="font" type="font/woff2" fetchpriority="high" crossorigin>
+    <link rel="preload" href="assets/eb_garamond/NotEBGaramond-Regular.woff2" as="font" type="font/woff2" fetchpriority="high" crossorigin>
+<link rel="preload" href="assets/eb_garamond/NotEBGaramond-ExtraBold.woff2" as="font" type="font/woff2" fetchpriority="high" crossorigin>
 
     <style>
         :root {
@@ -34,8 +34,8 @@
 
         @font-face {
     font-family: 'Not EB Garamond';
-    src: url('assets/eb_garamond/loading-regular.woff2') format('woff2'),
-         url('assets/eb_garamond/loading-regular.ttf') format('truetype');
+    src: url('assets/eb_garamond/NotEBGaramond-Regular.woff2') format('woff2'),
+         url('assets/eb_garamond/NotEBGaramond-Regular.ttf') format('truetype');
     font-weight: 400;
     font-style: normal;
     font-display: block;
@@ -43,8 +43,8 @@
 
 @font-face {
     font-family: 'Not EB Garamond';
-    src: url('assets/eb_garamond/loading-extrabold.woff2') format('woff2'),
-         url('assets/eb_garamond/loading-extrabold.ttf') format('truetype');
+    src: url('assets/eb_garamond/NotEBGaramond-ExtraBold.woff2') format('woff2'),
+         url('assets/eb_garamond/NotEBGaramond-ExtraBold.ttf') format('truetype');
     font-weight: 800;
     font-style: normal;
     font-display: block;
@@ -428,9 +428,8 @@ html[lang="fr"] .loading-cta::after {
             </div>
 
             <div class="hero-footer relative-content">
-                <p data-i18n="hero.footer_established">Est. 2025 by Franz-Felix in Trier.</p>
+                <p data-i18n="hero.footer_established">Est. 2025 in the city of Trier.</p>
                 <p data-i18n="hero.footer_copyright">© 2025–2026 SANS SAINT. All rights reserved.</p>
-                <p data-i18n="hero.footer_rights">Do not replicate without permission.</p>
             </div>
 
             <div class="parallax-layer particles-front" id="particles-front"></div>
@@ -509,34 +508,64 @@ html[lang="fr"] .loading-cta::after {
         <section class="section" id="portfolio">
         </section>
 
-        <section class="section slideshow-section" id="portfolio-slideshow">
-            
-            <div class="slideshow-image-wrapper">
-                <picture class="parallax-layer slideshow-parallax">
-                    <source media="(max-width: 1920px)" type="image/avif" srcset="portfolio/2025_sed_vivam/01_sed_vivam_thumbnail_1920px.avif">
-                    <source media="(max-width: 1920px)" type="image/jpeg" srcset="portfolio/2025_sed_vivam/01_sed_vivam_thumbnail_1920px.jpeg">
-                    
-                    <source type="image/avif" srcset="portfolio/2025_sed_vivam/01_sed_vivam_thumbnail.avif">
-                    <img src="portfolio/2025_sed_vivam/01_sed_vivam_thumbnail.jpeg" fetchpriority="low" alt="Sed Vivam I Thumbnail" class="slideshow-img">
+        <section class="section portfolio-section" id="portfolio-slideshow">
+
+            <div class="parallax-layer bg-layer" id="portfolio-bg"></div>
+
+            <div class="parallax-layer particles-back" id="portfolio-particles-back"></div>
+
+            <div class="parallax-layer weapons-layer weapons-left">
+                <picture>
+                    <source srcset="assets/images/05_ai_generated_weapons_left.avif" type="image/avif">
+                    <img src="assets/images/05_ai_generated_weapons_left.png" alt="Swords Left" fetchpriority="low">
                 </picture>
             </div>
 
-            <div class="slideshow-nav">
-                
-                <p class="slideshow-title" data-i18n="slideshow.title">
-                    1/1. <span class="title-highlight">Sed Vivam I</span> – A photo series – 2025
-                </p>
-
-                <div class="slideshow-controls">
-                    <div class="button-wrapper button-wrapper-slideshow">
-                        <button class="btn btn-white btn-arrow" aria-label="Previous project" data-i18n-aria="slideshow.prev_aria">&#x2190;</button>
-                        <a href="#sed-vivam" class="btn btn-black btn-main" data-i18n="slideshow.see_more">See more</a>
-                        <button class="btn btn-white btn-arrow" aria-label="Next project" data-i18n-aria="slideshow.next_aria">&#x2192;</button>
-                    </div>
-                </div>
-
+            <div class="parallax-layer weapons-layer weapons-also-right">
+                <picture>
+                    <img src="assets/images/08_ai_generated_weapons_also_right.avif"
+                         onerror="this.src='assets/images/08_ai_generated_weapons_also_right.png'"
+                         alt="Swords Also Right" fetchpriority="low">
+                </picture>
             </div>
-            
+
+            <div class="parallax-layer weapons-layer weapons-right">
+                <picture>
+                    <source srcset="assets/images/06_ai_generated_weapons_right.avif" type="image/avif">
+                    <img src="assets/images/06_ai_generated_weapons_right.png" alt="Swords Right" fetchpriority="low">
+                </picture>
+            </div>
+
+            <div class="center-container relative-content">
+                <h2 class="portfolio-heading">
+                    <span class="portfolio-heading-top"  data-i18n="portfolio.heading_top">Port-</span>
+                    <span class="portfolio-heading-bottom" data-i18n="portfolio.heading_bottom">folio</span>
+                </h2>
+                <div class="button-wrapper button-wrapper-portfolio">
+
+                    <!-- Download group: labels + black button, left-aligned -->
+                    <div class="portfolio-btn-group portfolio-btn-group-left">
+                        <div class="portfolio-btn-labels">
+                            <p class="portfolio-btn-label portfolio-btn-label-main"  data-i18n="portfolio.download_title">SELECTED WORKS</p>
+                            <p class="portfolio-btn-label portfolio-btn-label-small" data-i18n="portfolio.download_file">Franz-Felix_Schwan_Portfolio_v2.pdf</p>
+                        </div>
+                        <a href="#" class="btn btn-black" data-i18n="portfolio.download">Download</a>
+                    </div>
+
+                    <!-- Visit group: labels + white button, right-aligned -->
+                    <div class="portfolio-btn-group portfolio-btn-group-right">
+                        <div class="portfolio-btn-labels">
+                            <p class="portfolio-btn-label portfolio-btn-label-main"  data-i18n="portfolio.visit_title">Instagram</p>
+                            <p class="portfolio-btn-label portfolio-btn-label-small" data-i18n="portfolio.visit_url">www.instagram.com/sanssaintco/</p>
+                        </div>
+                        <a href="https://www.instagram.com/sanssaintco/" target="_blank" rel="noopener noreferrer" class="btn btn-white" data-i18n="portfolio.visit">Visit</a>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="parallax-layer particles-front" id="portfolio-particles-front"></div>
+
         </section>
 
     </main>
