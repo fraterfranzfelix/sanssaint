@@ -37,5 +37,19 @@
         "visit_title":    "Instagram",
         "visit_url":      "www.instagram.com/sanssaintco/",
         "visit":          "Visit"
+    },
+
+    "contact": {
+        "name":          "Franz-Felix Schwan O.C.D.S.",
+        "role_1":        "Graphic Designer",
+        "role_2":        "and Secular Carmelite",
+        "location_1":    "—based in Mannheim,",
+        "location_2":    "Mainz, and Trier.",
+        "resume_title":  "RESUME",
+        "resume_file":   "Franz-Felix_Schwan_Resume_v1.pdf",
+        "download":      "Download",
+        "email_title":   "CONTACT",
+        "email_address": "contact@sanssaint.eu",
+        "email_btn":     "E-mail"
     }
 }

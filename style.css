@@ -1396,3 +1396,111 @@ body.is-revealed .scroll-container {
     letter-spacing: 0.03rem;
     text-transform: none;
 }
+
+/* --- Section 5: Portrait Photo -------------------------------------------- */
+
+.portrait-layer {
+    /* Oversize the container slightly so the parallax movement 
+       doesn't pull the edges of the image into view */
+    top: -7.5% !important;
+    left: -7.5% !important;
+    width: 115% !important;
+    height: 115% !important;
+    z-index: 10;
+    
+    /* The double-exposure effect */
+    mix-blend-mode: lighten;
+}
+
+.portrait-img {
+    width: 100%;
+    height: 100%;
+    
+    /* Ensures the image always fills the space and stays centered */
+    object-fit: cover;
+    object-position: center;
+    display: block;
+}
+
+/* --- Section 5 Overrides: Reversed Split Panels --------------------------- */
+
+/* The Portrait (Left) sits on top and receives the mirrored right-side cutouts */
+#contact-panel-left {
+    margin-right: 0; /* Clear the default negative margin */
+    flex: 0 0 50%;
+    max-width: 50%;
+    z-index: 2;
+
+    /* Mirrored 4-Part Vesica Piscis Mask (Right-Side Cutouts) */
+    -webkit-mask-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 57.735 100'%3E%3Cpath d='M 0 0 A 115.47 115.47 0 0 1 57.735 100 L 0 100 Z'/%3E%3C/svg%3E"),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 57.735 100'%3E%3Cpath d='M 0 100 A 115.47 115.47 0 0 0 57.735 0 L 0 0 Z'/%3E%3C/svg%3E"),
+        linear-gradient(black, black),
+        linear-gradient(black, black);
+
+    mask-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 57.735 100'%3E%3Cpath d='M 0 0 A 115.47 115.47 0 0 1 57.735 100 L 0 100 Z'/%3E%3C/svg%3E"),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 57.735 100'%3E%3Cpath d='M 0 100 A 115.47 115.47 0 0 0 57.735 0 L 0 0 Z'/%3E%3C/svg%3E"),
+        linear-gradient(black, black),
+        linear-gradient(black, black);
+
+    -webkit-mask-size: 
+        var(--cutout-w) var(--cutout-h),                                /* Top Right */
+        var(--cutout-w) var(--cutout-h),                                /* Bottom Right */
+        calc(100% - var(--cutout-w) + 1px) 100%,                        /* Main Left Body */
+        var(--cutout-w) calc(100% - (var(--cutout-h) * 2) + 1px);       /* Right Edge Connector */
+        
+    mask-size: 
+        var(--cutout-w) var(--cutout-h), 
+        var(--cutout-w) var(--cutout-h), 
+        calc(100% - var(--cutout-w) + 1px) 100%, 
+        var(--cutout-w) calc(100% - (var(--cutout-h) * 2) + 1px);
+
+    -webkit-mask-position: 
+        top right, 
+        bottom right, 
+        top left, 
+        100% var(--cutout-h); /* Center right edge */
+        
+    mask-position: 
+        top right, 
+        bottom right, 
+        top left, 
+        100% var(--cutout-h);
+
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+}
+
+/* The Text (Right) clears any masks and tucks UNDER the left panel */
+#contact-panel-right {
+    -webkit-mask-image: none;
+    mask-image: none;
+    
+    flex: 0 0 calc(50% + var(--cutout-w));
+    max-width: calc(50% + var(--cutout-w));
+    margin-left: calc(var(--cutout-w) * -1); /* Pulled left to tuck under */
+    z-index: 1;
+}
+
+/* Fix for mobile stacking so IDs don't overpower the max-width: 768px rule */
+@media (max-width: 768px) {
+    #contact-panel-left,
+    #contact-panel-right {
+        flex: auto;
+        max-width: 100%;
+        margin: 0;
+    }
+}
+
+/* --- Contact Section Overrides -------------------------------------------- */
+
+/* Force buttons to fill the narrow 1/3 column perfectly */
+#contact-panel-right .portfolio-btn-group .btn {
+    width: 100%;
+}
+
+/* Ensure the button wrapper clears the text above it */
+#contact-panel-right .button-wrapper-portfolio {
+    margin-top: 1.5rem;
+}

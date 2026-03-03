@@ -37,5 +37,19 @@
         "visit_title":    "Instagram",
         "visit_url":      "www.instagram.com/sanssaintco/",
         "visit":          "Visiter"
+    },
+
+    "contact": {
+        "name":          "François Félicien Schwan O.C.D.S.",
+        "role_1":        "Graphiste",
+        "role_2":        "et Carme séculier",
+        "location_1":    "—basé à Mannheim,",
+        "location_2":    "Mayence et Trèves.",
+        "resume_title":  "CV",
+        "resume_file":   "Franz-Felix_Schwan_Resume_v1.pdf",
+        "download":      "Télécharger",
+        "email_title":   "CONTACT",
+        "email_address": "contact@sanssaint.eu",
+        "email_btn":     "E-mail"
     }
 }

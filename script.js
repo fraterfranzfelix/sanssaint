@@ -37,6 +37,10 @@ function getSpeed(layer) {
     if (layer.classList.contains('weapons-layer'))        return -15;
     if (layer.classList.contains('center-image-wrapper')) return -35;
     if (layer.classList.contains('particles-back'))       return -35;
+    
+    /* --- NEW LINE HERE --- */
+    if (layer.classList.contains('portrait-layer'))       return -35;
+    
     if (layer.classList.contains('bg-layer-creation'))    return  50;  // Inverted
     if (layer.classList.contains('bg-layer-eden'))        return  50;  // Inverted
     return  50;  // Default: hero background — inverted
