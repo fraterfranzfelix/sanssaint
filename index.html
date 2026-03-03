@@ -13,7 +13,7 @@
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://www.sanssaint.eu/">
     <meta property="og:title" content="Atelier Sans Saint">
-    <meta property="og:description" content="Atelier Sans Saint, a creative agency est. 2025 by Franz-Felix in Trier.">
+    <meta property="og:description" content="Atelier Sans Saint, a creative agency est. 2025 by Franz-Felix Schwan O.C.D.S. in the city Trier.">
     <meta property="og:site_name" content="Atelier Sans Saint">
 
     <title>Atelier Sans Saint</title>
@@ -165,6 +165,26 @@ html[lang="fr"] .loading-cta::after {
     }
 }
 
+/* Latin */
+html[lang="la"] .loading-cta::after {
+    content: "Preme ubique ut intres\2026";
+}
+/* Luxembourgish */
+html[lang="lb"] .loading-cta::after {
+    content: "Klickt iwwerall fir eranzekommen\2026";
+}
+
+@media (pointer: coarse) {
+    /* Latin (Touch) */
+    html[lang="la"] .loading-cta::after {
+        content: "Tange ubique ut intres\2026";
+    }
+    /* Luxembourgish (Touch) */
+    html[lang="lb"] .loading-cta::after {
+        content: "Tippt iwwerall fir eranzekommen\2026";
+    }
+}
+
         /* Note: The .scroll-container reveal styles should remain in your main style.css 
            since they deal with the layout once the loader is gone. */
 
@@ -179,25 +199,38 @@ html[lang="fr"] .loading-cta::after {
     <!-- Runs before first paint to apply saved preferences and detect language.
          Order: saved user override → browser preference → default English. -->
     <script>
-        (function () {
+    (function () {
+        // Contrast
+        if (localStorage.getItem('sanssaint-contrast') === 'high') {
+            document.documentElement.classList.add('high-contrast');
+        }
 
-            // Contrast
-            if (localStorage.getItem('sanssaint-contrast') === 'high') {
-                document.documentElement.classList.add('high-contrast');
-            }
+        // Language detection
+        const saved = localStorage.getItem('sanssaint-lang');
+        let lang = 'en'; // Default fallback
 
-            // Language detection
-            // A saved choice (from the language dropdown) always takes precedence.
-            // Otherwise, read the browser's primary language and use French if it
-            // starts with 'fr' — anything else falls back to English.
-            const saved   = localStorage.getItem('sanssaint-lang');
+        if (saved) {
+            lang = saved;
+        } else {
             const browser = (navigator.language || '').toLowerCase();
-            const lang    = saved || (browser.startsWith('fr') ? 'fr' : 'en');
+            if (browser.startsWith('fr')) {
+                lang = 'fr';
+            } else if (browser.startsWith('lb')) {
+                lang = 'lb';
+            } else if (browser.startsWith('la')) {
+                lang = 'la'; // Highly unlikely natively, but logically sound to include!
+            }
+        }
 
-            document.documentElement.lang = lang;
+        // Safeguard: Ensure the resolved language is actually supported
+        const supported = ['en', 'fr', 'la', 'lb'];
+        if (!supported.includes(lang)) {
+            lang = 'en';
+        }
 
-        })();
-    </script>
+        document.documentElement.lang = lang;
+    })();
+</script>
     <link rel="stylesheet" href="style.css" media="print" onload="this.media='all'">
 
     <noscript>
@@ -331,9 +364,11 @@ html[lang="fr"] .loading-cta::after {
                         <span id="lang-current">EN</span>
                     </button>
                     <ul class="header-lang-dropdown" id="lang-menu" role="listbox">
-                        <li><a href="#" data-lang="en">English</a></li>
-                        <li><a href="#" data-lang="fr">Français</a></li>
-                    </ul>
+    <li><a href="#" data-lang="en">English</a></li>
+    <li><a href="#" data-lang="fr">Français</a></li>
+    <li><a href="#" data-lang="la">Latina</a></li>
+    <li><a href="#" data-lang="lb">Lëtzebuergesch</a></li>
+</ul>
                 </div>
 
                 <!-- Settings panel -->
@@ -373,16 +408,18 @@ html[lang="fr"] .loading-cta::after {
          Runs synchronously here — font-display: block means no text is painted
          until the font arrives, so this executes before anything is visible. -->
     <script>
-        (function () {
-            var quotes = {
-                en: '“Acquire all <span class="quote-highlight">Hope,</span><br>ye who enter here.”',
-                fr: '« Acquérez toute <span class="quote-highlight">Espérance,</span><br>vous qui entrez ici. »'
-            };
-            var lang = document.documentElement.lang;
-            var el   = document.getElementById('loading-quote');
-            if (el && quotes[lang]) el.innerHTML = quotes[lang];
-        })();
-    </script>
+    (function () {
+        var quotes = {
+            en: '“Acquire all <span class="quote-highlight">Hope,</span><br>ye who enter here.”',
+            fr: '« Acquérez toute <span class="quote-highlight">Espérance,</span><br>vous qui entrez ici. »',
+            la: '“Acquirite omnem <span class="quote-highlight">Spem,</span><br>vos qui hic intratis.”',
+            lb: '“Kritt all <span class="quote-highlight">Hoffnung,</span><br>dir déi hei erakommt.”'
+        };
+        var lang = document.documentElement.lang;
+        var el   = document.getElementById('loading-quote');
+        if (el && quotes[lang]) el.innerHTML = quotes[lang];
+    })();
+</script>
 
     <!-- =====================================================================
          MAIN SCROLL CONTAINER

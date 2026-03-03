@@ -1,0 +1,48 @@
+{
+    "wholemark": "assets/icons/11_sans_saint_logos_wholemark_lb.svg",
+
+    "nav": {
+        "portfolio": "Portfolio",
+        "contact":   "Contact"
+    },
+
+    "hero": {
+        "explore":            "Exploréiert",
+        "contact_btn":        "Kontaktéiert eis",
+        "footer_established": "Gegr. 2025 an der Stad Tréier.",
+        "footer_copyright":   "\u00a9 2025\u20132026 SANS SAINT. All Rechter reservéiert."
+    },
+
+    "creation": {
+        "quote":         "\"D'Konscht muss d'Welt vum Geescht,<br>vum Onsichtbaren,<br>vum Onsiichtlechen,<br>vu <span class=\"highlight-viola\">Gott</span> attraktiv maachen.\"",
+        "attribution":   "Hl. Johannes Paul II<br><span class=\"citation\">Bréif un d'Kënschtler, 4. Abr. 1999</span>",
+        "panel_right_1": "<span class=\"highlight-malve\">Sans Saint</span> ass aus der Stad<br>Tréier entstanen<br>am Jubilée-Joer 2025",
+        "panel_right_2": "\u2014 geprägt vun der Traditioun,<br>prett fir ze reforméieren.",
+        "panel_right_3": "Mir wëlle Konscht maachen,<br>déi éiweg, ätherësch, ëmmer präsent ass."
+    },
+
+    "portfolio": {
+        "heading_top":    "Port-",
+        "heading_bottom": "folio",
+        "download_title": "AUSGEWIELTE WIERKER",
+        "download_file":  "Franz-Felix_Schwan_Portfolio_v2.pdf",
+        "download":       "Eroflueden",
+        "visit_title":    "Instagram",
+        "visit_url":      "www.instagram.com/sanssaintco/",
+        "visit":          "Visiteieren"
+    },
+
+    "contact": {
+        "name":          "Franz-Felix Schwan O.C.D.S.",
+        "role_1":        "Grapheschen Designer",
+        "role_2":        "a Sékuläre Karmelit",
+        "location_1":    "\u2014wunnt zu Mannheim,",
+        "location_2":    "Mainz an Tréier.",
+        "resume_title":  "CV",
+        "resume_file":   "Franz-Felix_Schwan_Resume_v1.pdf",
+        "download":      "Eroflueden",
+        "email_title":   "CONTACT",
+        "email_address": "contact@sanssaint.eu",
+        "email_btn":     "E-Mail"
+    }
+}

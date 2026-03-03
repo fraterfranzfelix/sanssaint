@@ -1,0 +1,48 @@
+{
+    "wholemark": "assets/icons/10_sans_saint_logos_wholemark_la.svg",
+
+    "nav": {
+        "portfolio": "Portafolium",
+        "contact":   "Contactus"
+    },
+
+    "hero": {
+        "explore":            "Explora",
+        "contact_btn":        "Nos conveni",
+        "footer_established": "Fund. MMXXV in urbe Treverorum.",
+        "footer_copyright":   "\u00a9 MMXXV\u2013MMXXVI SANS SAINT. Omnia iura reservantur."
+    },
+
+    "creation": {
+        "quote":         "\"Ars mundum spiritus,<br>invisibilium,<br>rerum non visibilium,<br><span class=\"highlight-viola\">Dei</span> amabilem reddere debet.\"",
+        "attribution":   "S. Ioannes Paulus II<br><span class=\"citation\">Epistula ad Artifices, IV Apr. MCMXCIX</span>",
+        "panel_right_1": "<span class=\"highlight-malve\">Sans Saint</span> ex urbe<br>Treverorum orta est<br>anno Iubilaei MMXXV",
+        "panel_right_2": "\u2014 traditione formata,<br>ad reformandum parata.",
+        "panel_right_3": "Artem facere volumus<br>aeternam, aetheream, semper praesentem."
+    },
+
+    "portfolio": {
+        "heading_top":    "Porta-",
+        "heading_bottom": "folium",
+        "download_title": "OPERA SELECTA",
+        "download_file":  "Franz-Felix_Schwan_Portfolio_v2.pdf",
+        "download":       "Extrahe",
+        "visit_title":    "Instagram",
+        "visit_url":      "www.instagram.com/sanssaintco/",
+        "visit":          "Adi"
+    },
+
+    "contact": {
+        "name":          "Franciscus Felix Schwan O.C.D.S.",
+        "role_1":        "Artifex Graphicus",
+        "role_2":        "et Carmelita Saecularis",
+        "location_1":    "\u2014degit Mannhemii,",
+        "location_2":    "Moguntiae et Treveris.",
+        "resume_title":  "CURRICULUM VITAE",
+        "resume_file":   "Franz-Felix_Schwan_Resume_v1.pdf",
+        "download":      "Extrahe",
+        "email_title":   "CONTACTUS",
+        "email_address": "contact@sanssaint.eu",
+        "email_btn":     "Epistula"
+    }
+}

@@ -417,6 +417,11 @@ function initLangDropdown() {
 
     if (!menu || !current) return;
 
+    // --- NEW: Sync the initial label on page load ---
+    // Reads the language set by your <head> script and updates the label
+    const activeLang = document.documentElement.lang || 'en';
+    current.textContent = activeLang.toUpperCase();
+
     // Open/close is handled purely by CSS :hover on .header-lang.
     // This function handles selection, persistence, and triggering translation.
     menu.querySelectorAll('a[data-lang]').forEach(link => {
