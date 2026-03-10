@@ -26,10 +26,14 @@
 
     <style>
         :root {
-            --noir-leger: #151515;
-            --blanc-leger: #eaeaea;
-            --malve-magenta: #fa8ca0;
-            --noir-tres-leger: #555555;
+            --noir-leger:        #151515;
+            --blanc-leger:       #eaeaea;
+            --malve-magenta:     #fa8ca0;
+            --noir-tres-leger:   #555555;
+            --font-size-body:    1rem;
+            --font-size-small:   0.667rem;
+            --font-weight-medium: 500;
+            --letter-spacing-tight: 0.02em;
         }
 
         @font-face {
@@ -76,7 +80,7 @@
 
         .loading-quote {
             color: var(--blanc-leger);
-            font-size: 1rem;
+            font-size: var(--font-size-body);
             font-weight: 400;
             letter-spacing: 0.02rem;
             line-height: 1.4;
@@ -91,12 +95,12 @@
         }
 
         .loading-cta {
-            color: var(--noir-tres-leger); 
-            font-size: 1rem;
+            color: var(--noir-tres-leger);
+            font-size: var(--font-size-body);
             font-weight: 400;
             letter-spacing: 0.02rem;
             opacity: 0;
-            transition: opacity 3s ease 3s; 
+            transition: opacity 3s ease 3s;
         }
 
         #loading-screen.is-ready .loading-cta {
@@ -130,7 +134,7 @@
         }
 
         #loading-screen.is-ready #loading-star {
-            animation-play-state: paused; 
+            animation: none;
         }
 
         #loading-screen.is-expanding {
@@ -147,7 +151,7 @@
 
 .loading-cta::after {
     content: 'Click anywhere to enter\2026';
-    font-size: 1rem;
+    font-size: var(--font-size-body);
     color: var(--noir-tres-leger);
 }
 
@@ -662,6 +666,60 @@ html[lang="lb"] .loading-cta::after {
             </div>
 
         </section>
+
+        <!-- Footer Section -->
+        <footer class="section footer-section" id="footer">
+            <div class="footer-inner">
+
+                <!-- Left: Imprint & Contact -->
+                <div class="footer-col">
+                    <h2>Imprint &amp;<br>Privacy Policy</h2>
+                    <p>Responsibility for data processing on this website, within the meaning of the General Data Protection Regulation (GDPR/DSGVO), lies with:</p>
+                    <br>
+                    <p>Franz-Felix Schwan<br>
+                    Bürgermeister-Fuchs-Str. 79<br>
+                    68169 Mannheim<br>
+                    Germany</p>
+                    <br>
+                    <p>More info…</p>
+
+                    <h2>Contact</h2>
+                    <p>contact@sanssaint.eu</p>
+                </div>
+
+                <!-- Middle: Downloads & Links -->
+                <div class="footer-col">
+                    <h2>Downloads</h2>
+                    <p>Portfolio<br>
+                    <a href="assets/Franz-Felix_Schwan_Portfolio_2020-2026.pdf" download><l>Franz-Felix_Schwan_Portfolio_2020-2026.pdf</l></a></p>
+                    <p>Resume<br>
+                    <a href="assets/Franz-Felix_Schwan_Resume.pdf" download><l>Franz-Felix_Schwan_Resume.pdf</l></a></p>
+
+                    <h2>Links</h2>
+                    <p>Website<br>
+                    <a href="https://www.sanssaint.eu" target="_blank" rel="noopener"><l>www.sanssaint.eu</l></a></p>
+                    <p>Instagram<br>
+                    <a href="https://www.instagram.com/sanssaintco/" target="_blank" rel="noopener"><l>www.instagram.com/sanssaintco/</l></a></p>
+                    <br>
+                    <p>A tithe of 10 % of our profit is donated to the Carmelite community or to charity causes, as per Leviticus 27:30 and Deuteronomy 14:22.</p>
+                </div>
+
+                <!-- Right: Credits -->
+                <div class="footer-col">
+                    <h2>Credits</h2>
+                    <p>Text set in EB Garamond font by Georg Duffner.<br>
+                    <a href="https://github.com/georgd/EB-Garamond" target="_blank" rel="noopener"><i>https://github.com/georgd/EB-Garamond</i></a></p>
+                    <p>Public Domain images provided by Wikimedia Commons.<br>
+                    <a href="https://creativecommons.org/public-domain/" target="_blank" rel="noopener"><i>https://creativecommons.org/public-domain/</i></a></p>
+                    <p>Custom domain by IONOS. Coded with Anthropic PBC's Claude AI.</p>
+                    <p>Illustrations, photography, and music by Franz-Felix Schwan.</p>
+                    <p>This website is hosted via GitHub.<br>
+                    <a href="https://github.com/fraterfranzfelix/sanssaint" target="_blank" rel="noopener"><i>https://github.com/fraterfranzfelix/sanssaint</i></a></p>
+                    <p>Mostly made in Europe.</p>
+                </div>
+
+            </div>
+        </footer>
 
     </main>
 

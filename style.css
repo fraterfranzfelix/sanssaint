@@ -21,6 +21,7 @@
    7. Responsive Breakpoints
    8. Loading Screen & Reveal Effect
    9. Section 4: Slideshow
+  10. Footer
 ============================================================================= */
 
 
@@ -46,6 +47,13 @@
     /* Em dash stroke weight — set precisely by JS canvas measurement after font load.
        This fallback value is intentionally approximate and will be overridden at runtime. */
     --em-dash-weight: 0.09rem;
+
+    /* Typography scale — used throughout all sections for consistent sizing. */
+    --font-size-body:       1rem;
+    --font-size-small:      0.667rem;
+    --font-weight-medium:   500;
+    --letter-spacing-tight: 0.02em;
+    --letter-spacing-caps:  0.1rem;
 
 
     /* --- Highlights ----------------------------------------------------------- */
@@ -234,7 +242,7 @@ body {
 
 .header-nav a {
     font-family: var(--font-primary);
-    font-size: 1rem;
+    font-size: var(--font-size-body);
     font-weight: 600;
     color: white;
     text-decoration: none;
@@ -380,14 +388,14 @@ body {
 
 .header-lang-toggle {
     font-family: var(--font-primary);
-    font-size: 1rem;
-    font-weight: 500;
+    font-size: var(--font-size-body);
+    font-weight: var(--font-weight-medium);
     color: white;
     background: none;
     border: none;
     padding: 0;
     cursor: pointer;
-    letter-spacing: 0.02em;
+    letter-spacing: var(--letter-spacing-tight);
     display: flex;
     align-items: center;
     gap: 0.35rem;
@@ -431,12 +439,12 @@ body {
 
 .header-lang-dropdown a {
     font-family: var(--font-primary);
-    font-size: 1rem;
-    font-weight: 500;
+    font-size: var(--font-size-body);
+    font-weight: var(--font-weight-medium);
     color: var(--noir-leger);
     text-decoration: none;
     white-space: nowrap;
-    letter-spacing: 0.02em;
+    letter-spacing: var(--letter-spacing-tight);
     transition: font-weight 0.2s ease;
 }
 
@@ -501,10 +509,10 @@ body {
 
 .settings-label {
     font-family: var(--font-primary);
-    font-size: 1rem;
-    font-weight: 500;
+    font-size: var(--font-size-body);
+    font-weight: var(--font-weight-medium);
     color: var(--noir-leger);
-    letter-spacing: 0.02em;
+    letter-spacing: var(--letter-spacing-tight);
     user-select: none;
 }
 
@@ -689,7 +697,14 @@ body {
     animation: wind-front 15s linear infinite;
 }
 
-/* 3. The perfect GPU loops */
+/* 3. Promote to compositor layers so the blur is rasterized once per GPU texture
+   and only the transform matrix changes each frame — no CPU repaint. */
+.particles-back::before,
+.particles-front::before {
+    will-change: transform;
+}
+
+/* 4. The perfect GPU loops */
 /* Back moves +200X and +1000Y — both exact multiples of its 200px tile size */
 @keyframes wind-back {
     0%   { transform: translate3d(0, 0, 0); }
@@ -743,9 +758,9 @@ body {
     align-items: center;
     padding: 0 2rem;
     font-family: var(--font-primary);
-    font-size: 1rem;
-    font-weight: 500;
-    letter-spacing: 0.02em;
+    font-size: var(--font-size-body);
+    font-weight: var(--font-weight-medium);
+    letter-spacing: var(--letter-spacing-tight);
     text-decoration: none;
     cursor: pointer;
     border: none;
@@ -829,8 +844,8 @@ body {
     width: 100%;
     text-align: center;
     font-family: var(--font-primary);
-    font-size: 0.667rem;
-    font-weight: 500;
+    font-size: var(--font-size-small);
+    font-weight: var(--font-weight-medium);
     color: var(--noir-leger);
     z-index: 10;
 }
@@ -1007,7 +1022,7 @@ body {
 
 /* Base: Creation (4K) */
 .bg-layer-creation {
-    background-color: #eaeaea; /* TODO: Replace with an average color from the engraving */
+    background-color: var(--blanc-leger); /* TODO: Replace with an average color from the engraving */
     background-image: -webkit-image-set(url('assets/images/03_gustave_dore_creation.jpg') 1x);
     background-image: image-set(
         url('assets/images/03_gustave_dore_creation.avif') type('image/avif'),
@@ -1017,7 +1032,7 @@ body {
 
 /* Base: Eden (4K) */
 .bg-layer-eden {
-    background-color: #151515; /* TODO: Replace with an average color from the engraving */
+    background-color: var(--noir-leger); /* TODO: Replace with an average color from the engraving */
     background-image: -webkit-image-set(url('assets/images/04_gustave_dore_jacobs_dream.jpg') 1x);
     background-image: image-set(
         url('assets/images/04_gustave_dore_jacobs_dream.avif') type('image/avif'),
@@ -1102,7 +1117,7 @@ body {
     width: 100%;
     white-space: nowrap;
     font-family: var(--font-primary);
-    font-size: 1rem;
+    font-size: var(--font-size-body);
     font-weight: 400;
     line-height: 1.5;
 }
@@ -1132,7 +1147,7 @@ body {
 }
 
 .citation {
-    font-size: 0.667rem;
+    font-size: var(--font-size-small);
     display: inline-block;
 }
 
@@ -1384,15 +1399,15 @@ body.is-revealed .scroll-container {
 
 /* "SELECTED WORKS" / "Instagram" — full caps, 1rem */
 .portfolio-btn-label-main {
-    font-size: 1rem;
-    letter-spacing: 0.1rem;
+    font-size: var(--font-size-body);
+    letter-spacing: var(--letter-spacing-caps);
     text-transform: uppercase;
 }
 
 /* Filename / URL — regular case, 0.67rem */
 .portfolio-btn-label-small {
-    font-size: 0.667rem;
-    font-weight: 500;
+    font-size: var(--font-size-small);
+    font-weight: var(--font-weight-medium);
     letter-spacing: 0.03rem;
     text-transform: none;
 }
@@ -1503,4 +1518,84 @@ body.is-revealed .scroll-container {
 /* Ensure the button wrapper clears the text above it */
 #contact-panel-right .button-wrapper-portfolio {
     margin-top: 1.5rem;
+}
+
+
+/* =============================================================================
+   10. FOOTER
+============================================================================= */
+
+.footer-section {
+    background-color: var(--noir-leger);
+    align-items: center;
+    justify-content: center;
+}
+
+/* Three-column grid, as wide as the contact panel right (50% + cutout).
+   Each column is therefore 1/3 of that width — matching the text column
+   in #contact-panel-right's rule-of-thirds grid. */
+.footer-inner {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 3rem;
+    width: calc(50% + var(--cutout-w));
+    font-family: var(--font-primary);
+    font-size: var(--font-size-body);
+    font-weight: 400;
+    line-height: 1.5;
+    color: var(--blanc-leger);
+}
+
+/* h2: all-caps label style, matching portfolio-btn-label-main */
+.footer-section h2 {
+    font-family: var(--font-primary);
+    font-size: var(--font-size-body);
+    font-weight: 400;
+    letter-spacing: var(--letter-spacing-caps);
+    text-transform: uppercase;
+    color: var(--blanc-leger);
+    margin-top: 1.5rem;
+    margin-bottom: 0.4rem;
+}
+
+.footer-col > h2:first-child {
+    margin-top: 0;
+}
+
+.footer-col p {
+    margin-bottom: 0.4rem;
+    color: var(--blanc-leger);
+}
+
+/* <l> custom tag — filenames and URLs, small */
+l {
+    display: inline;
+    font-size: var(--font-size-small);
+    font-weight: 400;
+    color: var(--blanc-leger);
+}
+
+/* <i> in footer — credit URLs, small */
+.footer-col i {
+    font-size: var(--font-size-small);
+    font-style: normal;
+    color: var(--blanc-leger);
+}
+
+/* Links — inherit color and remove underline */
+.footer-col a {
+    color: inherit;
+    text-decoration: none;
+}
+
+/* Mobile: stack columns vertically, scrollable */
+@media (max-width: 768px) {
+    .footer-inner {
+        grid-template-columns: 1fr;
+        width: 66.66%;
+        overflow-y: auto;
+        max-height: 100%;
+        padding: 3rem 0;
+        align-content: start;
+    }
 }

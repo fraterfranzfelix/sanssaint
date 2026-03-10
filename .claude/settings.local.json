@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls -la /Volumes/perotin2/sanssaint/07_website/sanssaint/*.js)"
+    ]
+  }
+}

@@ -23,6 +23,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
 const angelWrapper = document.querySelector('.center-image-wrapper');
 
+// Viewport dimensions — cached once and refreshed on resize so per-frame
+// code never needs to read window.innerWidth/Height directly.
+let vpWidth  = window.innerWidth;
+let vpHeight = window.innerHeight;
+window.addEventListener('resize', () => {
+    vpWidth  = window.innerWidth;
+    vpHeight = window.innerHeight;
+}, { passive: true });
+
 /**
  * Returns the parallax speed divisor for a given layer.
  * Higher absolute value → slower movement (feels further away).
@@ -63,7 +72,7 @@ function getSpeed(layer) {
  */
 function applyTransform(layer, xMove, yMove) {
     if (layer === angelWrapper) {
-        const isMobileLayout = window.innerWidth <= 768;
+        const isMobileLayout = vpWidth <= 768;
         const baseX          = isMobileLayout ? '-55%' : '-50%';
         const clampedX       = Math.max(-40, Math.min(40, xMove));
         const clampedY       = Math.max(-30, Math.min(30, yMove));
@@ -90,27 +99,32 @@ function initMouseParallax() {
     ];
     const layers = document.querySelectorAll(selectors.join(', '));
 
-    // 2. Set up variables to hold our target coordinates and a lock (ticking)
+    // 2. Pre-compute each layer's speed divisor once — getSpeed() uses
+    //    classList.contains() checks that don't need to run every frame.
+    const speedCache = new Map();
+    layers.forEach(layer => speedCache.set(layer, getSpeed(layer)));
+
+    // 3. Set up variables to hold our target coordinates and a lock (ticking)
     let targetX = 0;
     let targetY = 0;
     let ticking = false;
 
-    // 3. The function that actually updates the screen
+    // 4. The function that actually updates the screen
     function updateScreen() {
         layers.forEach(layer => {
-            const speed = getSpeed(layer);
+            const speed = speedCache.get(layer);
             applyTransform(layer, targetX / speed, targetY / speed);
         });
-        
+
         // Unlock the frame so the next mouse movement can queue up a new draw
         ticking = false;
     }
 
-    // 4. The event listener that tracks the mouse
+    // 5. The event listener that tracks the mouse
     document.addEventListener('mousemove', (e) => {
         // Just do the math here
-        targetX = e.clientX - window.innerWidth / 2;
-        targetY = e.clientY - window.innerHeight / 2;
+        targetX = e.clientX - vpWidth  / 2;
+        targetY = e.clientY - vpHeight / 2;
 
         // If an animation frame isn't already queued up, queue one!
         if (!ticking) {
@@ -139,6 +153,10 @@ function initTiltParallax() {
     ];
     const layers = document.querySelectorAll(selectors.join(', '));
 
+    // Pre-compute each layer's speed divisor once.
+    const speedCache = new Map();
+    layers.forEach(layer => speedCache.set(layer, getSpeed(layer)));
+
     let baseGamma = null;
     let baseBeta  = null;
 
@@ -149,10 +167,10 @@ function initTiltParallax() {
     // These represent where the elements CURRENTLY are
     let smoothX = 0;
     let smoothY = 0;
-    
-    const SMOOTHING = 0.12; 
+
+    const SMOOTHING = 0.12;
     const MAX_TILT = 10;
-    
+
     let ticking = false;
 
     // 2. The animation loop that runs at 60 FPS
@@ -163,7 +181,7 @@ function initTiltParallax() {
         smoothY += (targetY - smoothY) * SMOOTHING;
 
         layers.forEach(layer => {
-            const speed = getSpeed(layer);
+            const speed = speedCache.get(layer);
             applyTransform(layer, smoothX / speed, smoothY / speed);
         });
 
@@ -197,8 +215,8 @@ function initTiltParallax() {
 
         const normX  = rawX / MAX_TILT;
         const normY  = rawY / MAX_TILT;
-        const rangeX = window.innerWidth  / 2;
-        const rangeY = window.innerHeight / 2;
+        const rangeX = vpWidth  / 2;
+        const rangeY = vpHeight / 2;
 
         // Update the target coordinates
         targetX = normX * rangeX;
@@ -286,35 +304,30 @@ function initWordmarkReveal() {
 
     const headerCenter    = document.getElementById('header-center');
     const scrollContainer = document.querySelector('.scroll-container');
+    const heroSection     = document.getElementById('hero');
 
-    if (!headerCenter || !scrollContainer) return;
+    if (!headerCenter || !scrollContainer || !heroSection) return;
 
-    // The hero wholemark sits at 50vh (vertical center of section 1).
-    // The header's vertical midpoint is half of its 3rem height = 1.5rem.
-    // When scrollTop reaches (50vh − 1.5rem), the two logos are at the same
-    // screen position — this is the moment the center column expands and the
-    // line splits, creating the illusion that the logo snapped into the header.
-    // 1.5rem is computed from the live root font-size to stay correct across
-    // browser zoom levels.
-    function getRevealThreshold() {
-        const rootFontSize   = parseFloat(getComputedStyle(document.documentElement).fontSize);
-        const headerMidpoint = 1.5 * rootFontSize;
-        return (window.innerHeight * 0.5) - headerMidpoint;
-    }
+    // Place a 1px sentinel at the hero's vertical midpoint (50vh).
+    // IntersectionObserver fires exactly once when it crosses the trigger line,
+    // replacing the scroll listener that previously fired on every pixel.
+    const sentinel = document.createElement('div');
+    sentinel.style.cssText = 'position:absolute;top:50%;left:0;width:1px;height:1px;pointer-events:none;';
+    heroSection.appendChild(sentinel);
 
-    function onScroll() {
-        const scrollTop = scrollContainer.scrollTop;
-        const threshold = getRevealThreshold();
+    // The header is 3rem tall; its midpoint is 1.5rem from the top of the
+    // scroll container. rootMargin shrinks the observable area by that amount,
+    // so the threshold matches the previous scroll-based trigger exactly.
+    // rootMargin only accepts px/%, not rem, so we convert from the live font size.
+    const rootFontSize     = parseFloat(getComputedStyle(document.documentElement).fontSize);
+    const headerMidpointPx = Math.round(1.5 * rootFontSize);
 
-        if (scrollTop >= threshold) {
-            headerCenter.classList.add('is-visible');
-        } else {
-            headerCenter.classList.remove('is-visible');
-        }
-    }
+    const observer = new IntersectionObserver(
+        ([entry]) => headerCenter.classList.toggle('is-visible', !entry.isIntersecting),
+        { root: scrollContainer, rootMargin: `-${headerMidpointPx}px 0px 0px 0px`, threshold: 0 }
+    );
 
-    scrollContainer.addEventListener('scroll', onScroll, { passive: true });
-    onScroll(); // Run once on load in case the page is refreshed mid-scroll
+    observer.observe(sentinel);
 }
 
 
@@ -492,15 +505,22 @@ window.addEventListener('load', async () => {
 
     if (!loader || !star) return;
 
-    // Wait for the star to finish its current spin cycle before pausing.
+    // Tracks whether the current spin cycle has fully completed.
+    let isReady = false;
+
+    // Wait for the star to finish its current spin cycle before allowing interaction.
     star.addEventListener('animationiteration', () => {
+        isReady = true;
         loader.classList.add('is-ready');
     }, { once: true });
 
     // 2. The user initiates the experience
     // Note: Added 'async' here to handle the iOS permission promise
     loader.addEventListener('click', async () => {
-        
+
+        // Ignore clicks until the spin cycle has fully completed.
+        if (!isReady) return;
+
 document.getElementById('mute-btn').removeAttribute('disabled');
 
         // --- NEW: iOS 13+ Gyroscope Permission Request ---
