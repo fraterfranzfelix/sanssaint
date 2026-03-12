@@ -245,6 +245,34 @@ html[lang="lb"] .loading-cta::after {
         </noscript>
 </head>
 <body>
+    <div id="loading-screen" aria-label="Loading site">
+    <svg id="loading-star" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 215.41 215.4">
+        <path fill="currentColor" d="M125.48.13v-.13h-35.56c0,58.93-29.13,88.79-87.02,89.81H0v35.59c59.87,0,89.88,29.98,89.92,89.89v.11h35.56c0-58.93,29.12-88.79,87.02-89.81h2.91v-35.59c-59.87,0-89.87-29.97-89.92-89.88h-.01Z"/>
+    </svg>
+
+    <div class="loading-text">
+        <p class="loading-quote" id="loading-quote">“Acquire all <span class="quote-highlight">Hope,</span><br>ye who enter here.”</p>
+        <p class="loading-cta"></p>
+    </div>
+</div>
+
+    <!-- Swaps the loading screen quote for the detected language.
+         Runs synchronously here — font-display: block means no text is painted
+         until the font arrives, so this executes before anything is visible. -->
+    <script>
+    (function () {
+        var quotes = {
+            en: '“Acquire all <span class="quote-highlight">Hope,</span><br>ye who enter here.”',
+            fr: '« Acquérez toute <span class="quote-highlight">Espérance,</span><br>vous qui entrez ici. »',
+            la: '“Acquirite omnem <span class="quote-highlight">Spem,</span><br>vos qui hic intratis.”',
+            lb: '“Kritt all <span class="quote-highlight">Hoffnung,</span><br>dir déi hei erakommt.”'
+        };
+        var lang = document.documentElement.lang;
+        var el   = document.getElementById('loading-quote');
+        if (el && quotes[lang]) el.innerHTML = quotes[lang];
+    })();
+</script>
+
     
     <!-- =====================================================================
          HEADER
@@ -396,34 +424,6 @@ html[lang="lb"] .loading-cta::after {
         </div>
 
     </header>
-
-    <div id="loading-screen" aria-label="Loading site">
-    <svg id="loading-star" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 215.41 215.4">
-        <path fill="currentColor" d="M125.48.13v-.13h-35.56c0,58.93-29.13,88.79-87.02,89.81H0v35.59c59.87,0,89.88,29.98,89.92,89.89v.11h35.56c0-58.93,29.12-88.79,87.02-89.81h2.91v-35.59c-59.87,0-89.87-29.97-89.92-89.88h-.01Z"/>
-    </svg>
-
-    <div class="loading-text">
-        <p class="loading-quote" id="loading-quote">“Acquire all <span class="quote-highlight">Hope,</span><br>ye who enter here.”</p>
-        <p class="loading-cta"></p>
-    </div>
-</div>
-
-    <!-- Swaps the loading screen quote for the detected language.
-         Runs synchronously here — font-display: block means no text is painted
-         until the font arrives, so this executes before anything is visible. -->
-    <script>
-    (function () {
-        var quotes = {
-            en: '“Acquire all <span class="quote-highlight">Hope,</span><br>ye who enter here.”',
-            fr: '« Acquérez toute <span class="quote-highlight">Espérance,</span><br>vous qui entrez ici. »',
-            la: '“Acquirite omnem <span class="quote-highlight">Spem,</span><br>vos qui hic intratis.”',
-            lb: '“Kritt all <span class="quote-highlight">Hoffnung,</span><br>dir déi hei erakommt.”'
-        };
-        var lang = document.documentElement.lang;
-        var el   = document.getElementById('loading-quote');
-        if (el && quotes[lang]) el.innerHTML = quotes[lang];
-    })();
-</script>
 
     <!-- =====================================================================
          MAIN SCROLL CONTAINER

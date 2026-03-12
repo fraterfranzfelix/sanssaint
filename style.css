@@ -768,6 +768,9 @@ body {
     background: transparent !important;
     transition: all 0.3s ease;
     z-index: 1;
+    /* Scope font-weight/letter-spacing reflow to this element's subtree.
+       Paint containment omitted — drop-shadow extends beyond the border box. */
+    contain: layout style;
 }
 
 /* 2. Shape layer — holds the vesica piscis mask and the background gradient */
