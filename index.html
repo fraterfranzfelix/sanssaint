@@ -416,6 +416,34 @@ html[lang="lb"] .loading-cta::after {
                                 <span class="settings-toggle-thumb" aria-hidden="true"></span>
                             </span>
                         </label>
+
+                        <label class="settings-item" for="setting-motion">
+                            <span class="settings-label">Reduce motion</span>
+                            <span class="settings-toggle-track">
+                                <input type="checkbox" id="setting-motion" class="settings-checkbox">
+                                <span class="settings-toggle-thumb" aria-hidden="true"></span>
+                            </span>
+                        </label>
+
+                        <!-- Mobile-only: sound toggle -->
+                        <label class="settings-item settings-mobile-only" for="setting-mute">
+                            <span class="settings-label">Sound</span>
+                            <span class="settings-toggle-track">
+                                <input type="checkbox" id="setting-mute" class="settings-checkbox" checked>
+                                <span class="settings-toggle-thumb" aria-hidden="true"></span>
+                            </span>
+                        </label>
+
+                        <!-- Mobile-only: language selector -->
+                        <div class="settings-lang-mobile settings-mobile-only">
+                            <span class="settings-label">Language</span>
+                            <ul class="settings-lang-list" id="settings-lang-menu">
+                                <li><a href="#" data-lang="en">English</a></li>
+                                <li><a href="#" data-lang="fr">Français</a></li>
+                                <li><a href="#" data-lang="la">Latina</a></li>
+                                <li><a href="#" data-lang="lb">Lëtzebuergesch</a></li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
 
@@ -671,52 +699,62 @@ html[lang="lb"] .loading-cta::after {
         <footer class="section footer-section" id="footer">
             <div class="footer-inner">
 
-                <!-- Left: Imprint & Contact -->
-                <div class="footer-col">
-                    <h2>Imprint &amp;<br>Privacy Policy</h2>
-                    <p>Responsibility for data processing on this website, within the meaning of the General Data Protection Regulation (GDPR/DSGVO), lies with:</p>
-                    <br>
-                    <p>Franz-Felix Schwan<br>
-                    Bürgermeister-Fuchs-Str. 79<br>
-                    68169 Mannheim<br>
-                    Germany</p>
-                    <br>
-                    <p>More info…</p>
+                <!-- Page 1: Imprint + Downloads/Links -->
+                <div class="footer-page footer-page-1">
 
-                    <h2>Contact</h2>
-                    <p>contact@sanssaint.eu</p>
-                </div>
+                    <!-- Left: Imprint & Contact -->
+                    <div class="footer-col">
+                        <h2>Imprint &amp;<br>Privacy Policy</h2>
+                        <div class="footer-address-block">
+                            <p>Responsibility for data processing on this website, within the meaning of the General Data Protection Regulation (GDPR/DSGVO), lies with:</p>
+                            <p>Franz-Felix Schwan<br>
+                            Bürgermeister-Fuchs-Str. 79<br>
+                            68169 Mannheim<br>
+                            Germany</p>
+                        </div>
+                        <p>More info…</p>
 
-                <!-- Middle: Downloads & Links -->
-                <div class="footer-col">
-                    <h2>Downloads</h2>
-                    <p>Portfolio<br>
-                    <a href="assets/Franz-Felix_Schwan_Portfolio_2020-2026.pdf" download><l>Franz-Felix_Schwan_Portfolio_2020-2026.pdf</l></a></p>
-                    <p>Resume<br>
-                    <a href="assets/Franz-Felix_Schwan_Resume.pdf" download><l>Franz-Felix_Schwan_Resume.pdf</l></a></p>
+                        <h2>Contact</h2>
+                        <p>contact@sanssaint.eu</p>
+                    </div>
 
-                    <h2>Links</h2>
-                    <p>Website<br>
-                    <a href="https://www.sanssaint.eu" target="_blank" rel="noopener"><l>www.sanssaint.eu</l></a></p>
-                    <p>Instagram<br>
-                    <a href="https://www.instagram.com/sanssaintco/" target="_blank" rel="noopener"><l>www.instagram.com/sanssaintco/</l></a></p>
-                    <br>
-                    <p>A tithe of 10 % of our profit is donated to the Carmelite community or to charity causes, as per Leviticus 27:30 and Deuteronomy 14:22.</p>
-                </div>
+                    <!-- Middle: Downloads & Links -->
+                    <div class="footer-col">
+                        <h2>Downloads</h2>
+                        <p>Portfolio<br>
+                        <a href="assets/Franz-Felix_Schwan_Portfolio_2020-2026.pdf" download><l>Franz-Felix_Schwan_Portfolio_2020-2026.pdf</l></a></p>
+                        <p>Resume<br>
+                        <a href="assets/Franz-Felix_Schwan_Resume.pdf" download><l>Franz-Felix_Schwan_Resume.pdf</l></a></p>
 
-                <!-- Right: Credits -->
-                <div class="footer-col">
-                    <h2>Credits</h2>
-                    <p>Text set in EB Garamond font by Georg Duffner.<br>
-                    <a href="https://github.com/georgd/EB-Garamond" target="_blank" rel="noopener"><i>https://github.com/georgd/EB-Garamond</i></a></p>
-                    <p>Public Domain images provided by Wikimedia Commons.<br>
-                    <a href="https://creativecommons.org/public-domain/" target="_blank" rel="noopener"><i>https://creativecommons.org/public-domain/</i></a></p>
-                    <p>Custom domain by IONOS. Coded with Anthropic PBC's Claude AI.</p>
-                    <p>Illustrations, photography, and music by Franz-Felix Schwan.</p>
-                    <p>This website is hosted via GitHub.<br>
-                    <a href="https://github.com/fraterfranzfelix/sanssaint" target="_blank" rel="noopener"><i>https://github.com/fraterfranzfelix/sanssaint</i></a></p>
-                    <p>Mostly made in Europe.</p>
-                </div>
+                        <h2>Links</h2>
+                        <p>Website<br>
+                        <a href="https://www.sanssaint.eu" target="_blank" rel="noopener"><l>www.sanssaint.eu</l></a></p>
+                        <p>Instagram<br>
+                        <a href="https://www.instagram.com/sanssaintco/" target="_blank" rel="noopener"><l>www.instagram.com/sanssaintco/</l></a></p>
+                        <br>
+                        <p>A tithe of 10 % of our profit is donated to the Carmelite community or to charity causes, as per Leviticus 27:30 and Deuteronomy 14:22.</p>
+                    </div>
+
+                </div><!-- /footer-page-1 -->
+
+                <!-- Page 2: Credits -->
+                <div class="footer-page footer-page-2">
+
+                    <!-- Right: Credits -->
+                    <div class="footer-col">
+                        <h2>Credits</h2>
+                        <p>Text set in EB Garamond font by Georg Duffner.<br>
+                        <a href="https://github.com/georgd/EB-Garamond" target="_blank" rel="noopener"><i>https://github.com/georgd/EB-Garamond</i></a></p>
+                        <p>Public Domain images provided by Wikimedia Commons.<br>
+                        <a href="https://creativecommons.org/public-domain/" target="_blank" rel="noopener"><i>https://creativecommons.org/public-domain/</i></a></p>
+                        <p>Custom domain by IONOS. Coded with Anthropic PBC's Claude AI.</p>
+                        <p>Illustrations, photography, and music by Franz-Felix Schwan.</p>
+                        <p>This website is hosted via GitHub.<br>
+                        <a href="https://github.com/fraterfranzfelix/sanssaint" target="_blank" rel="noopener"><i>https://github.com/fraterfranzfelix/sanssaint</i></a></p>
+                        <p>Mostly made in Europe.</p>
+                    </div>
+
+                </div><!-- /footer-page-2 -->
 
             </div>
         </footer>

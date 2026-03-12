@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initLangDropdown();
     initSettingsPanel();
     initLanguage();
+    initContactMobileSnap();
 });
 
 
@@ -27,9 +28,13 @@ const angelWrapper = document.querySelector('.center-image-wrapper');
 // code never needs to read window.innerWidth/Height directly.
 let vpWidth  = window.innerWidth;
 let vpHeight = window.innerHeight;
+
+// Parallax movement multiplier — 1 = full, 0.333 = reduced motion
+let motionScale = 1;
 window.addEventListener('resize', () => {
     vpWidth  = window.innerWidth;
     vpHeight = window.innerHeight;
+    initContactMobileSnap();
 }, { passive: true });
 
 /**
@@ -113,7 +118,7 @@ function initMouseParallax() {
     function updateScreen() {
         layers.forEach(layer => {
             const speed = speedCache.get(layer);
-            applyTransform(layer, targetX / speed, targetY / speed);
+            applyTransform(layer, (targetX / speed) * motionScale, (targetY / speed) * motionScale);
         });
 
         // Unlock the frame so the next mouse movement can queue up a new draw
@@ -182,7 +187,7 @@ function initTiltParallax() {
 
         layers.forEach(layer => {
             const speed = speedCache.get(layer);
-            applyTransform(layer, smoothX / speed, smoothY / speed);
+            applyTransform(layer, (smoothX / speed) * motionScale, (smoothY / speed) * motionScale);
         });
 
         // Optimization: If the current position is extremely close to the target, 
@@ -336,25 +341,33 @@ function initWordmarkReveal() {
 ============================================================================= */
 
 function initMuteToggle() {
-    const btn  = document.getElementById('mute-btn');
-    const icon = document.getElementById('mute-icon');
+    const btn      = document.getElementById('mute-btn');
+    const icon     = document.getElementById('mute-icon');
+    const checkbox = document.getElementById('setting-mute');
 
     if (!btn || !icon) return;
 
     let muted = false;
 
-    btn.addEventListener('click', () => {
-        muted = !muted;
-
+    function applyMute(isMuted) {
+        muted = isMuted;
         icon.src = muted ? 'assets/icons/03_sound_off_icon.svg' : 'assets/icons/04_sound_on_icon.svg';
         icon.alt = muted ? 'Sound off' : 'Sound on';
         btn.setAttribute('aria-label', muted ? 'Unmute' : 'Mute');
+        if (window.audioEngine) window.audioEngine.toggleMute(muted);
+    }
 
-        // NEW: Tell the audio engine to mute/unmute
-        if (window.audioEngine) {
-            window.audioEngine.toggleMute(muted);
-        }
+    btn.addEventListener('click', () => {
+        applyMute(!muted);
+        if (checkbox) checkbox.checked = !muted; // checked = sound on
     });
+
+    // Mobile settings checkbox: checked = sound on, unchecked = muted
+    if (checkbox) {
+        checkbox.addEventListener('change', () => {
+            applyMute(!checkbox.checked);
+        });
+    }
 }
 
 
@@ -437,26 +450,34 @@ function initLangDropdown() {
 
     // Open/close is handled purely by CSS :hover on .header-lang.
     // This function handles selection, persistence, and triggering translation.
-    menu.querySelectorAll('a[data-lang]').forEach(link => {
-        link.addEventListener('click', (e) => {
-            e.preventDefault();
-            const lang = link.dataset.lang;
+    function bindLangLinks(container) {
+        container.querySelectorAll('a[data-lang]').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const lang = link.dataset.lang;
 
-            // Persist so the inline <head> script picks it up on the next visit
-            // and sets document.documentElement.lang before first paint.
-            localStorage.setItem('sanssaint-lang', lang);
+                // Persist so the inline <head> script picks it up on the next visit
+                // and sets document.documentElement.lang before first paint.
+                localStorage.setItem('sanssaint-lang', lang);
 
-            // Update <html lang> so CSS selectors (loading screen CTA variants)
-            // and the next initLanguage() call both use the new language.
-            document.documentElement.lang = lang;
+                // Update <html lang> so CSS selectors (loading screen CTA variants)
+                // and the next initLanguage() call both use the new language.
+                document.documentElement.lang = lang;
 
-            // Update the visible language code in the header toggle.
-            current.textContent = lang.toUpperCase();
+                // Update the visible language code in the header toggle.
+                current.textContent = lang.toUpperCase();
 
-            // Fetch and apply the new language file.
-            initLanguage();
+                // Fetch and apply the new language file.
+                initLanguage();
+            });
         });
-    });
+    }
+
+    bindLangLinks(menu);
+
+    // Also wire language links inside the mobile settings panel
+    const settingsLangMenu = document.getElementById('settings-lang-menu');
+    if (settingsLangMenu) bindLangLinks(settingsLangMenu);
 }
 
 
@@ -470,7 +491,28 @@ function initSettingsPanel() {
 
     if (!contrastBox) return;
 
-    // Open/close is handled purely by CSS :hover on .header-settings.
+    // On mobile, hover is unreliable — wire a click-toggle for the settings button.
+    const toggle = document.getElementById('settings-toggle');
+    const panel  = document.getElementById('settings-panel');
+
+    if (toggle && panel) {
+        toggle.addEventListener('click', (e) => {
+            if (window.innerWidth > 768) return; // desktop uses CSS :hover
+            e.stopPropagation();
+            const isOpen = panel.classList.toggle('is-open');
+            toggle.setAttribute('aria-expanded', isOpen);
+        });
+
+        document.addEventListener('click', (e) => {
+            if (window.innerWidth > 768) return;
+            if (!panel.contains(e.target)) {
+                panel.classList.remove('is-open');
+                toggle.setAttribute('aria-expanded', 'false');
+            }
+        });
+    }
+
+    // Open/close on desktop is handled purely by CSS :hover on .header-settings.
     // This function only handles preference restoration and the contrast toggle.
 
     // --- Restore saved preference ---
@@ -490,6 +532,69 @@ function initSettingsPanel() {
             localStorage.setItem('sanssaint-contrast', 'normal');
         }
     });
+
+    // --- Reduce motion toggle ---
+    const motionBox = document.getElementById('setting-motion');
+
+    function applyReduceMotion(reduced) {
+        motionScale = reduced ? 0.333 : 1;
+        if (reduced) {
+            document.documentElement.classList.add('reduce-motion');
+        } else {
+            document.documentElement.classList.remove('reduce-motion');
+        }
+        if (motionBox) motionBox.checked = reduced;
+    }
+
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const savedMotion = localStorage.getItem('sanssaint-motion');
+
+    // Evaluates all passive signals (never writes to localStorage).
+    // Called on init and whenever any signal changes.
+    function evaluateAutoMotion() {
+        if (localStorage.getItem('sanssaint-motion') !== null) return; // manual override wins
+        const reduced =
+            prefersReducedMotion.matches ||
+            (navigator.deviceMemory !== undefined && navigator.deviceMemory < 2);
+        applyReduceMotion(reduced);
+    }
+
+    if (savedMotion === 'reduced') {
+        applyReduceMotion(true);
+    } else if (savedMotion === 'normal') {
+        applyReduceMotion(false);
+    } else {
+        evaluateAutoMotion(); // No manual preference — check all passive signals
+    }
+
+    if (motionBox) {
+        motionBox.addEventListener('change', () => {
+            applyReduceMotion(motionBox.checked);
+            localStorage.setItem('sanssaint-motion', motionBox.checked ? 'reduced' : 'normal');
+        });
+    }
+
+    // React to OS setting changes during the session
+    prefersReducedMotion.addEventListener('change', () => {
+        if (localStorage.getItem('sanssaint-motion') === null) evaluateAutoMotion();
+    });
+
+    // Battery monitoring — Chrome/Edge only, silent elsewhere
+    if (typeof navigator.getBattery === 'function') {
+        navigator.getBattery().then(battery => {
+            function onBatteryChange() {
+                if (localStorage.getItem('sanssaint-motion') !== null) return;
+                if (battery.level < 0.05 && !battery.charging) {
+                    applyReduceMotion(true);
+                } else {
+                    evaluateAutoMotion(); // Re-evaluate when battery recovers
+                }
+            }
+            battery.addEventListener('levelchange',    onBatteryChange);
+            battery.addEventListener('chargingchange', onBatteryChange);
+            onBatteryChange(); // Check current state immediately
+        }).catch(() => {}); // Silent fail if API unavailable or denied
+    }
 }
 
 /* =============================================================================
@@ -556,3 +661,51 @@ document.getElementById('mute-btn').removeAttribute('disabled');
         }, 1000);
     });
 });
+
+/* =============================================================================
+   CONTACT SECTION — MOBILE SNAP RESTRUCTURE
+   On mobile the two contact panels must be direct children of .scroll-container
+   to register as individual scroll-snap targets. This function promotes them on
+   mobile and restores them inside #contact on desktop.
+============================================================================= */
+
+function initContactMobileSnap() {
+    const contact    = document.getElementById('contact');
+    const panelLeft  = document.getElementById('contact-panel-left');
+    const panelRight = document.getElementById('contact-panel-right');
+    const scroller   = document.querySelector('.scroll-container');
+
+    if (!contact || !panelLeft || !panelRight || !scroller) return;
+
+    const isMobile   = window.innerWidth <= 768;
+    const isPromoted = panelLeft.parentElement === scroller;
+
+    if (isMobile && !isPromoted) {
+        // Promote: insert both panels before #contact, then hide the wrapper
+        scroller.insertBefore(panelLeft,  contact);
+        scroller.insertBefore(panelRight, contact);
+        contact.hidden = true;
+    } else if (!isMobile && isPromoted) {
+        // Restore: put panels back inside #contact in their original order
+        contact.prepend(panelRight);
+        contact.prepend(panelLeft);
+        contact.hidden = false;
+    }
+}
+
+/* =============================================================================
+   PERPETUAL PRAYER
+============================================================================= */
+
+let isKyrie = true;
+
+setInterval(() => {
+  if (isKyrie) {
+    console.log("Kyrie eleison");
+  } else {
+    console.log("Christe eleison");
+  }
+  
+  // Flip the toggle for the next round
+  isKyrie = !isKyrie; 
+}, 3000);

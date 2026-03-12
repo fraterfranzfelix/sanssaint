@@ -105,6 +105,23 @@ html.high-contrast {
     --noir-leger:  #000000;
 }
 
+html.high-contrast .bg-layer,
+html.high-contrast .bg-layer-creation,
+html.high-contrast .bg-layer-eden {
+    opacity: 0.667;
+}
+
+/* Reduce-motion mode — toggled by adding .reduce-motion to <html>, or
+   automatically applied when the OS/browser prefers reduced motion.
+   Doubles background-size on particle layers, halving their density. */
+html.reduce-motion .particles-back::before {
+    background-size: 400px 400px, 400px 400px;
+}
+
+html.reduce-motion .particles-front::before {
+    background-size: 800px 800px, 800px 800px;
+}
+
 
 /* =============================================================================
    2. RESET & BASE STYLES
@@ -555,6 +572,45 @@ body {
 
 .settings-item:has(.settings-checkbox:checked) .settings-toggle-track {
     background: var(--malve-magenta);
+}
+
+/* Mobile-only settings items — hidden on desktop, revealed at ≤ 768px */
+.settings-mobile-only {
+    display: none;
+}
+
+/* Language group inside the settings panel */
+.settings-lang-mobile {
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.settings-lang-list {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem 0.75rem;
+}
+
+.settings-lang-list a {
+    font-family: var(--font-primary);
+    font-size: var(--font-size-body);
+    font-weight: var(--font-weight-medium);
+    color: var(--noir-leger);
+    text-decoration: none;
+    letter-spacing: var(--letter-spacing-tight);
+    transition: font-weight 0.2s ease;
+}
+
+.settings-lang-list a:hover {
+    font-weight: 700;
+}
+
+/* Click-based open on mobile (toggled via .is-open on .header-settings) */
+@media (max-width: 768px) {
+    .header-settings.is-open .header-settings-menu {
+        display: flex;
+    }
 }
 
 
@@ -1008,6 +1064,10 @@ body {
     mask-repeat: no-repeat;
 }
 
+#panel-right {
+    background-color: var(--noir-leger);
+}
+
 
 /* --- 6b. Background Images ------------------------------------------------ */
 
@@ -1258,6 +1318,24 @@ body {
         gap: 1.5rem;
     }
 
+    /* Collapse standalone mute and lang controls — they move into the settings dropdown */
+    .header-mute,
+    .header-lang {
+        display: none;
+    }
+
+    /* Reveal mobile-only rows inside the settings menu */
+    .settings-mobile-only {
+        display: flex;
+    }
+
+    /* Language group needs a top border to separate from the toggle rows */
+    .settings-lang-mobile {
+        border-top: 1px solid rgba(0, 0, 0, 0.1);
+        padding-top: 0.75rem;
+        margin-top: 0.25rem;
+    }
+
 }
 
 
@@ -1494,6 +1572,7 @@ body.is-revealed .scroll-container {
 #contact-panel-right {
     -webkit-mask-image: none;
     mask-image: none;
+    background-color: var(--blanc-leger);
     
     flex: 0 0 calc(50% + var(--cutout-w));
     max-width: calc(50% + var(--cutout-w));
@@ -1501,13 +1580,24 @@ body.is-revealed .scroll-container {
     z-index: 1;
 }
 
-/* Fix for mobile stacking so IDs don't overpower the max-width: 768px rule */
+/* On mobile the panels are promoted to direct .scroll-container children by JS
+   so they register as individual scroll-snap targets. Reset all desktop-only
+   sizing, positioning, and shape properties for that promoted state. */
 @media (max-width: 768px) {
     #contact-panel-left,
     #contact-panel-right {
-        flex: auto;
+        flex: none;
+        width: 100%;
         max-width: 100%;
         margin: 0;
+        height: 100dvh;
+        z-index: auto;
+        scroll-snap-align: start;
+    }
+
+    #contact-panel-left {
+        -webkit-mask-image: none;
+        mask-image: none;
     }
 }
 
@@ -1591,14 +1681,53 @@ l {
     text-decoration: none;
 }
 
-/* Mobile: stack columns vertically, scrollable */
+/* Page wrappers: invisible on desktop — columns flow directly into the grid */
+.footer-page {
+    display: contents;
+}
+
+/* Mobile: two full-screen snap pages */
 @media (max-width: 768px) {
-    .footer-inner {
-        grid-template-columns: 1fr;
-        width: 66.66%;
-        overflow-y: auto;
-        max-height: 100%;
-        padding: 3rem 0;
-        align-content: start;
+
+    /* Let the footer grow to hold both pages; hand snap-align to the pages */
+    .footer-section {
+        height: auto;
+        scroll-snap-align: none;
+        display: block;
     }
+
+    .footer-inner {
+        display: block;
+        width: 100%;
+        padding: 0;
+    }
+
+    /* Each page is a full-screen snap target */
+    .footer-page {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100dvh;
+        scroll-snap-align: start;
+        overflow-y: auto;
+        padding: 3rem 0;
+        box-sizing: border-box;
+    }
+
+    /* Columns inside pages span 2/3 of the screen width */
+    .footer-page > .footer-col {
+        width: 66.66%;
+    }
+
+    /* Page 1 has two stacked columns — add a gap between them */
+    .footer-page-1 {
+        gap: 2rem;
+    }
+
+    /* Hide address block on mobile */
+    .footer-address-block {
+        display: none;
+    }
+
 }
