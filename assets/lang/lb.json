@@ -44,5 +44,24 @@
         "email_title":   "CONTACT",
         "email_address": "contact@sanssaint.eu",
         "email_btn":     "E-Mail"
+    },
+
+    "footer": {
+        "heading_imprint":  "Impressum &amp;<br>Dateschutz",
+        "address_gdpr":     "D\u2019Verantwortlechkeet fir d\u2019Veraarbechtung vu Daten op d\u00ebser Wabs\u00e4it, am S\u00ebnn vun der Dateschutz-Grondverordnung (DSGVO), l\u00e4it bei:",
+        "more_info":        "M\u00e9i Infoen\u2026",
+        "heading_contact":  "Kontakt",
+        "email_label":      "E-Mail",
+        "heading_links":    "Linken",
+        "portfolio_label":  "Portfolio",
+        "resume_label":     "CV",
+        "tithe":            "En Z\u00e9ngten vun 10\u00a0% vun eisem Gew\u00ebnn g\u00ebtt un d\u2019Karmelitergemeinschaft oder u karitative Zw\u00e9cker gespent, laut Leviticus 27:30 a Deuteronomium 14:22.",
+        "heading_credits":  "Kreditter",
+        "credits_font":     "Text a Schreift EB Garamond vu Georg Duffner gesat.",
+        "credits_images":   "Biller aus dem \u00ebffentleche Ber\u00e4ich vu Wikimedia Commons.",
+        "credits_domain":   "Eege Domain duerch Infomaniak. Kod\u00e9iert mat dem Claude AI vun Anthropic PBC.",
+        "credits_hosting":  "D\u00ebse Websait g\u00ebtt via GitHub gehost.",
+        "credits_origin":   "Gr\u00e9isstendeels a Europa gemaach.",
+        "credits_version":  "Beta v0.6.1. Lescht Aktualis\u00e9ierung den 21. M\u00e4erz 2026."
     }
 }

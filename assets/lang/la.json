@@ -44,5 +44,24 @@
         "email_title":   "CONTACTUS",
         "email_address": "contact@sanssaint.eu",
         "email_btn":     "Epistula"
+    },
+
+    "footer": {
+        "heading_imprint":  "Impressum &amp;<br>Tutela Notitiarum",
+        "address_gdpr":     "Responsabilitas pro tractatione notitiarum in hoc situ, secundum Regulamentum Generale de Tutela Notitiarum (RGTN/DSGVO), penes hunc est:",
+        "more_info":        "Plura\u2026",
+        "heading_contact":  "Contactus",
+        "email_label":      "Epistula electronica",
+        "heading_links":    "Nexus",
+        "portfolio_label":  "Portafolium",
+        "resume_label":     "Curriculum Vitae",
+        "tithe":            "Decima pars (10\u00a0%) lucri nostri communitati Carmeliticae vel causis caritativis donatur, secundum Leviticum 27:30 et Deuteronomium 14:22.",
+        "heading_credits":  "Attributiones",
+        "credits_font":     "Textus charactere EB Garamond ab Georgio Duffner compositus.",
+        "credits_images":   "Imagines publici iuris ex Wikimedia Commons.",
+        "credits_domain":   "Dominium proprium ab Infomaniak. Codice scripto ab Anthropic PBC per machinam Claude.",
+        "credits_hosting":  "Hic situs per GitHub hospitatur.",
+        "credits_origin":   "Maxima ex parte in Europa factum.",
+        "credits_version":  "Beta v0.6.1. Ultima renovatio die XXI Martii MMXXVI."
     }
 }

@@ -44,5 +44,24 @@
         "email_title":   "CONTACT",
         "email_address": "contact@sanssaint.eu",
         "email_btn":     "E-mail"
+    },
+
+    "footer": {
+        "heading_imprint":  "Imprint &amp;<br>Privacy Policy",
+        "address_gdpr":     "Responsibility for data processing on this website, within the meaning of the General Data Protection Regulation (GDPR/DSGVO), lies with:",
+        "more_info":        "More info\u2026",
+        "heading_contact":  "Contact",
+        "email_label":      "E-mail",
+        "heading_links":    "Links",
+        "portfolio_label":  "Portfolio",
+        "resume_label":     "Resume",
+        "tithe":            "A tithe of 10\u00a0% of our profit is donated to the Carmelite community or to charity causes, as per Leviticus 27:30 and Deuteronomy 14:22.",
+        "heading_credits":  "Credits",
+        "credits_font":     "Text set in EB Garamond font by Georg Duffner.",
+        "credits_images":   "Public Domain images provided by Wikimedia Commons.",
+        "credits_domain":   "Custom domain by Infomaniak. Coded with Anthropic PBC\u2019s Claude AI.",
+        "credits_hosting":  "This website is hosted via GitHub.",
+        "credits_origin":   "Mostly made in Europe.",
+        "credits_version":  "Beta v0.6.1. Last update March 21, 2026."
     }
 }

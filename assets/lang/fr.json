@@ -44,5 +44,24 @@
         "email_title":   "CONTACT",
         "email_address": "contact@sanssaint.eu",
         "email_btn":     "E-mail"
+    },
+
+    "footer": {
+        "heading_imprint":  "Mentions l\u00e9gales &amp;<br>Confidentialit\u00e9",
+        "address_gdpr":     "La responsabilit\u00e9 du traitement des donn\u00e9es sur ce site, au sens du R\u00e8glement g\u00e9n\u00e9ral sur la protection des donn\u00e9es (RGPD/DSGVO), incombe \u00e0\u00a0:",
+        "more_info":        "Plus d\u2019infos\u2026",
+        "heading_contact":  "Contact",
+        "email_label":      "E-mail",
+        "heading_links":    "Liens",
+        "portfolio_label":  "Portfolio",
+        "resume_label":     "CV",
+        "tithe":            "Une d\u00eeme de 10\u00a0% de nos b\u00e9n\u00e9fices est vers\u00e9e \u00e0 la communaut\u00e9 carm\u00e9litaine ou \u00e0 des \u0153uvres caritatives, conform\u00e9ment \u00e0 L\u00e9vitique 27:30 et Deut\u00e9ronome 14:22.",
+        "heading_credits":  "Cr\u00e9dits",
+        "credits_font":     "Texte compos\u00e9 en police EB Garamond par Georg Duffner.",
+        "credits_images":   "Images du domaine public fournies par Wikimedia Commons.",
+        "credits_domain":   "Domaine personnalis\u00e9 par Infomaniak. Con\u00e7u avec l\u2019IA Claude d\u2019Anthropic PBC.",
+        "credits_hosting":  "Ce site est h\u00e9berg\u00e9 via GitHub.",
+        "credits_origin":   "Principalement r\u00e9alis\u00e9 en Europe.",
+        "credits_version":  "B\u00eata v0.6.1. Derni\u00e8re mise \u00e0 jour le 21 mars 2026."
     }
 }
