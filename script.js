@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initSettingsPanel();
     initLanguage();
     initContactMobileSnap();
+    initCreationMobileSnap();
 });
 
 
@@ -35,6 +36,7 @@ window.addEventListener('resize', () => {
     vpWidth  = window.innerWidth;
     vpHeight = window.innerHeight;
     initContactMobileSnap();
+    initCreationMobileSnap();
 }, { passive: true });
 
 /**
@@ -537,7 +539,7 @@ function initSettingsPanel() {
     const motionBox = document.getElementById('setting-motion');
 
     function applyReduceMotion(reduced) {
-        motionScale = reduced ? 0.333 : 1;
+        motionScale = reduced ? 0 : 1;
         if (reduced) {
             document.documentElement.classList.add('reduce-motion');
         } else {
@@ -661,6 +663,38 @@ document.getElementById('mute-btn').removeAttribute('disabled');
         }, 1000);
     });
 });
+
+/* =============================================================================
+   CREATION SECTION — MOBILE SNAP RESTRUCTURE
+   On mobile the two creation panels must be direct children of .scroll-container
+   to register as individual scroll-snap targets. This function promotes them on
+   mobile and restores them inside #creation on desktop.
+============================================================================= */
+
+function initCreationMobileSnap() {
+    const creation  = document.getElementById('creation');
+    const panelLeft  = document.getElementById('panel-left');
+    const panelRight = document.getElementById('panel-right');
+    const scroller   = document.querySelector('.scroll-container');
+
+    if (!creation || !panelLeft || !panelRight || !scroller) return;
+
+    const isMobile   = window.innerWidth <= 768;
+    const isPromoted = panelLeft.parentElement === scroller;
+
+    if (isMobile && !isPromoted) {
+        // Promote: insert both panels before #creation, then hide the wrapper
+        scroller.insertBefore(panelLeft,  creation);
+        scroller.insertBefore(panelRight, creation);
+        creation.hidden = true;
+    } else if (!isMobile && isPromoted) {
+        // Restore: put panels back inside #creation in their original order
+        creation.prepend(panelRight);
+        creation.prepend(panelLeft);
+        creation.hidden = false;
+    }
+}
+
 
 /* =============================================================================
    CONTACT SECTION — MOBILE SNAP RESTRUCTURE

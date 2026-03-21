@@ -175,6 +175,8 @@ body {
     scroll-snap-type: y mandatory;
 }
 
+.section[hidden] { display: none; }
+
 .section {
     position: relative;
     height: 100dvh;
@@ -1580,6 +1582,27 @@ body.is-revealed .scroll-container {
     z-index: 1;
 }
 
+/* On mobile the creation panels are promoted to direct .scroll-container
+   children by JS — same pattern as the contact section. */
+@media (max-width: 768px) {
+    #panel-left,
+    #panel-right {
+        flex: none;
+        width: 100%;
+        max-width: 100%;
+        margin: 0;
+        height: 100dvh;
+        z-index: auto;
+        scroll-snap-align: start;
+    }
+
+    #panel-left,
+    #panel-right {
+        -webkit-mask-image: none;
+        mask-image: none;
+    }
+}
+
 /* On mobile the panels are promoted to direct .scroll-container children by JS
    so they register as individual scroll-snap targets. Reset all desktop-only
    sizing, positioning, and shape properties for that promoted state. */
@@ -1679,6 +1702,13 @@ l {
 .footer-col a {
     color: inherit;
     text-decoration: none;
+    transition: color 0.3s;
+}
+
+.footer-col a:hover,
+.footer-col a:hover l,
+.footer-col a:hover i {
+    color: var(--malve-magenta);
 }
 
 /* Page wrappers: invisible on desktop — columns flow directly into the grid */
