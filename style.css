@@ -762,6 +762,12 @@ body {
     will-change: transform;
 }
 
+/* 5. Pause animations on sections that are off-screen (set by IntersectionObserver) */
+.particles-back.is-paused::before,
+.particles-front.is-paused::before {
+    animation-play-state: paused;
+}
+
 /* 4. The perfect GPU loops */
 /* Back moves +200X and +1000Y — both exact multiples of its 200px tile size */
 @keyframes wind-back {

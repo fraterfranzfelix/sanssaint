@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initLanguage();
     initContactMobileSnap();
     initCreationMobileSnap();
+    initSectionVisibilityObserver();
 });
 
 
@@ -32,6 +33,10 @@ let vpHeight = window.innerHeight;
 
 // Parallax movement multiplier — 1 = full, 0.333 = reduced motion
 let motionScale = 1;
+
+// Tracks which sections are currently intersecting the viewport.
+// Used by parallax functions to skip off-screen layers.
+const visibleSections = new Set();
 window.addEventListener('resize', () => {
     vpWidth  = window.innerWidth;
     vpHeight = window.innerHeight;
@@ -111,6 +116,10 @@ function initMouseParallax() {
     const speedCache = new Map();
     layers.forEach(layer => speedCache.set(layer, getSpeed(layer)));
 
+    // Pre-cache each layer's parent section for fast visibility lookup.
+    const sectionCache = new Map();
+    layers.forEach(layer => sectionCache.set(layer, layer.closest('.section')));
+
     // 3. Set up variables to hold our target coordinates and a lock (ticking)
     let targetX = 0;
     let targetY = 0;
@@ -119,6 +128,7 @@ function initMouseParallax() {
     // 4. The function that actually updates the screen
     function updateScreen() {
         layers.forEach(layer => {
+            if (!visibleSections.has(sectionCache.get(layer))) return;
             const speed = speedCache.get(layer);
             applyTransform(layer, (targetX / speed) * motionScale, (targetY / speed) * motionScale);
         });
@@ -164,6 +174,10 @@ function initTiltParallax() {
     const speedCache = new Map();
     layers.forEach(layer => speedCache.set(layer, getSpeed(layer)));
 
+    // Pre-cache each layer's parent section for fast visibility lookup.
+    const sectionCache = new Map();
+    layers.forEach(layer => sectionCache.set(layer, layer.closest('.section')));
+
     let baseGamma = null;
     let baseBeta  = null;
 
@@ -188,6 +202,7 @@ function initTiltParallax() {
         smoothY += (targetY - smoothY) * SMOOTHING;
 
         layers.forEach(layer => {
+            if (!visibleSections.has(sectionCache.get(layer))) return;
             const speed = speedCache.get(layer);
             applyTransform(layer, (smoothX / speed) * motionScale, (smoothY / speed) * motionScale);
         });
@@ -235,6 +250,35 @@ function initTiltParallax() {
             window.requestAnimationFrame(updateScreen);
         }
     });
+}
+
+
+/* =============================================================================
+   SECTION VISIBILITY: PAUSE OFF-SCREEN ANIMATIONS
+============================================================================= */
+
+function initSectionVisibilityObserver() {
+    const sections = document.querySelectorAll('section.section');
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            const section = entry.target;
+
+            if (entry.isIntersecting) {
+                visibleSections.add(section);
+                // Resume particle animations inside this section
+                section.querySelectorAll('.particles-back, .particles-front')
+                    .forEach(el => el.classList.remove('is-paused'));
+            } else {
+                visibleSections.delete(section);
+                // Pause particle animations inside this section
+                section.querySelectorAll('.particles-back, .particles-front')
+                    .forEach(el => el.classList.add('is-paused'));
+            }
+        });
+    }, { threshold: 0 }); // fires as soon as any pixel enters/leaves
+
+    sections.forEach(section => observer.observe(section));
 }
 
 

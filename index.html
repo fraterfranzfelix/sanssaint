@@ -107,12 +107,27 @@
             opacity: 1;
         }
 
-        #loading-star {
-            height: 1rem;
+        /* Anchor: keeps the flex layout at 1rem × 1rem while the SVG
+           overflows absolutely — so the star's vector paths are always
+           rasterized at full resolution and scale: never scales up a tiny bitmap. */
+        #loading-star-anchor {
             width: 1rem;
+            height: 1rem;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        #loading-star {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            translate: -50% -50%;
+            height: 100vmax;
+            width: 100vmax;
             color: var(--blanc-leger);
             transform-origin: center;
-            animation: spin-jump 2.5s infinite; 
+            animation: spin-jump 2.5s infinite;
+            scale: 0.01;
             transition: scale 2s cubic-bezier(0.5, -0.3, 0.1, 1), opacity 1.2s ease-out;
         }
 
@@ -142,7 +157,7 @@
         }
 
         #loading-screen.is-expanding #loading-star {
-            scale: 300; 
+            scale: 2.0; /* 200vmax covers all corners of any screen */
         }
 
         .loading-cta {
@@ -246,9 +261,11 @@ html[lang="lb"] .loading-cta::after {
 </head>
 <body>
     <div id="loading-screen" aria-label="Loading site">
-    <svg id="loading-star" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 215.41 215.4">
-        <path fill="currentColor" d="M125.48.13v-.13h-35.56c0,58.93-29.13,88.79-87.02,89.81H0v35.59c59.87,0,89.88,29.98,89.92,89.89v.11h35.56c0-58.93,29.12-88.79,87.02-89.81h2.91v-35.59c-59.87,0-89.87-29.97-89.92-89.88h-.01Z"/>
-    </svg>
+    <div id="loading-star-anchor">
+        <svg id="loading-star" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 215.41 215.4">
+            <path fill="currentColor" d="M125.48.13v-.13h-35.56c0,58.93-29.13,88.79-87.02,89.81H0v35.59c59.87,0,89.88,29.98,89.92,89.89v.11h35.56c0-58.93,29.12-88.79,87.02-89.81h2.91v-35.59c-59.87,0-89.87-29.97-89.92-89.88h-.01Z"/>
+        </svg>
+    </div>
 
     <div class="loading-text">
         <p class="loading-quote" id="loading-quote">“Acquire all <span class="quote-highlight">Hope,</span><br>ye who enter here.”</p>
@@ -686,7 +703,7 @@ html[lang="lb"] .loading-cta::after {
                         <p><span data-i18n="footer.credits_hosting">This website is hosted via GitHub.</span><br>
                         <a href="https://github.com/fraterfranzfelix/sanssaint" target="_blank" rel="noopener"><i>https://github.com/fraterfranzfelix/sanssaint</i></a></p>
                         <p data-i18n="footer.credits_origin">Mostly made in Europe.</p>
-                        <p data-i18n="footer.credits_version">Beta v0.6.1. Last update March 21, 2026.</p>
+                        <p data-i18n="footer.credits_version">Beta v0.6.2. Last update April 3, 2026.</p>
                     </div>
 
                 </div><!-- /footer-page-2 -->
