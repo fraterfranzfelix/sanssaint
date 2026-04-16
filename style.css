@@ -1,0 +1,1786 @@
+/* =============================================================================
+   STYLESHEET INDEX
+   1. Variables & Design Tokens
+   2. Reset & Base Styles
+   3. Layout, Scrolling & Snap
+   4. Header
+   5. Hero Section
+      5a. Parallax Layers
+      5b. Particle Animations
+      5c. Center Container
+      5d. Buttons
+      5e. Hero Footer
+      5f. Weapons Layers
+   6. Section 2: Split Panels
+      6a. Panel Configuration
+      6b. Background Images
+      6c. Gradient Overlays
+      6d. Rule of Thirds Grid
+      6e. Typography
+      6f. Center Image (Angel)
+   7. Responsive Breakpoints
+   8. Loading Screen & Reveal Effect
+   9. Section 4: Slideshow
+  10. Footer
+============================================================================= */
+
+
+/* =============================================================================
+   1. VARIABLES & DESIGN TOKENS
+============================================================================= */
+
+:root {
+
+    /* --- Color Palette -------------------------------------------------------- */
+
+    --viola-violet:   #785adc;
+    --malve-magenta:  #fa8ca0;
+    --blanc-leger:    #eaeaea;
+    --noir-leger:     #151515;
+    --noir-tres-leger: #555555;
+
+
+    /* --- Typography ----------------------------------------------------------- */
+
+    --font-primary: 'EB Garamond', Garamond, serif;
+
+    /* Em dash stroke weight — set precisely by JS canvas measurement after font load.
+       This fallback value is intentionally approximate and will be overridden at runtime. */
+    --em-dash-weight: 0.09rem;
+
+    /* Typography scale — used throughout all sections for consistent sizing. */
+    --font-size-body:       1rem;
+    --font-size-small:      0.667rem;
+    --font-weight-medium:   500;
+    --letter-spacing-tight: 0.02em;
+    --letter-spacing-caps:  0.1rem;
+
+
+    /* --- Highlights ----------------------------------------------------------- */
+
+    /* Shared typographic style for all branded highlights.
+       Color is set per-class (.highlight-viola / .highlight-malve) since it varies.
+       letter-spacing is intentionally absent here — .quote-highlight and
+       .title-highlight add their own; the main highlights in body copy do not. */
+    --highlight-weight:  800;
+
+
+    /* --- Buttons -------------------------------------------------------------- */
+
+    /* White button: for use on light (#eaeaea) backgrounds.
+       Layer 1 — bright top-left rim, subtle dark bottom-right rim.
+       Layer 2 — soft off-white to light-grey gradient. */
+    --btn-white-bg:
+        linear-gradient(145deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0) 8%, rgba(0, 0, 0, 0) 92%, rgba(0, 0, 0, 0.08) 100%),
+        linear-gradient(145deg, #fafafa, #d3d3d3);
+    --btn-white-shadow:
+        drop-shadow( 0.4rem  0.4rem 0.8rem #c8c8c8)
+        drop-shadow(-0.4rem -0.4rem 0.8rem #ffffff);
+    --btn-white-shadow-hover:
+        drop-shadow( 0.5rem  0.5rem 1rem   #b8b8b8)
+        drop-shadow(-0.5rem -0.5rem 1rem   #ffffff);
+
+    /* Black button: for use on light (#eaeaea) backgrounds.
+       Layer 1 — subtle white rim top-left, deep shadow bottom-right.
+       Layer 2 — near-black gradient for the body. */
+    --btn-black-bg:
+        linear-gradient(145deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0) 8%, rgba(0, 0, 0, 0) 92%, rgba(0, 0, 0, 0.6) 100%),
+        linear-gradient(145deg, #161616, #131313);
+    --btn-black-shadow:
+        drop-shadow( 0.4rem  0.4rem 0.8rem #8a8a8a)
+        drop-shadow(-0.4rem -0.4rem 0.8rem #ffffff);
+    --btn-black-shadow-hover:
+        drop-shadow( 0.5rem  0.5rem 1rem   #8a8a8a)
+        drop-shadow(-0.5rem -0.5rem 1rem   #ffffff);
+
+}
+
+
+/* High-contrast mode — toggled by adding .high-contrast to <html>.
+   Replaces the soft off-whites and near-blacks with pure #ffffff and #000000.
+   The same rule is duplicated in the inline <style> in index.html so it applies
+   to the loading screen for returning users before style.css has loaded. */
+html.high-contrast {
+    --blanc-leger: #ffffff;
+    --noir-leger:  #000000;
+}
+
+html.high-contrast .bg-layer,
+html.high-contrast .bg-layer-creation,
+html.high-contrast .bg-layer-eden {
+    opacity: 0.667;
+}
+
+/* Reduce-motion mode — toggled by adding .reduce-motion to <html>, or
+   automatically applied when the OS/browser prefers reduced motion.
+   Doubles background-size on particle layers, halving their density. */
+html.reduce-motion .particles-back::before {
+    background-size: 400px 400px, 400px 400px;
+}
+
+html.reduce-motion .particles-front::before {
+    background-size: 800px 800px, 800px 800px;
+}
+
+/* Retina / high-DPI displays — halve particle density to reduce GPU texture
+   complexity and memory. background-size values match the reduce-motion overrides. */
+@media (min-resolution: 2dppx) {
+    .particles-back::before {
+        background-size: 400px 400px, 400px 400px;
+    }
+
+    .particles-front::before {
+        background-size: 800px 800px, 800px 800px;
+    }
+}
+
+
+/* =============================================================================
+   2. RESET & BASE STYLES
+============================================================================= */
+
+@font-face {
+    font-family: 'EB Garamond';
+    src: url('assets/eb_garamond/EBGaramond-VariableFont_wght.woff2') format('woff2'),
+         url('assets/eb_garamond/EBGaramond-VariableFont_wght.ttf') format('truetype');
+    font-weight: 400 800;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: 'EB Garamond';
+    src: url('assets/eb_garamond/EBGaramond-Italic-VariableFont_wght.woff2') format('woff2'),
+         url('assets/eb_garamond/EBGaramond-Italic-VariableFont_wght.ttf') format('truetype');
+    font-weight: 400 800;
+    font-style: italic;
+    font-display: block;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--font-primary);
+    color: var(--noir-leger);
+    background-color: var(--blanc-leger);
+    overflow: hidden;
+    font-kerning: normal;
+  text-rendering: optimizeLegibility;
+}
+
+
+/* =============================================================================
+   3. LAYOUT, SCROLLING & SNAP
+============================================================================= */
+
+/* Sections snap to full-viewport increments for a curated slide experience.
+   scroll-behavior: smooth animates the snap jump rather than cutting instantly. */
+.scroll-container {
+    height: 100dvh;
+    width: 100vw;
+    overflow-y: scroll;
+    scroll-behavior: smooth;
+    scroll-snap-type: y mandatory;
+}
+
+.section[hidden] { display: none; }
+
+.section {
+    position: relative;
+    height: 100dvh;
+    width: 100%;
+    scroll-snap-align: start;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
+/* =============================================================================
+   4. HEADER
+   
+   The header floats above all sections as a fixed overlay with no background.
+   mix-blend-mode: difference inverts content color against whatever is behind:
+   white content reads as near-white on dark backgrounds, near-black on light.
+
+   Structure: three equal flex columns — [left nav + line] [wordmark] [line + controls].
+   The two line halves are split SVGs of the same em dash path, each stretching
+   with preserveAspectRatio="none" to fill their column's remaining space while
+   keeping the serif caps at the outer edges undistorted.
+
+   When the wordmark is hidden (section 1), its center column collapses to
+   max-width: 0, and the two line halves grow to meet seamlessly in the middle.
+   When the wordmark appears, the column expands and the lines split apart.
+
+   IMPORTANT: All child images use filter: brightness(0) invert(1) to force
+   pure white output, which mix-blend-mode: difference requires to invert correctly.
+   This works regardless of the original asset color — no re-export needed.
+============================================================================= */
+
+.site-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3rem;
+    padding: 1rem 3rem;
+    z-index: 100;
+
+    display: flex;
+    align-items: center;
+
+    mix-blend-mode: difference;
+    -webkit-font-smoothing: antialiased;
+    color: white;
+
+    transition: padding 0.3s ease;
+}
+
+
+/* --- Outer columns -------------------------------------------------------- */
+
+/* Both outer columns are equal-flex so the center wordmark sits at exactly 50% */
+.header-col {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    min-width: 0;       /* Prevents flex children from overflowing */
+}
+
+.header-col-left {
+    gap: 3rem;          /* Space between nav items and the left line half */
+}
+
+.header-col-right {
+    gap: 3rem;          /* Space between the right line half and controls */
+    justify-content: flex-end;
+}
+
+
+/* --- Nav links ------------------------------------------------------------ */
+
+.header-nav {
+    display: flex;
+    align-items: center;
+    gap: 3rem;
+    list-style: none;
+    flex-shrink: 0;     /* Nav never shrinks — the line absorbs available space */
+}
+
+.header-nav a {
+    font-family: var(--font-primary);
+    font-size: var(--font-size-body);
+    font-weight: 600;
+    color: white;
+    text-decoration: none;
+    letter-spacing: 0.03em;
+    transition: font-weight 0.2s ease;
+}
+
+.header-nav a:hover {
+    font-weight: 800;
+    letter-spacing: 0.04em;
+}
+
+
+/* --- Em dash line halves -------------------------------------------------- */
+
+/* Each line is a three-part flex row: [cap-left] [body] [cap-right].
+   This gives every half-line its own complete pair of serif caps.
+   
+   The path's viewBox (0 0 73.05 8.4) is sliced into three non-overlapping zones:
+     Left cap:  x=0   → x=5     — the left serif, shown at natural proportions
+     Body:      x=4   → x=69.05 — the straight rectangular middle, allowed to stretch
+     Right cap: x=68  → x=73.05 — the right serif, shown at natural proportions
+   
+   The slight overlaps (4–5 on the left seam, 68–69.05 on the right) prevent
+   any hairline gap artifact between segments.
+   
+   Height for all three parts is driven by --em-dash-weight, which JS sets
+   precisely from a canvas measurement of the actual rendered font glyph. */
+.header-line {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    min-width: 0;
+}
+
+/* Left serif cap — fixed proportions, never stretched */
+.line-cap-left {
+    height: var(--em-dash-weight);
+    aspect-ratio: 5 / 8.4;     /* matches viewBox "0 0 5 8.4" */
+    flex-shrink: 0;
+    display: block;
+    overflow: visible;
+}
+
+/* Right serif cap — fixed proportions, never stretched */
+.line-cap-right {
+    height: var(--em-dash-weight);
+    aspect-ratio: 5.05 / 8.4;  /* matches viewBox "68 0 5.05 8.4" */
+    flex-shrink: 0;
+    display: block;
+    overflow: visible;
+}
+
+/* Body — pure rectangular section, stretched horizontally to fill remaining space */
+.line-body {
+    flex: 1;
+    height: var(--em-dash-weight);
+    display: block;
+    min-width: 0;
+}
+
+
+/* --- Center column: wordmark ---------------------------------------------- */
+
+/* Starts collapsed (max-width: 0, padding: 0) so the two line halves touch.
+   JS adds .is-visible once the hero wholemark scrolls up to meet the header,
+   creating the illusion that the logo snaps from center-screen into the header.
+   Both max-width and padding are transitioned so the gap opens smoothly.
+   box-sizing: border-box (global) means max-width constrains the total box
+   including padding — both collapse together to zero. */
+.header-center {
+    overflow: hidden;
+    flex-shrink: 0;
+    max-width: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    transition: max-width 0.45s ease, padding 0.45s ease;
+}
+
+.header-center.is-visible {
+    max-width: 16rem;   /* Generous upper bound: wordmark width + 2 × 1.5rem padding */
+    padding: 0 1.5rem;  /* Gap between each line end and the wordmark edges */
+}
+
+.header-wordmark {
+    height: 1rem;
+    width: auto;
+    display: block;
+    flex-shrink: 0;
+    filter: brightness(0) invert(1);
+    opacity: 0;
+
+    /* EXIT state (scrolling UP to hero):
+       Fades out in 0.15s immediately with NO delay,
+       disappearing before the container crushes it. */
+    transition: opacity 0.15s ease 0s;
+}
+
+.header-center.is-visible .header-wordmark {
+    opacity: 1;
+
+    /* ENTER state (scrolling DOWN to Section 2):
+       Waits 0.15s for the gap to open, then fades in. */
+    transition: opacity 0.15s ease 0.15s;
+}
+
+
+/* --- Right controls ------------------------------------------------------- */
+
+.header-controls {
+    display: flex;
+    align-items: center;
+    gap: 3rem;
+    flex-shrink: 0;
+}
+
+/* Mute toggle button */
+.header-mute {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+.header-mute img {
+    height: 1rem;
+    width: auto;
+    filter: brightness(0) invert(1);
+}
+
+.header-mute:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+/* Language dropdown */
+.header-lang {
+    position: relative;
+}
+
+.header-lang-toggle {
+    font-family: var(--font-primary);
+    font-size: var(--font-size-body);
+    font-weight: var(--font-weight-medium);
+    color: white;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    letter-spacing: var(--letter-spacing-tight);
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    transition: font-weight 0.2s ease;
+}
+
+.header-lang-toggle img {
+    height: 1rem;
+    width: auto;
+    filter: brightness(0) invert(1);
+    flex-shrink: 0;
+}
+
+.header-lang-toggle:hover {
+    font-weight: 700;
+}
+
+/* No chevron — the language icon is self-explanatory */
+
+/* The gap between button and menu lives as padding-top inside the menu,
+   keeping the hover zone continuous so the menu doesn't close in transit. */
+.header-lang-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    display: none;
+    flex-direction: column;
+    gap: 0.5rem;
+    list-style: none;
+    padding: 0.75rem 1rem;
+    background: var(--blanc-leger);
+    white-space: nowrap;
+    mix-blend-mode: normal;
+    z-index: 200;
+}
+
+/* Opens on hover of the parent wrapper, not a click */
+.header-lang:hover .header-lang-dropdown {
+    display: flex;
+}
+
+.header-lang-dropdown a {
+    font-family: var(--font-primary);
+    font-size: var(--font-size-body);
+    font-weight: var(--font-weight-medium);
+    color: var(--noir-leger);
+    text-decoration: none;
+    white-space: nowrap;
+    letter-spacing: var(--letter-spacing-tight);
+    transition: font-weight 0.2s ease;
+}
+
+.header-lang-dropdown a:hover {
+    font-weight: 700;
+}
+
+
+/* --- Settings panel ------------------------------------------------------- */
+
+.header-settings {
+    position: relative;
+}
+
+/* The toggle button mirrors the mute and lang buttons exactly */
+.header-settings-toggle {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.header-settings-toggle img {
+    height: 1rem;
+    width: auto;
+    filter: brightness(0) invert(1);
+    flex-shrink: 0;
+}
+
+/* Gap lives as padding-top so the hover zone is continuous */
+.header-settings-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    display: none;
+    flex-direction: column;
+    gap: 0.75rem;
+    list-style: none;
+    padding: 0.75rem 1rem;
+    background: var(--blanc-leger);
+    white-space: nowrap;
+    mix-blend-mode: normal;
+    z-index: 200;
+}
+
+/* Opens on hover of the parent wrapper */
+.header-settings:hover .header-settings-menu {
+    display: flex;
+}
+
+/* Each row: label on the left, toggle switch on the right */
+.settings-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    cursor: pointer;
+}
+
+.settings-label {
+    font-family: var(--font-primary);
+    font-size: var(--font-size-body);
+    font-weight: var(--font-weight-medium);
+    color: var(--noir-leger);
+    letter-spacing: var(--letter-spacing-tight);
+    user-select: none;
+}
+
+/* Toggle switch — the visible track */
+.settings-toggle-track {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    width: 2rem;
+    height: 1rem;
+    border-radius: 0.5rem;
+    background: rgba(0, 0, 0, 0.15);
+    flex-shrink: 0;
+    transition: background 0.2s ease;
+}
+
+/* The actual checkbox is hidden — the track and thumb are purely visual */
+.settings-checkbox {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+/* The sliding thumb */
+.settings-toggle-thumb {
+    position: absolute;
+    left: 0.125rem;
+    width: 0.75rem;
+    height: 0.75rem;
+    border-radius: 50%;
+    background: var(--noir-leger);
+    transition: transform 0.2s ease;
+}
+
+/* Checked state: track lights up in Malve, thumb slides right */
+.settings-checkbox:checked ~ .settings-toggle-thumb {
+    transform: translateX(1rem);
+}
+
+.settings-item:has(.settings-checkbox:checked) .settings-toggle-track {
+    background: var(--malve-magenta);
+}
+
+/* Mobile-only settings items — hidden on desktop, revealed at ≤ 768px */
+.settings-mobile-only {
+    display: none;
+}
+
+/* Language group inside the settings panel */
+.settings-lang-mobile {
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.settings-lang-list {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem 0.75rem;
+}
+
+.settings-lang-list a {
+    font-family: var(--font-primary);
+    font-size: var(--font-size-body);
+    font-weight: var(--font-weight-medium);
+    color: var(--noir-leger);
+    text-decoration: none;
+    letter-spacing: var(--letter-spacing-tight);
+    transition: font-weight 0.2s ease;
+}
+
+.settings-lang-list a:hover {
+    font-weight: 700;
+}
+
+/* Click-based open on mobile (toggled via .is-open on .header-settings) */
+@media (max-width: 768px) {
+    .header-settings.is-open .header-settings-menu {
+        display: flex;
+    }
+}
+
+
+/* --- Responsive: tighter padding below 960px ------------------------------ */
+
+@media (max-width: 960px) {
+    .site-header {
+        padding: 1rem 2rem;
+    }
+
+    .header-col-left,
+    .header-col-right {
+        gap: 2rem;
+    }
+
+    .header-nav {
+        gap: 2rem;
+    }
+
+    .header-controls {
+        gap: 2rem;
+    }
+}
+
+
+/* =============================================================================
+   5. HERO SECTION
+============================================================================= */
+
+.hero-section {
+    position: relative;
+    overflow: hidden;
+}
+
+
+/* --- 5a. Parallax Layers -------------------------------------------------- */
+
+.parallax-layer {
+    position: absolute;
+    top: -5%;
+    left: -5%;
+    width: 110%;
+    height: 110%;
+    pointer-events: none;
+}
+
+/* 1. DEFAULT: Massive 4000px original (for 4K monitors) */
+.bg-layer {
+    z-index: 1;
+    background-size: cover;
+    background-position: center;
+
+    background-image: -webkit-image-set(
+        url('assets/images/01_caspar_david_friedrich_abtei_im_eichwald.avif') 1x,
+        url('assets/images/01_caspar_david_friedrich_abtei_im_eichwald.jpg') 1x
+    );
+    background-image: image-set(
+        url('assets/images/01_caspar_david_friedrich_abtei_im_eichwald.avif') type('image/avif'),
+        url('assets/images/01_caspar_david_friedrich_abtei_im_eichwald.jpg') type('image/jpg')
+    );
+}
+
+/* 2. LAPTOP / STANDARD DESKTOP: 1920px and below */
+@media (max-width: 1920px) {
+    .bg-layer {
+        background-image: -webkit-image-set(
+            url('assets/images/01_caspar_david_friedrich_abtei_im_eichwald_1920px.avif') 1x,
+            url('assets/images/01_caspar_david_friedrich_abtei_im_eichwald_1920px.jpg') 1x
+        );
+        background-image: image-set(
+            url('assets/images/01_caspar_david_friedrich_abtei_im_eichwald_1920px.avif') type('image/avif'),
+            url('assets/images/01_caspar_david_friedrich_abtei_im_eichwald_1920px.jpg') type('image/jpg')
+        );
+    }
+}
+
+/* Ensures hero content sits between the back and front particle layers */
+.relative-content {
+    position: relative;
+    z-index: 10;
+}
+
+
+/* --- 5b. Particle Animations (Hardware Accelerated) ----------------------- */
+
+/* 1. The parent layers — moved by JavaScript parallax */
+.particles-back,
+.particles-front {
+    z-index: 5;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.particles-front { z-index: 20; }
+
+/* 2. The pseudo-elements — handle the infinite GPU scrolling */
+.particles-back::before {
+    content: "";
+    position: absolute;
+    /* Oversize the container so we don't reveal a hard edge when it slides */
+    top: -1000px;
+    left: -200px;
+    width: calc(100% + 200px);
+    height: calc(100% + 1000px);
+
+    /* Unified sizes of exactly 200px to make the loop math perfect */
+    background-image:
+        radial-gradient(var(--blanc-leger) 1px, transparent 2px),
+        radial-gradient(var(--blanc-leger) 1px, transparent 2px);
+    background-size: 200px 200px, 200px 200px;
+    background-position: 0 0, 40px 60px;
+
+    opacity: 1;
+    filter: blur(1px);
+    animation: wind-back 33s linear infinite;
+}
+
+.particles-front::before {
+    content: "";
+    position: absolute;
+    /* Oversize to hide edges during movement */
+    top: -1200px;
+    left: -400px;
+    width: calc(100% + 400px);
+    height: calc(100% + 1200px);
+
+    /* Unified sizes of exactly 400px */
+    background-image:
+        radial-gradient(var(--blanc-leger) 3px, transparent 4px),
+        radial-gradient(var(--blanc-leger) 2px, transparent 3px);
+    background-size: 400px 400px, 400px 400px;
+    background-position: 0 0, 60px 90px;
+
+    opacity: 1;
+    filter: blur(0.5px);
+    animation: wind-front 15s linear infinite;
+}
+
+/* 3. Promote to compositor layers so the blur is rasterized once per GPU texture
+   and only the transform matrix changes each frame — no CPU repaint. */
+.particles-back::before,
+.particles-front::before {
+    will-change: transform;
+}
+
+/* 5. Pause animations on sections that are off-screen (set by IntersectionObserver) */
+.particles-back.is-paused::before,
+.particles-front.is-paused::before {
+    animation-play-state: paused;
+}
+
+/* 4. The perfect GPU loops */
+/* Back moves +200X and +1000Y — both exact multiples of its 200px tile size */
+@keyframes wind-back {
+    0%   { transform: translate3d(0, 0, 0); }
+    100% { transform: translate3d(200px, 1000px, 0); }
+}
+
+/* Front moves +400X and +1200Y — both exact multiples of its 400px tile size */
+@keyframes wind-front {
+    0%   { transform: translate3d(0, 0, 0); }
+    100% { transform: translate3d(400px, 1200px, 0); }
+}
+
+
+/* --- 5c. Center Container ------------------------------------------------- */
+
+/* Width glides from 33.33% on wide screens to 50% at 960px,
+   eliminating the discrete 960px breakpoint entirely. */
+.center-container {
+    width: clamp(33.33%, calc(33.33% + (1400px - 100vw) * 0.037886), 50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 2rem;
+    transition: width 0.4s ease;
+}
+
+.hero-logo {
+    width: 100%;
+    height: auto;
+    margin-bottom: 2rem;
+}
+
+
+/* --- 5d. Buttons ---------------------------------------------------------- */
+
+.button-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    width: 100%;
+}
+
+/* 1. Base button — holds the drop shadow and shared typography */
+.btn {
+    position: relative;
+    flex: 1 0 150px;
+    height: 2rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0 2rem;
+    font-family: var(--font-primary);
+    font-size: var(--font-size-body);
+    font-weight: var(--font-weight-medium);
+    letter-spacing: var(--letter-spacing-tight);
+    text-decoration: none;
+    cursor: pointer;
+    border: none;
+    outline: none;
+    background: transparent !important;
+    transition: all 0.3s ease;
+    z-index: 1;
+    /* Scope font-weight/letter-spacing reflow to this element's subtree.
+       Paint containment omitted — drop-shadow extends beyond the border box. */
+    contain: layout style;
+}
+
+/* 2. Shape layer — holds the vesica piscis mask and the background gradient */
+.btn::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: var(--btn-bg, var(--noir-leger));
+    transition: all 0.3s ease;
+
+    /* The mathematically perfect vesica piscis mask.
+       Caps are 1.732rem wide (= √3), matching the circle arc geometry. */
+    -webkit-mask-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 86.6025 100'%3E%3Cpath d='M 86.6025 0 A 100 100 0 0 0 0 50 A 100 100 0 0 0 86.6025 100 Z'/%3E%3C/svg%3E"),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 86.6025 100'%3E%3Cpath d='M 0 0 A 100 100 0 0 1 86.6025 50 A 100 100 0 0 1 0 100 Z'/%3E%3C/svg%3E"),
+        linear-gradient(black, black);
+    mask-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 86.6025 100'%3E%3Cpath d='M 86.6025 0 A 100 100 0 0 0 0 50 A 100 100 0 0 0 86.6025 100 Z'/%3E%3C/svg%3E"),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 86.6025 100'%3E%3Cpath d='M 0 0 A 100 100 0 0 1 86.6025 50 A 100 100 0 0 1 0 100 Z'/%3E%3C/svg%3E"),
+        linear-gradient(black, black);
+
+    -webkit-mask-size: 1.732rem 100%, 1.732rem 100%, calc(100% - 3.464rem + 8px) 100%;
+    mask-size:         1.732rem 100%, 1.732rem 100%, calc(100% - 3.464rem + 8px) 100%;
+
+    -webkit-mask-position: left center, right center, center;
+    mask-position:         left center, right center, center;
+
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat:         no-repeat;
+
+    -webkit-mask-composite: source-over, source-over;
+    mask-composite:         add, add;
+}
+
+.btn:hover {
+    font-weight: 600;
+    letter-spacing: 0.025em;
+}
+
+/* 3. Button themes --------------------------------------------------------- */
+
+/* White button */
+.btn-white {
+    --btn-bg: var(--btn-white-bg);
+    color: var(--noir-leger);
+    filter: var(--btn-white-shadow);
+}
+
+.btn-white:hover {
+    transform: translateY(-2px);
+    filter: var(--btn-white-shadow-hover);
+}
+
+/* Black button */
+.btn-black {
+    --btn-bg: var(--btn-black-bg);
+    color: var(--blanc-leger);
+    filter: var(--btn-black-shadow);
+}
+
+.btn-black:hover {
+    transform: translateY(-2px);
+    filter: var(--btn-black-shadow-hover);
+}
+
+
+/* --- 5e. Hero Footer ------------------------------------------------------ */
+
+.hero-footer {
+    position: absolute;
+    bottom: 2rem;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    font-family: var(--font-primary);
+    font-size: var(--font-size-small);
+    font-weight: var(--font-weight-medium);
+    color: var(--noir-leger);
+    z-index: 10;
+}
+
+.hero-footer p {
+    margin: 0;
+}
+
+
+/* --- 5f. Weapons Layers --------------------------------------------------- */
+
+/* Primary strategy — position absorbs viewport changes, not size:
+     Width is locked at 700px (= exactly 50vw at the 1400px design baseline).
+     On wider screens it scales up proportionally as 50vw so the swords always
+     meet at the center with zero gap and zero overlap.
+     As the viewport narrows below 1400px, the image stays 700px wide; only the
+     outer edges slide off-screen (up to −12.5%) while the inner edges naturally
+     begin to overlap (up to ~30%). No resizing happens at all in this range.
+
+   Secondary strategy — only below 900px, where primary is exhausted:
+     Height and width start stepping down. Both properties are transitioned
+     so the reduction feels like a breath rather than a jump. */
+.weapons-layer {
+    top: auto;
+    bottom: 0;
+    height: 110%;
+    width: max(50vw, 700px);
+    z-index: 7;
+    transition: width 0.4s ease, height 0.4s ease;
+}
+
+.weapons-layer picture,
+.weapons-layer img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: contain;
+}
+
+/* Outer edges glide off-screen from 0 (at 1400px) to −12.5% (at 900px).
+   The formula resolves to 0 on wide screens and is clamped at −12.5% below 900px. */
+.weapons-left {
+    left: clamp(-12.5%, calc((100vw - 1400px) * 0.225), 0%);
+}
+
+.weapons-left img {
+    object-position: left bottom;
+}
+
+.weapons-right {
+    left: auto;
+    right: clamp(-12.5%, calc((100vw - 1400px) * 0.225), 0%);
+}
+
+.weapons-right img {
+    object-position: right bottom;
+}
+
+.weapons-also-right {
+    left: auto;
+    right: clamp(-12.5%, calc((100vw - 1400px) * 0.225), 0%);
+    z-index: 6;
+}
+
+.weapons-also-right img {
+    object-position: right bottom;
+}
+
+
+/* =============================================================================
+   6. SECTION 2: SPLIT PANELS
+============================================================================= */
+
+.split-section {
+    display: flex;
+    flex-direction: row;
+    width: 100vw;
+    height: 100dvh;
+    overflow: hidden;
+    position: relative;
+}
+
+.panel {
+    position: relative;
+    height: 100%;
+    overflow: hidden;
+}
+
+
+/* --- 6a. Panel Configuration ---------------------------------------------- */
+
+:root {
+    /* The exact Vesica Piscis aspect ratio: 1 : √3 */
+    --cutout-h: 5rem;
+    --cutout-w: 2.887rem; /* 5rem / 1.73205 */
+}
+
+/* Left panel extends to cover the exact width of the new cutout */
+.panel-left {
+    flex: 0 0 calc(50% + var(--cutout-w));
+    max-width: calc(50% + var(--cutout-w));
+    margin-right: calc(var(--cutout-w) * -1);
+    z-index: 1;
+}
+
+/* Right panel sits on top with the mathematically accurate top-left corner */
+.panel-right {
+    flex: 0 0 50%;
+    max-width: 50%;
+    z-index: 2;
+    overflow: hidden;
+
+    /* The 4-Part Pure Vesica Piscis Mask
+       1: Top-Left Cutout
+       2: Bottom-Left Cutout (Flipped)
+       3: Solid Left Edge (between the cutouts)
+       4: Solid Right Body
+    */
+    -webkit-mask-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 57.735 100'%3E%3Cpath d='M 57.735 0 A 115.47 115.47 0 0 0 0 100 L 57.735 100 Z'/%3E%3C/svg%3E"),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 57.735 100'%3E%3Cpath d='M 57.735 100 A 115.47 115.47 0 0 1 0 0 L 57.735 0 Z'/%3E%3C/svg%3E"),
+        linear-gradient(black, black),
+        linear-gradient(black, black);
+
+    mask-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 57.735 100'%3E%3Cpath d='M 57.735 0 A 115.47 115.47 0 0 0 0 100 L 57.735 100 Z'/%3E%3C/svg%3E"),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 57.735 100'%3E%3Cpath d='M 57.735 100 A 115.47 115.47 0 0 1 0 0 L 57.735 0 Z'/%3E%3C/svg%3E"),
+        linear-gradient(black, black),
+        linear-gradient(black, black);
+
+    /* Map the pieces using the split width and height variables */
+    -webkit-mask-size: 
+        var(--cutout-w) var(--cutout-h), 
+        var(--cutout-w) var(--cutout-h), 
+        var(--cutout-w) calc(100% - (var(--cutout-h) * 2) + 1px),
+        calc(100% - var(--cutout-w) + 1px) 100%;
+        
+    mask-size: 
+        var(--cutout-w) var(--cutout-h), 
+        var(--cutout-w) var(--cutout-h), 
+        var(--cutout-w) calc(100% - (var(--cutout-h) * 2) + 1px),
+        calc(100% - var(--cutout-w) + 1px) 100%;
+
+    -webkit-mask-position: 
+        top left, 
+        bottom left, 
+        0 var(--cutout-h), 
+        top right;
+        
+    mask-position: 
+        top left, 
+        bottom left, 
+        0 var(--cutout-h), 
+        top right;
+
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+}
+
+#panel-right {
+    background-color: var(--noir-leger);
+}
+
+
+/* --- 6b. Background Images ------------------------------------------------ */
+
+/* 1. DEFAULT (Base layout & 4K original images)
+   Both layers are oversized to allow parallax movement without edge gaps. */
+.bg-layer-creation,
+.bg-layer-eden {
+    width: 115% !important;
+    height: 115% !important;
+    left: -7.5% !important;
+    top: -7.5% !important;
+    background-size: cover;
+    background-position: center;
+}
+
+/* Base: Creation (4K) */
+.bg-layer-creation {
+    background-color: var(--blanc-leger); /* TODO: Replace with an average color from the engraving */
+    background-image: -webkit-image-set(url('assets/images/03_gustave_dore_creation.jpg') 1x);
+    background-image: image-set(
+        url('assets/images/03_gustave_dore_creation.avif') type('image/avif'),
+        url('assets/images/03_gustave_dore_creation.jpg') type('image/jpg')
+    );
+}
+
+/* Base: Eden (4K) */
+.bg-layer-eden {
+    background-color: var(--noir-leger); /* TODO: Replace with an average color from the engraving */
+    background-image: -webkit-image-set(url('assets/images/04_gustave_dore_jacobs_dream.jpg') 1x);
+    background-image: image-set(
+        url('assets/images/04_gustave_dore_jacobs_dream.avif') type('image/avif'),
+        url('assets/images/04_gustave_dore_jacobs_dream.jpg') type('image/jpg')
+    );
+}
+
+/* 2. LAPTOP / STANDARD DESKTOP (1920px and below) */
+@media (max-width: 1920px) {
+    .bg-layer-creation {
+        background-image: -webkit-image-set(url('assets/images/03_gustave_dore_creation_1920px.jpg') 1x);
+        background-image: image-set(
+            url('assets/images/03_gustave_dore_creation_1920px.avif') type('image/avif'),
+            url('assets/images/03_gustave_dore_creation_1920px.jpg') type('image/jpg')
+        );
+    }
+
+    .bg-layer-eden {
+        background-image: -webkit-image-set(url('assets/images/04_gustave_dore_jacobs_dream_1920px.jpg') 1x);
+        background-image: image-set(
+            url('assets/images/04_gustave_dore_jacobs_dream_1920px.avif') type('image/avif'),
+            url('assets/images/04_gustave_dore_jacobs_dream_1920px.jpg') type('image/jpg')
+        );
+    }
+}
+
+/* 3. MOBILE (768px and below) */
+@media (max-width: 768px) {
+    .bg-layer-creation {
+        background-image: url('assets/images/03_gustave_dore_creation_768px.jpg');
+    }
+
+    .bg-layer-eden {
+        background-image: url('assets/images/04_gustave_dore_jacobs_dream_768px.jpg');
+    }
+}
+
+
+/* --- 6c. Gradient Overlays ------------------------------------------------ */
+
+/* Fade edges of the left panel into the page background color */
+.gradient-overlay {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 2rem;
+    z-index: 5;
+    pointer-events: none;
+}
+
+.gradient-top {
+    top: 0;
+    background: linear-gradient(to bottom, var(--blanc-leger), transparent);
+}
+
+.gradient-bottom {
+    bottom: 0;
+    background: linear-gradient(to top, var(--blanc-leger), transparent);
+}
+
+
+/* --- 6d. Rule of Thirds Grid ---------------------------------------------- */
+
+/* Three equal columns keep text anchored to the middle third of each panel.
+   Column ratio is transitioned so grid tightening at breakpoints feels gradual. */
+.thirds-grid {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    height: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 1fr auto 1fr;
+    align-items: center;
+    transition: grid-template-columns 0.4s ease;
+}
+
+.grid-center-content {
+    grid-column: 2;
+    grid-row: 2;
+    justify-self: center;
+    width: 100%;
+    white-space: nowrap;
+    font-family: var(--font-primary);
+    font-size: var(--font-size-body);
+    font-weight: 400;
+    line-height: 1.5;
+}
+
+
+/* --- 6e. Typography ------------------------------------------------------- */
+
+/* Alignment utilities */
+.text-left   { text-align: left; }
+.align-right { text-align: right; }
+
+/* Color utilities */
+.text-noir  { color: var(--noir-leger); }
+.text-blanc { color: var(--blanc-leger); }
+
+/* Branded highlights — color varies per class; weight is shared via variable */
+.highlight-viola {
+    color: var(--viola-violet);
+    font-weight: var(--highlight-weight);
+    font-variant: small-caps;
+}
+
+.highlight-malve {
+    color: var(--malve-magenta);
+    font-weight: var(--highlight-weight);
+    font-variant: small-caps;
+}
+
+.citation {
+    font-size: var(--font-size-small);
+    display: inline-block;
+}
+
+
+/* --- 6f. Center Image (Angel) --------------------------------------------- */
+
+/* Absolutely centered within the split section, hovering above both panels.
+   JS parallax composes its translate on top of the base -50%/-50% centering.
+   Height is transitioned so breakpoint resizes feel smooth. Transform is
+   intentionally excluded from the transition to keep JS parallax responsive. */
+.center-image-wrapper {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    height: 85.71%;
+    z-index: 15;
+    pointer-events: none;
+    transition: height 0.4s ease;
+}
+
+.center-angel-img {
+    height: 100%;
+    width: auto;
+    object-fit: contain;
+    filter: drop-shadow(4px 4px 12px rgba(0, 0, 0, 0.12));
+}
+
+
+/* =============================================================================
+   7. RESPONSIVE BREAKPOINTS
+
+   clamp() handles the continuous fluid range for weapons bleed and several
+   widths, so hard breakpoints are kept to a minimum. What remains:
+     — Two grid-ratio steps for the split panel text (1300px, 1000px)
+     — One secondary-strategy step for weapons height (900px)
+     — One full layout flip for mobile (768px) — covers both layout and header
+   Every discrete property change is transitioned so threshold crossings
+   feel like gentle animations rather than snaps.
+============================================================================= */
+
+/* (≤ 1300px) Grid tightens — side padding narrows from 33% to 25% */
+@media (max-width: 1300px) {
+    .thirds-grid          { grid-template-columns: 1fr 2fr 1fr; }
+    .center-image-wrapper { height: 70%; }
+}
+
+/* (≤ 1000px) Grid tightens further — side padding narrows to ~16.6% */
+@media (max-width: 1000px) {
+    .thirds-grid          { grid-template-columns: 1fr 4fr 1fr; }
+    .center-image-wrapper { height: 58%; }
+}
+
+/* (≤ 900px) Secondary strategy begins — primary bleed/overlap is exhausted */
+@media (max-width: 900px) {
+    .weapons-layer { height: 95%; }
+}
+
+/* (≤ 768px) Full mobile stack — layout flip and header collapse */
+@media (max-width: 768px) {
+
+    /* Layout */
+    .center-container { width: 66.66%; }
+
+    .split-section { flex-direction: column; }
+
+    .panel {
+        width: 100%;
+        height: 50vh;
+        flex: auto;
+        max-width: 100%;
+        margin: 0;
+        border-radius: 0;
+    }
+
+    /* Full panel width restores the spacious 1/3 grid margins */
+    .thirds-grid { grid-template-columns: 1fr 1fr 1fr; }
+
+    /* Angel shifts left so only ~45% is visible by default — enough to feel
+       present without blocking text. Parallax (tilt or cursor) reveals the rest. */
+    .center-image-wrapper {
+        left: 0;
+        height: 65%;
+        transform: translate(-55%, -50%);
+    }
+
+    /* Weapons yield to percentage sizing on narrow mobile viewports.
+       75% width allows up to ~50% overlap between the two images. */
+    .weapons-layer { width: 75%; height: 80%; }
+
+    /* Header: minimal editorial layout — left column hidden, wordmark takes over */
+    .header-col-left {
+        display: none;
+    }
+
+    /* Only override max-width when the wordmark is actually visible */
+    .header-center.is-visible {
+        max-width: none;
+        padding: 0;
+        padding-right: 1.5rem;
+    }
+
+    .header-col-right {
+        flex: 1;
+        gap: 1.5rem;
+    }
+
+    /* Collapse standalone mute and lang controls — they move into the settings dropdown */
+    .header-mute,
+    .header-lang {
+        display: none;
+    }
+
+    /* Reveal mobile-only rows inside the settings menu */
+    .settings-mobile-only {
+        display: flex;
+    }
+
+    /* Language group needs a top border to separate from the toggle rows */
+    .settings-lang-mobile {
+        border-top: 1px solid rgba(0, 0, 0, 0.1);
+        padding-top: 0.75rem;
+        margin-top: 0.25rem;
+    }
+
+}
+
+
+/* =============================================================================
+   8. LOADING SCREEN & REVEAL EFFECT
+
+   The .scroll-container starts in a blurred, scaled, invisible state so that
+   the loading screen has something atmospheric to expand into. Once the user
+   clicks through, body.is-revealed is added and the site animates in.
+============================================================================= */
+
+/* Initial hidden state — applied at all times until reveal */
+.scroll-container {
+    filter: blur(12px) brightness(1.5);
+    transform: scale(1.05);
+    opacity: 0;
+    transition: filter 3s ease-out, transform 1.5s ease-out, opacity 1s ease-out;
+}
+
+/* Revealed state — triggered by JS adding .is-revealed to <body> */
+body.is-revealed .scroll-container {
+    filter: blur(0) brightness(1);
+    transform: scale(1);
+    opacity: 1;
+}
+
+
+/* =============================================================================
+   9. SECTION 4: PORTFOLIO
+============================================================================= */
+
+/* Mirrors the hero section — same overflow:hidden to contain the weapons and
+   particles layers that bleed beyond the section boundaries. */
+.portfolio-section {
+    position: relative;
+    overflow: hidden;
+}
+
+
+/* --- Portfolio Heading ----------------------------------------------------- */
+
+/* "Port-" sits centered; "folio" aligns to the left edge of the same block.
+   Each line is a display:block span so text-align can differ per line.
+   margin-bottom matches .hero-logo so buttons sit at the same visual
+   distance from the heading as they do from the logo in the hero. */
+.portfolio-heading {
+    font-family: var(--font-primary);
+    font-size: 5rem;
+    font-weight: 800;
+    font-style: italic;
+    color: var(--viola-violet);
+    letter-spacing: 0.03rem;
+    line-height: 0.9;
+    margin-bottom: 1.5rem;
+    width: 100%;
+}
+
+.portfolio-heading-top {
+    display: block;
+    text-align: center;
+}
+
+.portfolio-heading-bottom {
+    display: block;
+    text-align: left;
+}
+
+
+/* --- Button Groups -------------------------------------------------------- */
+
+/* Stack the two groups vertically inside the shared center-container.
+   gap: 1.5rem gives a comfortable breath between the Download and Visit groups. */
+.button-wrapper-portfolio {
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+/* Each group is a column: label wrapper → button.
+   align-items controls which edge the button snaps to.
+   gap: 0 here — spacing between labels and button is handled by
+   margin-top on the button so it can be set independently. */
+.portfolio-btn-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    width: 100%;
+}
+
+.portfolio-btn-group-left  { align-items: flex-start; }
+.portfolio-btn-group-right { align-items: flex-end;   }
+
+/* Labels wrapper — sits above the button in the stacking order.
+   width: 100% makes it span the full group so text-align takes effect.
+   position: relative + z-index: 1 ensures the button's drop-shadow
+   (which creates its own stacking context) never paints over the text. */
+.portfolio-btn-labels {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    width: 100%;
+    position: relative;
+    z-index: 1;
+}
+
+.portfolio-btn-group-left  .portfolio-btn-labels { text-align: left;  }
+.portfolio-btn-group-right .portfolio-btn-labels { text-align: right; }
+
+/* Download button: full container width. */
+.portfolio-btn-group-left .btn {
+    flex: none;
+    width: 100%;
+    margin-top: 0.5rem;
+    position: relative;
+    z-index: 0;
+}
+
+/* Visit button: one sixth of the viewport width on desktop, right-aligned
+   via the parent's align-items: flex-end. */
+.portfolio-btn-group-right .btn {
+    flex: none;
+    width: calc(100vw / 6);
+    margin-top: 0.5rem;
+    position: relative;
+    z-index: 0;
+}
+
+@media (max-width: 768px) {
+    .portfolio-btn-group-right .btn {
+        width: calc(100vw / 3);
+    }
+}
+
+
+/* --- Button Labels -------------------------------------------------------- */
+
+.portfolio-btn-label {
+    font-family: var(--font-primary);
+    font-weight: 400;
+    color: var(--noir-leger);
+    margin: 0;
+}
+
+/* "SELECTED WORKS" / "Instagram" — full caps, 1rem */
+.portfolio-btn-label-main {
+    font-size: var(--font-size-body);
+    letter-spacing: var(--letter-spacing-caps);
+    text-transform: uppercase;
+}
+
+/* Filename / URL — regular case, 0.67rem */
+.portfolio-btn-label-small {
+    font-size: var(--font-size-small);
+    font-weight: var(--font-weight-medium);
+    letter-spacing: 0.03rem;
+    text-transform: none;
+}
+
+/* --- Section 5: Portrait Photo -------------------------------------------- */
+
+.portrait-layer {
+    /* Oversize the container slightly so the parallax movement 
+       doesn't pull the edges of the image into view */
+    top: -7.5% !important;
+    left: -7.5% !important;
+    width: 115% !important;
+    height: 115% !important;
+    z-index: 10;
+    
+    /* The double-exposure effect */
+    mix-blend-mode: lighten;
+}
+
+.portrait-img {
+    width: 100%;
+    height: 100%;
+    
+    /* Ensures the image always fills the space and stays centered */
+    object-fit: cover;
+    object-position: center;
+    display: block;
+}
+
+/* --- Section 5 Overrides: Reversed Split Panels --------------------------- */
+
+/* The Portrait (Left) sits on top and receives the mirrored right-side cutouts */
+#contact-panel-left {
+    margin-right: 0; /* Clear the default negative margin */
+    flex: 0 0 50%;
+    max-width: 50%;
+    z-index: 2;
+
+    /* Mirrored 4-Part Vesica Piscis Mask (Right-Side Cutouts) */
+    -webkit-mask-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 57.735 100'%3E%3Cpath d='M 0 0 A 115.47 115.47 0 0 1 57.735 100 L 0 100 Z'/%3E%3C/svg%3E"),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 57.735 100'%3E%3Cpath d='M 0 100 A 115.47 115.47 0 0 0 57.735 0 L 0 0 Z'/%3E%3C/svg%3E"),
+        linear-gradient(black, black),
+        linear-gradient(black, black);
+
+    mask-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 57.735 100'%3E%3Cpath d='M 0 0 A 115.47 115.47 0 0 1 57.735 100 L 0 100 Z'/%3E%3C/svg%3E"),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 57.735 100'%3E%3Cpath d='M 0 100 A 115.47 115.47 0 0 0 57.735 0 L 0 0 Z'/%3E%3C/svg%3E"),
+        linear-gradient(black, black),
+        linear-gradient(black, black);
+
+    -webkit-mask-size: 
+        var(--cutout-w) var(--cutout-h),                                /* Top Right */
+        var(--cutout-w) var(--cutout-h),                                /* Bottom Right */
+        calc(100% - var(--cutout-w) + 1px) 100%,                        /* Main Left Body */
+        var(--cutout-w) calc(100% - (var(--cutout-h) * 2) + 1px);       /* Right Edge Connector */
+        
+    mask-size: 
+        var(--cutout-w) var(--cutout-h), 
+        var(--cutout-w) var(--cutout-h), 
+        calc(100% - var(--cutout-w) + 1px) 100%, 
+        var(--cutout-w) calc(100% - (var(--cutout-h) * 2) + 1px);
+
+    -webkit-mask-position: 
+        top right, 
+        bottom right, 
+        top left, 
+        100% var(--cutout-h); /* Center right edge */
+        
+    mask-position: 
+        top right, 
+        bottom right, 
+        top left, 
+        100% var(--cutout-h);
+
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+}
+
+/* The Text (Right) clears any masks and tucks UNDER the left panel */
+#contact-panel-right {
+    -webkit-mask-image: none;
+    mask-image: none;
+    background-color: var(--blanc-leger);
+    
+    flex: 0 0 calc(50% + var(--cutout-w));
+    max-width: calc(50% + var(--cutout-w));
+    margin-left: calc(var(--cutout-w) * -1); /* Pulled left to tuck under */
+    z-index: 1;
+}
+
+/* On mobile the creation panels are promoted to direct .scroll-container
+   children by JS — same pattern as the contact section. */
+@media (max-width: 768px) {
+    #panel-left,
+    #panel-right {
+        flex: none;
+        width: 100%;
+        max-width: 100%;
+        margin: 0;
+        height: 100dvh;
+        z-index: auto;
+        scroll-snap-align: start;
+    }
+
+    #panel-left,
+    #panel-right {
+        -webkit-mask-image: none;
+        mask-image: none;
+    }
+}
+
+/* On mobile the panels are promoted to direct .scroll-container children by JS
+   so they register as individual scroll-snap targets. Reset all desktop-only
+   sizing, positioning, and shape properties for that promoted state. */
+@media (max-width: 768px) {
+    #contact-panel-left,
+    #contact-panel-right {
+        flex: none;
+        width: 100%;
+        max-width: 100%;
+        margin: 0;
+        height: 100dvh;
+        z-index: auto;
+        scroll-snap-align: start;
+    }
+
+    #contact-panel-left {
+        -webkit-mask-image: none;
+        mask-image: none;
+    }
+}
+
+/* --- Contact Section Overrides -------------------------------------------- */
+
+/* Force buttons to fill the narrow 1/3 column perfectly */
+#contact-panel-right .portfolio-btn-group .btn {
+    width: 100%;
+}
+
+/* Ensure the button wrapper clears the text above it */
+#contact-panel-right .button-wrapper-portfolio {
+    margin-top: 1.5rem;
+}
+
+
+/* =============================================================================
+   10. FOOTER
+============================================================================= */
+
+.footer-section {
+    background-color: var(--noir-leger);
+    align-items: center;
+    justify-content: center;
+}
+
+/* Three-column grid, as wide as the contact panel right (50% + cutout).
+   Each column is therefore 1/3 of that width — matching the text column
+   in #contact-panel-right's rule-of-thirds grid. */
+.footer-inner {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 3rem;
+    width: calc(50% + var(--cutout-w));
+    font-family: var(--font-primary);
+    font-size: var(--font-size-body);
+    font-weight: 400;
+    line-height: 1.5;
+    color: var(--blanc-leger);
+}
+
+/* h2: all-caps label style, matching portfolio-btn-label-main */
+.footer-section h2 {
+    font-family: var(--font-primary);
+    font-size: var(--font-size-body);
+    font-weight: 400;
+    letter-spacing: var(--letter-spacing-caps);
+    text-transform: uppercase;
+    color: var(--blanc-leger);
+    margin-top: 1.5rem;
+    margin-bottom: 0.4rem;
+}
+
+.footer-col > h2:first-child {
+    margin-top: 0;
+}
+
+.footer-col p {
+    margin-bottom: 0.4rem;
+    color: var(--blanc-leger);
+}
+
+/* <l> custom tag — filenames and URLs, small */
+l {
+    display: inline;
+    font-size: var(--font-size-small);
+    font-weight: 400;
+    color: var(--blanc-leger);
+}
+
+/* <i> in footer — credit URLs, small */
+.footer-col i {
+    font-size: var(--font-size-small);
+    font-style: normal;
+    color: var(--blanc-leger);
+}
+
+/* Links — inherit color and remove underline */
+.footer-col a {
+    color: inherit;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.footer-col a l,
+.footer-col a i {
+    transition: color 0.2s ease;
+}
+
+.footer-col a:hover,
+.footer-col a:hover l,
+.footer-col a:hover i {
+    color: var(--malve-magenta);
+}
+
+/* Page wrappers: invisible on desktop — columns flow directly into the grid */
+.footer-page {
+    display: contents;
+}
+
+/* Mobile: two full-screen snap pages */
+@media (max-width: 768px) {
+
+    /* Let the footer grow to hold both pages; hand snap-align to the pages */
+    .footer-section {
+        height: auto;
+        scroll-snap-align: none;
+        display: block;
+    }
+
+    .footer-inner {
+        display: block;
+        width: 100%;
+        padding: 0;
+    }
+
+    /* Each page is a full-screen snap target */
+    .footer-page {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100dvh;
+        scroll-snap-align: start;
+        overflow-y: auto;
+        padding: 3rem 0;
+        box-sizing: border-box;
+    }
+
+    /* Columns inside pages span 2/3 of the screen width */
+    .footer-page > .footer-col {
+        width: 66.66%;
+    }
+
+    /* Page 1 has two stacked columns — add a gap between them */
+    .footer-page-1 {
+        gap: 2rem;
+    }
+
+    /* Hide address block on mobile */
+    .footer-address-block {
+        display: none;
+    }
+
+}

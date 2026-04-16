@@ -1,0 +1,880 @@
+document.addEventListener('DOMContentLoaded', () => {
+
+    const hasMouse = window.matchMedia('(pointer: fine)').matches;
+
+    if (hasMouse) {
+        initMouseParallax();
+    } else {
+        initTiltParallax();
+    }
+
+    measureEmDashWeight();
+    initWordmarkReveal();
+    initMuteToggle();
+    initLangDropdown();
+    initSettingsPanel();
+    initLanguage();
+    initContactMobileSnap();
+    initCreationMobileSnap();
+    initSectionVisibilityObserver();
+    initUISounds();
+});
+
+
+/* =============================================================================
+   SHARED HELPERS
+============================================================================= */
+
+const angelWrapper = document.querySelector('.center-image-wrapper');
+
+// Viewport dimensions — cached once and refreshed on resize so per-frame
+// code never needs to read window.innerWidth/Height directly.
+let vpWidth  = window.innerWidth;
+let vpHeight = window.innerHeight;
+
+// Parallax movement multiplier — 1 = full, 0.333 = reduced motion
+let motionScale = 1;
+
+// Tracks which sections are currently intersecting the viewport.
+// Used by parallax functions to skip off-screen layers.
+const visibleSections = new Set();
+window.addEventListener('resize', () => {
+    vpWidth  = window.innerWidth;
+    vpHeight = window.innerHeight;
+    initContactMobileSnap();
+    initCreationMobileSnap();
+}, { passive: true });
+
+/**
+ * Returns the parallax speed divisor for a given layer.
+ * Higher absolute value → slower movement (feels further away).
+ * Lower absolute value  → faster movement (feels closer).
+ * Negative values = counter-parallax (moves opposite to input).
+ * Positive values = normal parallax (moves with input) — used for the
+ * three background paintings to give a sense of depth behind the content.
+ */
+function getSpeed(layer) {
+    if (layer.classList.contains('particles-front'))      return -15;
+    if (layer.classList.contains('weapons-also-right'))   return -35;
+    if (layer.classList.contains('weapons-layer'))        return -15;
+    if (layer.classList.contains('center-image-wrapper')) return -35;
+    if (layer.classList.contains('particles-back'))       return -35;
+    
+    /* --- NEW LINE HERE --- */
+    if (layer.classList.contains('portrait-layer'))       return -35;
+    
+    if (layer.classList.contains('bg-layer-creation'))    return  50;  // Inverted
+    if (layer.classList.contains('bg-layer-eden'))        return  50;  // Inverted
+    return  50;  // Default: hero background — inverted
+}
+
+/**
+ * Applies a translate transform to a layer, correctly composing it on top
+ * of whatever CSS base transform the element needs.
+ *
+ * The angel has two possible base states set by CSS:
+ *   — Desktop (> 768px): translate(-50%, -50%)   — centered on both axes
+ *   — Mobile  (≤ 768px): translate(-55%, -50%)   — shifted left (left: 0)
+ *
+ * Without this awareness, JS would overwrite the mobile CSS rule with -50%,
+ * re-centering the angel and covering the panel text on narrow screens.
+ *
+ * Movement is also clamped so the parallax can never push the angel fully
+ * out of frame. The angel is intended to partially obscure text — revealing
+ * it through parallax is the experience — but it should never vanish entirely.
+ */
+function applyTransform(layer, xMove, yMove) {
+    if (layer === angelWrapper) {
+        const isMobileLayout = vpWidth <= 768;
+        const baseX          = isMobileLayout ? '-55%' : '-50%';
+        const clampedX       = Math.max(-40, Math.min(40, xMove));
+        const clampedY       = Math.max(-30, Math.min(30, yMove));
+
+        layer.style.transform =
+            `translate(calc(${baseX} + ${clampedX}px), calc(-50% + ${clampedY}px))`;
+    } else {
+        layer.style.transform = `translate(${xMove}px, ${yMove}px)`;
+    }
+}
+
+
+/* =============================================================================
+   DESKTOP: MOUSE PARALLAX (OPTIMIZED)
+============================================================================= */
+
+function initMouseParallax() {
+    // 1. Cache the elements ONCE so the browser isn't searching the DOM 60 times a second
+    const selectors = [
+        '.parallax-layer',
+        '.bg-layer-creation',
+        '.bg-layer-eden',
+        '.center-image-wrapper'
+    ];
+    const layers = document.querySelectorAll(selectors.join(', '));
+
+    // 2. Pre-compute each layer's speed divisor once — getSpeed() uses
+    //    classList.contains() checks that don't need to run every frame.
+    const speedCache = new Map();
+    layers.forEach(layer => speedCache.set(layer, getSpeed(layer)));
+
+    // Pre-cache each layer's parent section for fast visibility lookup.
+    const sectionCache = new Map();
+    layers.forEach(layer => sectionCache.set(layer, layer.closest('.section')));
+
+    // 3. Set up variables to hold our target coordinates and a lock (ticking)
+    let targetX = 0;
+    let targetY = 0;
+    let ticking = false;
+
+    // 4. The function that actually updates the screen
+    function updateScreen() {
+        layers.forEach(layer => {
+            if (!visibleSections.has(sectionCache.get(layer))) return;
+            const speed = speedCache.get(layer);
+            applyTransform(layer, (targetX / speed) * motionScale, (targetY / speed) * motionScale);
+        });
+
+        // Unlock the frame so the next mouse movement can queue up a new draw
+        ticking = false;
+    }
+
+    // 5. The event listener that tracks the mouse
+    document.addEventListener('mousemove', (e) => {
+        // Just do the math here
+        targetX = e.clientX - vpWidth  / 2;
+        targetY = e.clientY - vpHeight / 2;
+
+        // If an animation frame isn't already queued up, queue one!
+        if (!ticking) {
+            window.requestAnimationFrame(updateScreen);
+            ticking = true;
+        }
+    });
+}
+
+
+/* =============================================================================
+   MOBILE: TILT PARALLAX (OPTIMIZED)
+============================================================================= */
+
+function initTiltParallax() {
+
+    // TODO: On iOS 13+, DeviceOrientationEvent.requestPermission() must be called
+    // from a user gesture before this listener will fire. 
+
+    // 1. Cache elements once
+    const selectors = [
+        '.parallax-layer',
+        '.bg-layer-creation',
+        '.bg-layer-eden',
+        '.center-image-wrapper'
+    ];
+    const layers = document.querySelectorAll(selectors.join(', '));
+
+    // Pre-compute each layer's speed divisor once.
+    const speedCache = new Map();
+    layers.forEach(layer => speedCache.set(layer, getSpeed(layer)));
+
+    // Pre-cache each layer's parent section for fast visibility lookup.
+    const sectionCache = new Map();
+    layers.forEach(layer => sectionCache.set(layer, layer.closest('.section')));
+
+    let baseGamma = null;
+    let baseBeta  = null;
+
+    // These represent where the elements SHOULD be based on the tilt
+    let targetX = 0;
+    let targetY = 0;
+
+    // These represent where the elements CURRENTLY are
+    let smoothX = 0;
+    let smoothY = 0;
+
+    const SMOOTHING = 0.12;
+    const MAX_TILT = 10;
+
+    let ticking = false;
+
+    // 2. The animation loop that runs at 60 FPS
+    function updateScreen() {
+        // Move the smoothing math here. It ensures the easing looks buttery
+        // smooth because it calculates per-frame, not per-sensor-twitch.
+        smoothX += (targetX - smoothX) * SMOOTHING;
+        smoothY += (targetY - smoothY) * SMOOTHING;
+
+        layers.forEach(layer => {
+            if (!visibleSections.has(sectionCache.get(layer))) return;
+            const speed = speedCache.get(layer);
+            applyTransform(layer, (smoothX / speed) * motionScale, (smoothY / speed) * motionScale);
+        });
+
+        // Optimization: If the current position is extremely close to the target, 
+        // stop requesting frames to save battery. Otherwise, keep animating.
+        const diffX = Math.abs(targetX - smoothX);
+        const diffY = Math.abs(targetY - smoothY);
+
+        if (diffX > 0.05 || diffY > 0.05) {
+            window.requestAnimationFrame(updateScreen);
+        } else {
+            // The elements have settled. Unlock the loop.
+            ticking = false;
+        }
+    }
+
+    // 3. The event listener that tracks the gyroscope
+    window.addEventListener('deviceorientation', (e) => {
+
+        const gamma = e.gamma ?? 0;
+        const beta  = e.beta  ?? 0;
+
+        if (baseGamma === null) {
+            baseGamma = gamma;
+            baseBeta  = beta;
+            return;
+        }
+
+        const rawX = Math.max(-MAX_TILT, Math.min(MAX_TILT, gamma - baseGamma));
+        const rawY = Math.max(-MAX_TILT, Math.min(MAX_TILT, beta  - baseBeta));
+
+        const normX  = rawX / MAX_TILT;
+        const normY  = rawY / MAX_TILT;
+        const rangeX = vpWidth  / 2;
+        const rangeY = vpHeight / 2;
+
+        // Update the target coordinates
+        targetX = normX * rangeX;
+        targetY = normY * rangeY;
+
+        // If the animation loop is resting, wake it up
+        if (!ticking) {
+            ticking = true;
+            window.requestAnimationFrame(updateScreen);
+        }
+    });
+}
+
+
+/* =============================================================================
+   SECTION VISIBILITY: PAUSE OFF-SCREEN ANIMATIONS
+============================================================================= */
+
+function initSectionVisibilityObserver() {
+    const sections = document.querySelectorAll('section.section');
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            const section = entry.target;
+
+            if (entry.isIntersecting) {
+                visibleSections.add(section);
+                // Resume particle animations inside this section
+                section.querySelectorAll('.particles-back, .particles-front')
+                    .forEach(el => el.classList.remove('is-paused'));
+            } else {
+                visibleSections.delete(section);
+                // Pause particle animations inside this section
+                section.querySelectorAll('.particles-back, .particles-front')
+                    .forEach(el => el.classList.add('is-paused'));
+            }
+        });
+    }, { threshold: 0 }); // fires as soon as any pixel enters/leaves
+
+    sections.forEach(section => observer.observe(section));
+}
+
+
+/* =============================================================================
+   HEADER: EM DASH WEIGHT MEASUREMENT
+============================================================================= */
+
+/**
+ * Measures the actual stroke weight of EB Garamond's em dash glyph by rendering
+ * it onto an offscreen canvas and scanning the pixel data vertically.
+ *
+ * This sets --em-dash-weight on :root, which drives the height of all three
+ * parts of each header line (cap-left, body, cap-right). The result is exact
+ * regardless of system font rendering — no manual measurement or guesswork.
+ *
+ * Called after DOMContentLoaded; waits for document.fonts.ready so the custom
+ * font is guaranteed to be available before the canvas draws it.
+ */
+async function measureEmDashWeight() {
+    try {
+        await document.fonts.ready;
+
+        // Render at a large size for sub-pixel accuracy when dividing back down.
+        const testSize = 128;
+
+        const canvas  = document.createElement('canvas');
+        canvas.width  = Math.ceil(testSize * 2.5); // Wide enough for the em dash
+        canvas.height = Math.ceil(testSize * 1.2);  // Tall enough to contain any baseline shift
+        const ctx     = canvas.getContext('2d');
+
+        // White glyph on black background — easiest to threshold
+        ctx.fillStyle = '#000';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#fff';
+        ctx.font          = `400 ${testSize}px EB Garamond`;
+        ctx.textBaseline  = 'middle';
+        ctx.fillText('—', 0, canvas.height / 2);
+
+        // Find the center x of the drawn glyph to guarantee we're scanning
+        // through solid ink, not whitespace at either end
+        const emWidth = ctx.measureText('—').width;
+        const scanX   = Math.max(1, Math.floor(emWidth / 2));
+
+        const { data, width, height } = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+        // Scan the center column vertically for the topmost and bottommost lit pixel
+        let top = -1, bottom = -1;
+        for (let y = 0; y < height; y++) {
+            const r = data[(y * width + scanX) * 4]; // Red channel suffices for white pixels
+            if (r > 64) {
+                if (top    === -1) top    = y;
+                bottom = y;
+            }
+        }
+
+        if (top !== -1 && bottom !== -1) {
+            // strokePx / testSize gives the stroke height as a fraction of 1em,
+            // which expressed as rem is correct independent of the user's browser font size.
+            const strokeRem = (bottom - top + 1) / testSize;
+            document.documentElement.style.setProperty('--em-dash-weight', `${strokeRem}rem`);
+        }
+    } catch (err) {
+        // Font load failure or canvas unsupported — CSS fallback value (0.09rem) remains.
+        console.warn('Em dash weight measurement failed, using CSS fallback:', err);
+    }
+}
+
+
+/* =============================================================================
+   HEADER: WORDMARK SCROLL REVEAL
+============================================================================= */
+
+function initWordmarkReveal() {
+
+    const headerCenter    = document.getElementById('header-center');
+    const scrollContainer = document.querySelector('.scroll-container');
+    const heroSection     = document.getElementById('hero');
+
+    if (!headerCenter || !scrollContainer || !heroSection) return;
+
+    // Place a 1px sentinel at the hero's vertical midpoint (50vh).
+    // IntersectionObserver fires exactly once when it crosses the trigger line,
+    // replacing the scroll listener that previously fired on every pixel.
+    const sentinel = document.createElement('div');
+    sentinel.style.cssText = 'position:absolute;top:50%;left:0;width:1px;height:1px;pointer-events:none;';
+    heroSection.appendChild(sentinel);
+
+    // The header is 3rem tall; its midpoint is 1.5rem from the top of the
+    // scroll container. rootMargin shrinks the observable area by that amount,
+    // so the threshold matches the previous scroll-based trigger exactly.
+    // rootMargin only accepts px/%, not rem, so we convert from the live font size.
+    const rootFontSize     = parseFloat(getComputedStyle(document.documentElement).fontSize);
+    const headerMidpointPx = Math.round(1.5 * rootFontSize);
+
+    const observer = new IntersectionObserver(
+        ([entry]) => headerCenter.classList.toggle('is-visible', !entry.isIntersecting),
+        { root: scrollContainer, rootMargin: `-${headerMidpointPx}px 0px 0px 0px`, threshold: 0 }
+    );
+
+    observer.observe(sentinel);
+}
+
+
+/* =============================================================================
+   HEADER: MUTE TOGGLE
+============================================================================= */
+
+function initMuteToggle() {
+    const btn      = document.getElementById('mute-btn');
+    const icon     = document.getElementById('mute-icon');
+    const checkbox = document.getElementById('setting-mute');
+
+    if (!btn || !icon) return;
+
+    let muted = false;
+
+    function applyMute(isMuted) {
+        muted = isMuted;
+        icon.src = muted ? 'assets/icons/03_sound_off_icon.svg' : 'assets/icons/04_sound_on_icon.svg';
+        icon.alt = muted ? 'Sound off' : 'Sound on';
+        btn.setAttribute('aria-label', muted ? 'Unmute' : 'Mute');
+        if (window.audioEngine) window.audioEngine.toggleMute(muted);
+    }
+
+    btn.addEventListener('click', () => {
+        applyMute(!muted);
+        if (checkbox) checkbox.checked = !muted; // checked = sound on
+    });
+
+    // Mobile settings checkbox: checked = sound on, unchecked = muted
+    if (checkbox) {
+        checkbox.addEventListener('change', () => {
+            applyMute(!checkbox.checked);
+        });
+    }
+}
+
+
+/* =============================================================================
+   LANGUAGE & TRANSLATION
+============================================================================= */
+
+/**
+ * Fetches the JSON file for the current language and applies it to the DOM.
+ * Called once on DOMContentLoaded, and again each time the user switches language.
+ *
+ * If the file doesn't exist yet (e.g. fr.json during development), the fetch
+ * fails silently and the existing hardcoded HTML content is left untouched —
+ * so the English fallback remains visible rather than breaking.
+ */
+async function initLanguage() {
+    const lang = document.documentElement.lang || 'en';
+
+    try {
+        const response = await fetch(`assets/lang/${lang}.json`);
+        if (!response.ok) throw new Error(`${lang}.json returned ${response.status}`);
+        const data = await response.json();
+        applyTranslation(data);
+    } catch (err) {
+        // Expected during development when a language file doesn't exist yet.
+        console.info(`Language file '${lang}.json' not loaded — keeping existing content.`, err.message);
+    }
+}
+
+/**
+ * Walks the DOM for translation hooks and writes values from the language data.
+ *
+ *   data-i18n="key.subkey"       → sets element.innerHTML  (text + inline spans)
+ *   data-i18n-src="key.subkey"   → sets element.src         (logo swap)
+ *   data-i18n-aria="key.subkey"  → sets element.aria-label  (button labels)
+ */
+function applyTranslation(data) {
+
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const value = getNestedValue(data, el.dataset.i18n);
+        if (value !== undefined) el.innerHTML = value;
+    });
+
+    document.querySelectorAll('[data-i18n-src]').forEach(el => {
+        const value = getNestedValue(data, el.dataset.i18nSrc);
+        if (value !== undefined) el.src = value;
+    });
+
+    document.querySelectorAll('[data-i18n-aria]').forEach(el => {
+        const value = getNestedValue(data, el.dataset.i18nAria);
+        if (value !== undefined) el.setAttribute('aria-label', value);
+    });
+}
+
+/**
+ * Reads a dot-separated key path from a nested object.
+ * e.g. getNestedValue(data, 'creation.quote') → data.creation.quote
+ * Returns undefined if any segment of the path doesn't exist.
+ */
+function getNestedValue(obj, path) {
+    return path.split('.').reduce((acc, key) => acc?.[key], obj);
+}
+
+
+/* =============================================================================
+   HEADER: LANGUAGE DROPDOWN
+============================================================================= */
+
+function initLangDropdown() {
+
+    const current = document.getElementById('lang-current');
+    const menu    = document.getElementById('lang-menu');
+
+    if (!menu || !current) return;
+
+    // --- NEW: Sync the initial label on page load ---
+    // Reads the language set by your <head> script and updates the label
+    const activeLang = document.documentElement.lang || 'en';
+    current.textContent = activeLang.toUpperCase();
+
+    // Open/close is handled purely by CSS :hover on .header-lang.
+    // This function handles selection, persistence, and triggering translation.
+    function bindLangLinks(container) {
+        container.querySelectorAll('a[data-lang]').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const lang = link.dataset.lang;
+
+                // Persist so the inline <head> script picks it up on the next visit
+                // and sets document.documentElement.lang before first paint.
+                localStorage.setItem('sanssaint-lang', lang);
+
+                // Update <html lang> so CSS selectors (loading screen CTA variants)
+                // and the next initLanguage() call both use the new language.
+                document.documentElement.lang = lang;
+
+                // Update the visible language code in the header toggle.
+                current.textContent = lang.toUpperCase();
+
+                // Fetch and apply the new language file.
+                initLanguage();
+            });
+        });
+    }
+
+    bindLangLinks(menu);
+
+    // Also wire language links inside the mobile settings panel
+    const settingsLangMenu = document.getElementById('settings-lang-menu');
+    if (settingsLangMenu) bindLangLinks(settingsLangMenu);
+}
+
+
+/* =============================================================================
+   HEADER: SETTINGS PANEL
+============================================================================= */
+
+function initSettingsPanel() {
+
+    const contrastBox = document.getElementById('setting-contrast');
+
+    if (!contrastBox) return;
+
+    // On mobile, hover is unreliable — wire a click-toggle for the settings button.
+    const toggle = document.getElementById('settings-toggle');
+    const panel  = document.getElementById('settings-panel');
+
+    if (toggle && panel) {
+        toggle.addEventListener('click', (e) => {
+            if (window.innerWidth > 768) return; // desktop uses CSS :hover
+            e.stopPropagation();
+            const isOpen = panel.classList.toggle('is-open');
+            toggle.setAttribute('aria-expanded', isOpen);
+        });
+
+        document.addEventListener('click', (e) => {
+            if (window.innerWidth > 768) return;
+            if (!panel.contains(e.target)) {
+                panel.classList.remove('is-open');
+                toggle.setAttribute('aria-expanded', 'false');
+            }
+        });
+    }
+
+    // Open/close on desktop is handled purely by CSS :hover on .header-settings.
+    // This function only handles preference restoration and the contrast toggle.
+
+    // --- Restore saved preference ---
+    // The class on <html> is already applied by the inline script in <head>.
+    // We just need to sync the checkbox to match.
+    if (localStorage.getItem('sanssaint-contrast') === 'high') {
+        contrastBox.checked = true;
+    }
+
+    // --- Contrast toggle ---
+    contrastBox.addEventListener('change', () => {
+        if (contrastBox.checked) {
+            document.documentElement.classList.add('high-contrast');
+            localStorage.setItem('sanssaint-contrast', 'high');
+        } else {
+            document.documentElement.classList.remove('high-contrast');
+            localStorage.setItem('sanssaint-contrast', 'normal');
+        }
+    });
+
+    // --- Reduce motion toggle ---
+    const motionBox = document.getElementById('setting-motion');
+
+    function applyReduceMotion(reduced) {
+        motionScale = reduced ? 0 : 1;
+        if (reduced) {
+            document.documentElement.classList.add('reduce-motion');
+        } else {
+            document.documentElement.classList.remove('reduce-motion');
+        }
+        if (motionBox) motionBox.checked = reduced;
+    }
+
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const savedMotion = localStorage.getItem('sanssaint-motion');
+
+    // Evaluates all passive signals (never writes to localStorage).
+    // Called on init and whenever any signal changes.
+    function evaluateAutoMotion() {
+        if (localStorage.getItem('sanssaint-motion') !== null) return; // manual override wins
+        const reduced =
+            prefersReducedMotion.matches ||
+            (navigator.deviceMemory !== undefined && navigator.deviceMemory < 2);
+        applyReduceMotion(reduced);
+    }
+
+    if (savedMotion === 'reduced') {
+        applyReduceMotion(true);
+    } else if (savedMotion === 'normal') {
+        applyReduceMotion(false);
+    } else {
+        evaluateAutoMotion(); // No manual preference — check all passive signals
+    }
+
+    if (motionBox) {
+        motionBox.addEventListener('change', () => {
+            applyReduceMotion(motionBox.checked);
+            localStorage.setItem('sanssaint-motion', motionBox.checked ? 'reduced' : 'normal');
+        });
+    }
+
+    // React to OS setting changes during the session
+    prefersReducedMotion.addEventListener('change', () => {
+        if (localStorage.getItem('sanssaint-motion') === null) evaluateAutoMotion();
+    });
+
+    // Battery monitoring — Chrome/Edge only, silent elsewhere
+    if (typeof navigator.getBattery === 'function') {
+        navigator.getBattery().then(battery => {
+            function onBatteryChange() {
+                if (localStorage.getItem('sanssaint-motion') !== null) return;
+                if (battery.level < 0.05 && !battery.charging) {
+                    applyReduceMotion(true);
+                } else {
+                    evaluateAutoMotion(); // Re-evaluate when battery recovers
+                }
+            }
+            battery.addEventListener('levelchange',    onBatteryChange);
+            battery.addEventListener('chargingchange', onBatteryChange);
+            onBatteryChange(); // Check current state immediately
+        }).catch(() => {}); // Silent fail if API unavailable or denied
+    }
+}
+
+/* =============================================================================
+   LOADING SCREEN ORCHESTRATION
+============================================================================= */
+
+window.addEventListener('load', async () => {
+    
+    await document.fonts.ready;
+
+    const loader = document.getElementById('loading-screen');
+    const star = document.getElementById('loading-star');
+
+    if (!loader || !star) return;
+
+    // Tracks whether the current spin cycle has fully completed.
+    let isReady = false;
+
+    // Wait for the star to finish its current spin cycle before allowing interaction.
+    star.addEventListener('animationiteration', () => {
+        isReady = true;
+        loader.classList.add('is-ready');
+    }, { once: true });
+
+    // 2. The user initiates the experience
+    // Note: Added 'async' here to handle the iOS permission promise
+    loader.addEventListener('click', async () => {
+
+        // Ignore clicks until the spin cycle has fully completed.
+        if (!isReady) return;
+
+document.getElementById('mute-btn').removeAttribute('disabled');
+
+        // --- NEW: iOS 13+ Gyroscope Permission Request ---
+        // This MUST be inside a user gesture event listener like 'click'
+        if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+            try {
+                const permissionState = await DeviceOrientationEvent.requestPermission();
+                if (permissionState !== 'granted') {
+                    console.warn('Gyroscope permission denied. Tilt parallax disabled.');
+                }
+            } catch (error) {
+                console.error('Error requesting gyroscope access:', error);
+            }
+        }
+        // -------------------------------------------------
+
+        loader.classList.add('is-expanding');
+
+        if (window.audioEngine) {
+            window.audioEngine.play();
+        }
+
+        // We trigger the fade-out the moment the expanding star eclipses the viewport edges.
+        setTimeout(() => {
+            
+            document.body.classList.add('is-revealed');
+            loader.style.opacity = '0'; 
+
+            setTimeout(() => {
+                loader.remove();
+            }, 1200);
+
+        }, 1000);
+    });
+});
+
+/* =============================================================================
+   CREATION SECTION — MOBILE SNAP RESTRUCTURE
+   On mobile the two creation panels must be direct children of .scroll-container
+   to register as individual scroll-snap targets. This function promotes them on
+   mobile and restores them inside #creation on desktop.
+============================================================================= */
+
+function initCreationMobileSnap() {
+    const creation  = document.getElementById('creation');
+    const panelLeft  = document.getElementById('panel-left');
+    const panelRight = document.getElementById('panel-right');
+    const scroller   = document.querySelector('.scroll-container');
+
+    if (!creation || !panelLeft || !panelRight || !scroller) return;
+
+    const isMobile   = window.innerWidth <= 768;
+    const isPromoted = panelLeft.parentElement === scroller;
+
+    if (isMobile && !isPromoted) {
+        // Promote: insert both panels before #creation, then hide the wrapper
+        scroller.insertBefore(panelLeft,  creation);
+        scroller.insertBefore(panelRight, creation);
+        creation.hidden = true;
+    } else if (!isMobile && isPromoted) {
+        // Restore: put panels back inside #creation in their original order
+        creation.prepend(panelRight);
+        creation.prepend(panelLeft);
+        creation.hidden = false;
+    }
+}
+
+
+/* =============================================================================
+   CONTACT SECTION — MOBILE SNAP RESTRUCTURE
+   On mobile the two contact panels must be direct children of .scroll-container
+   to register as individual scroll-snap targets. This function promotes them on
+   mobile and restores them inside #contact on desktop.
+============================================================================= */
+
+function initContactMobileSnap() {
+    const contact    = document.getElementById('contact');
+    const panelLeft  = document.getElementById('contact-panel-left');
+    const panelRight = document.getElementById('contact-panel-right');
+    const scroller   = document.querySelector('.scroll-container');
+
+    if (!contact || !panelLeft || !panelRight || !scroller) return;
+
+    const isMobile   = window.innerWidth <= 768;
+    const isPromoted = panelLeft.parentElement === scroller;
+
+    if (isMobile && !isPromoted) {
+        // Promote: insert both panels before #contact, then hide the wrapper
+        scroller.insertBefore(panelLeft,  contact);
+        scroller.insertBefore(panelRight, contact);
+        contact.hidden = true;
+    } else if (!isMobile && isPromoted) {
+        // Restore: put panels back inside #contact in their original order
+        contact.prepend(panelRight);
+        contact.prepend(panelLeft);
+        contact.hidden = false;
+    }
+}
+
+/* =============================================================================
+   UI SOUND EFFECTS
+============================================================================= */
+
+function initUISounds() {
+
+    // Pre-load all six sounds. Each has OPUS (primary) + WAV (fallback).
+    // The browser picks the first source it can decode.
+    const soundNames = [
+        'button_click', 'button_download', 'button_hover',
+        'text_click',   'text_download',   'text_hover'
+    ];
+
+    // Each sound gets a pool of 3 Audio instances so rapid interactions
+    // never cut off a playing sound. If all 3 slots are busy, the new
+    // play is silently skipped rather than popping an existing one.
+    const sounds = {};
+    soundNames.forEach(name => {
+        sounds[name] = Array.from({ length: 3 }, () => {
+            const audio = document.createElement('audio');
+            audio.preload = 'auto';
+            audio.volume  = 0.6667;
+
+            const opus = document.createElement('source');
+            opus.src  = `assets/ui/${name}.opus`;
+            opus.type = 'audio/ogg; codecs=opus';
+
+            const wav = document.createElement('source');
+            wav.src  = `assets/ui/${name}.wav`;
+            wav.type = 'audio/wav';
+
+            audio.appendChild(opus);
+            audio.appendChild(wav);
+            return audio;
+        });
+    });
+
+    function playUISound(name) {
+        if (window.audioEngine?.isMuted) return;
+        const pool = sounds[name];
+        if (!pool) return;
+        const free = pool.find(a => a.paused); // paused = not playing or already finished
+        if (!free) return;                      // all 3 busy — skip rather than pop
+        free.currentTime = 0;
+        free.play().catch(() => {});
+    }
+
+    function hasDownload(el) {
+        return el.hasAttribute('download');
+    }
+
+    // --- CTA buttons (.btn): hero, portfolio, contact ---
+    document.querySelectorAll('.btn').forEach(btn => {
+        btn.addEventListener('mouseenter', () => playUISound('button_hover'));
+        btn.addEventListener('click',      () => playUISound(hasDownload(btn) ? 'button_download' : 'button_click'));
+    });
+
+    // --- Header control buttons: mute, language, settings ---
+    ['mute-btn', 'lang-toggle', 'settings-toggle'].forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.addEventListener('mouseenter', () => playUISound('text_hover'));
+        el.addEventListener('click',      () => playUISound('text_click'));
+    });
+
+    // --- Header nav links: Portfolio, Contact ---
+    document.querySelectorAll('.header-nav a').forEach(link => {
+        link.addEventListener('mouseenter', () => playUISound('text_hover'));
+        link.addEventListener('click',      () => playUISound('text_click'));
+    });
+
+    // --- Language dropdown links (desktop header + mobile settings panel) ---
+    document.querySelectorAll('#lang-menu a[data-lang], #settings-lang-menu a[data-lang]').forEach(link => {
+        link.addEventListener('mouseenter', () => playUISound('text_hover'));
+        link.addEventListener('click',      () => playUISound('text_click'));
+    });
+
+    // --- Footer links (text_download for PDF downloads, text_click otherwise) ---
+    document.querySelectorAll('.footer-section a').forEach(link => {
+        link.addEventListener('mouseenter', () => playUISound('text_hover'));
+        link.addEventListener('click',      () => playUISound(hasDownload(link) ? 'text_download' : 'text_click'));
+    });
+
+    // --- Settings panel toggle checkboxes ---
+    document.querySelectorAll('.settings-checkbox').forEach(checkbox => {
+        checkbox.addEventListener('change', () => playUISound('text_click'));
+    });
+}
+
+
+/* =============================================================================
+   PERPETUAL PRAYER
+============================================================================= */
+
+let isKyrie = true;
+
+setInterval(() => {
+  if (isKyrie) {
+    console.log("Kyrie eleison");
+  } else {
+    console.log("Christe eleison");
+  }
+  
+  // Flip the toggle for the next round
+  isKyrie = !isKyrie; 
+}, 3000);

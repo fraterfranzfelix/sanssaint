@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+
+    <meta name="description" content="Atelier Sans Saint, a creative agency est. 2025 by Franz-Felix in Trier.">
+    <meta name="author" content="Franz-Felix">
+
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.sanssaint.eu/">
+    <meta property="og:title" content="Atelier Sans Saint">
+    <meta property="og:description" content="Atelier Sans Saint, a creative agency est. 2025 by Franz-Felix Schwan O.C.D.S. in the city Trier.">
+    <meta property="og:site_name" content="Atelier Sans Saint">
+
+    <title>Atelier Sans Saint</title>
+
+    <!-- Favicon: browser selects based on system color scheme -->
+    <link rel="icon" href="assets/icons/06_sans_saint_favicon_light_mode.svg" media="(prefers-color-scheme: light)">
+    <link rel="icon" href="assets/icons/05_sans_saint_favicon_dark_mode.svg"  media="(prefers-color-scheme: dark)">
+    <link rel="preload" href="assets/eb_garamond/NotEBGaramond-Regular.woff2" as="font" type="font/woff2" fetchpriority="high" crossorigin>
+<link rel="preload" href="assets/eb_garamond/NotEBGaramond-ExtraBold.woff2" as="font" type="font/woff2" fetchpriority="high" crossorigin>
+
+    <style>
+        :root {
+            --noir-leger:        #151515;
+            --blanc-leger:       #eaeaea;
+            --malve-magenta:     #fa8ca0;
+            --noir-tres-leger:   #555555;
+            --font-size-body:    1rem;
+            --font-size-small:   0.667rem;
+            --font-weight-medium: 500;
+            --letter-spacing-tight: 0.02em;
+        }
+
+        @font-face {
+    font-family: 'Not EB Garamond';
+    src: url('assets/eb_garamond/NotEBGaramond-Regular.woff2') format('woff2'),
+         url('assets/eb_garamond/NotEBGaramond-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: 'Not EB Garamond';
+    src: url('assets/eb_garamond/NotEBGaramond-ExtraBold.woff2') format('woff2'),
+         url('assets/eb_garamond/NotEBGaramond-ExtraBold.ttf') format('truetype');
+    font-weight: 800;
+    font-style: normal;
+    font-display: block;
+}
+
+        #loading-screen {
+            font-family: 'Not EB Garamond', Garamond, serif;
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            background-color: var(--noir-leger);
+            display: flex;
+            flex-direction: column; 
+            gap: 1.5rem; 
+            justify-content: center;
+            align-items: center;
+            transition: opacity 1.2s ease-out; 
+        }
+
+        .loading-text {
+            text-align: center;
+            padding: 1rem;
+            transition: opacity 1s ease 0.1s;
+        }
+
+        #loading-screen.is-expanding .loading-text {
+            opacity: 0;
+        }
+
+        .loading-quote {
+            color: var(--blanc-leger);
+            font-size: var(--font-size-body);
+            font-weight: 400;
+            letter-spacing: 0.02rem;
+            line-height: 1.4;
+            margin-bottom: 1rem;
+        }
+
+        .quote-highlight {
+            color: var(--malve-magenta);
+            font-variant: small-caps;
+            letter-spacing: 0.03rem;
+            font-weight: 800;
+        }
+
+        .loading-cta {
+            color: var(--noir-tres-leger);
+            font-size: var(--font-size-body);
+            font-weight: 400;
+            letter-spacing: 0.02rem;
+            opacity: 0;
+            transition: opacity 3s ease 3s;
+        }
+
+        #loading-screen.is-ready .loading-cta {
+            opacity: 1;
+        }
+
+        /* Anchor: keeps the flex layout at 1rem × 1rem while the SVG
+           overflows absolutely — so the star's vector paths are always
+           rasterized at full resolution and scale: never scales up a tiny bitmap. */
+        #loading-star-anchor {
+            width: 1rem;
+            height: 1rem;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        #loading-star {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            translate: -50% -50%;
+            height: 100vmax;
+            width: 100vmax;
+            color: var(--blanc-leger);
+            transform-origin: center;
+            animation: spin-jump 2.5s infinite;
+            scale: 0.01;
+            transition: scale 2s cubic-bezier(0.5, -0.3, 0.1, 1), opacity 1.2s ease-out;
+        }
+
+        @keyframes spin-jump {
+            0% {
+                transform: rotate(0deg);
+                animation-timing-function: cubic-bezier(0.5, -0.2, 0.4, 1.2);
+            }
+            60% {
+                transform: rotate(360deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        #loading-screen.is-ready {
+            cursor: pointer;
+        }
+
+        #loading-screen.is-ready #loading-star {
+            animation: none;
+        }
+
+        #loading-screen.is-expanding {
+            pointer-events: none; 
+        }
+
+        #loading-screen.is-expanding #loading-star {
+            scale: 2.0; /* 200vmax covers all corners of any screen */
+        }
+
+        .loading-cta {
+    font-size: 0;
+}
+
+.loading-cta::after {
+    content: 'Click anywhere to enter\2026';
+    font-size: var(--font-size-body);
+    color: var(--noir-tres-leger);
+}
+
+html[lang="fr"] .loading-cta::after {
+    content: "Cliquez n’importe où pour entrer\2026";
+}
+
+@media (pointer: coarse) {
+    .loading-cta::after {
+        content: 'Tap anywhere to enter\2026';
+    }
+
+    html[lang="fr"] .loading-cta::after {
+        content: "Touchez n’importe où pour entrer\2026";
+    }
+}
+
+/* Latin */
+html[lang="la"] .loading-cta::after {
+    content: "Preme ubique ut intres\2026";
+}
+/* Luxembourgish */
+html[lang="lb"] .loading-cta::after {
+    content: "Klickt iwwerall fir eranzekommen\2026";
+}
+
+@media (pointer: coarse) {
+    /* Latin (Touch) */
+    html[lang="la"] .loading-cta::after {
+        content: "Tange ubique ut intres\2026";
+    }
+    /* Luxembourgish (Touch) */
+    html[lang="lb"] .loading-cta::after {
+        content: "Tippt iwwerall fir eranzekommen\2026";
+    }
+}
+
+        /* Note: The .scroll-container reveal styles should remain in your main style.css 
+           since they deal with the layout once the loader is gone. */
+
+        /* High-contrast override — applied here so it takes effect on the loading screen
+           for returning users who have already enabled it. Mirrored in style.css. */
+        html.high-contrast {
+            --noir-leger:  #000000;
+            --blanc-leger: #ffffff;
+        }
+    </style>
+
+    <!-- Runs before first paint to apply saved preferences and detect language.
+         Order: saved user override → browser preference → default English. -->
+    <script>
+    (function () {
+        // Contrast
+        if (localStorage.getItem('sanssaint-contrast') === 'high') {
+            document.documentElement.classList.add('high-contrast');
+        }
+
+        // Language detection
+        const saved = localStorage.getItem('sanssaint-lang');
+        let lang = 'en'; // Default fallback
+
+        if (saved) {
+            lang = saved;
+        } else {
+            const browser = (navigator.language || '').toLowerCase();
+            if (browser.startsWith('fr')) {
+                lang = 'fr';
+            } else if (browser.startsWith('lb')) {
+                lang = 'lb';
+            } else if (browser.startsWith('la')) {
+                lang = 'la'; // Highly unlikely natively, but logically sound to include!
+            }
+        }
+
+        // Safeguard: Ensure the resolved language is actually supported
+        const supported = ['en', 'fr', 'la', 'lb'];
+        if (!supported.includes(lang)) {
+            lang = 'en';
+        }
+
+        document.documentElement.lang = lang;
+    })();
+</script>
+    <link rel="stylesheet" href="style.css" media="print" onload="this.media='all'">
+
+    <noscript>
+            <style>
+                #loading-screen { display: none; }
+                .scroll-container { filter: none; opacity: 1; transform: none; }
+            </style>
+        </noscript>
+</head>
+<body>
+    <div id="loading-screen" aria-label="Loading site">
+    <div id="loading-star-anchor">
+        <svg id="loading-star" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 215.41 215.4">
+            <path fill="currentColor" d="M125.48.13v-.13h-35.56c0,58.93-29.13,88.79-87.02,89.81H0v35.59c59.87,0,89.88,29.98,89.92,89.89v.11h35.56c0-58.93,29.12-88.79,87.02-89.81h2.91v-35.59c-59.87,0-89.87-29.97-89.92-89.88h-.01Z"/>
+        </svg>
+    </div>
+
+    <div class="loading-text">
+        <p class="loading-quote" id="loading-quote">“Acquire all <span class="quote-highlight">Hope,</span><br>ye who enter here.”</p>
+        <p class="loading-cta"></p>
+    </div>
+</div>
+
+    <!-- Swaps the loading screen quote for the detected language.
+         Runs synchronously here — font-display: block means no text is painted
+         until the font arrives, so this executes before anything is visible. -->
+    <script>
+    (function () {
+        var quotes = {
+            en: '“Acquire all <span class="quote-highlight">Hope,</span><br>ye who enter here.”',
+            fr: '« Acquérez toute <span class="quote-highlight">Espérance,</span><br>vous qui entrez ici. »',
+            la: '“Acquirite omnem <span class="quote-highlight">Spem,</span><br>vos qui hic intratis.”',
+            lb: '“Kritt all <span class="quote-highlight">Hoffnung,</span><br>dir déi hei erakommt.”'
+        };
+        var lang = document.documentElement.lang;
+        var el   = document.getElementById('loading-quote');
+        if (el && quotes[lang]) el.innerHTML = quotes[lang];
+    })();
+</script>
+
+    
+    <!-- =====================================================================
+         HEADER
+         Fixed overlay — no background, mix-blend-mode: difference.
+         Three-column layout: [left nav + line half] [wordmark] [line half + controls].
+         The two SVG line halves are the same em dash path, each showing half
+         the viewBox. preserveAspectRatio="none" stretches the body while the
+         serif caps at the outermost edges of each viewBox remain undistorted.
+         The center column collapses to zero on section 1 so the lines meet,
+         then expands when the wordmark appears from section 2 onward.
+         Mobile dropdown: to be implemented alongside the loading screen.
+    ====================================================================== -->
+    <header class="site-header">
+
+        <!-- Left column: nav links + left line half -->
+        <div class="header-col header-col-left">
+
+            <nav>
+                <ul class="header-nav">
+                    <li><a href="#portfolio-slideshow" data-i18n="nav.portfolio">Portfolio</a></li>
+                    <li><a href="#contact"   data-i18n="nav.contact">Contact</a></li>
+                </ul>
+            </nav>
+
+            <!-- Left half-line: left-cap | body | right-cap
+                 Each half has its own complete pair of serif caps.
+                 The body viewBox clips to the purely rectangular middle section
+                 so preserveAspectRatio="none" only ever stretches flat geometry. -->
+            <div class="header-line header-line-left">
+
+                <!-- Left serif cap (fixed proportions) -->
+                <svg class="line-cap-left"
+                    viewBox="0 0 5 8.4"
+                    xmlns="http://www.w3.org/2000/svg"
+                    aria-hidden="true">
+                    <path fill="white" d="M2.25,8.4c-.6,0-1.12-.2-1.57-.6-.45-.4-.68-.8-.68-1.2,0-.6.1-1.43.3-2.48.2-1.05.6-2,1.2-2.85.6-.85,1.35-1.27,2.25-1.27h66.9c.7,0,1.28.2,1.73.6.45.4.68.85.68,1.35,0,1.5-.48,2.95-1.43,4.35-.95,1.4-2.08,2.1-3.38,2.1H2.25Z"/>
+                </svg>
+
+                <!-- Body: rectangular middle section, stretched horizontally -->
+                <svg class="line-body"
+                    viewBox="4 0 65.05 8.4"
+                    preserveAspectRatio="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    aria-hidden="true">
+                    <path fill="white" d="M2.25,8.4c-.6,0-1.12-.2-1.57-.6-.45-.4-.68-.8-.68-1.2,0-.6.1-1.43.3-2.48.2-1.05.6-2,1.2-2.85.6-.85,1.35-1.27,2.25-1.27h66.9c.7,0,1.28.2,1.73.6.45.4.68.85.68,1.35,0,1.5-.48,2.95-1.43,4.35-.95,1.4-2.08,2.1-3.38,2.1H2.25Z"/>
+                </svg>
+
+                <!-- Right serif cap (fixed proportions) -->
+                <svg class="line-cap-right"
+                    viewBox="68 0 5.05 8.4"
+                    xmlns="http://www.w3.org/2000/svg"
+                    aria-hidden="true">
+                    <path fill="white" d="M2.25,8.4c-.6,0-1.12-.2-1.57-.6-.45-.4-.68-.8-.68-1.2,0-.6.1-1.43.3-2.48.2-1.05.6-2,1.2-2.85.6-.85,1.35-1.27,2.25-1.27h66.9c.7,0,1.28.2,1.73.6.45.4.68.85.68,1.35,0,1.5-.48,2.95-1.43,4.35-.95,1.4-2.08,2.1-3.38,2.1H2.25Z"/>
+                </svg>
+
+            </div>
+
+        </div>
+
+
+        <!-- Center column: wordmark — collapses on section 1, expands on section 2+ -->
+        <div class="header-center" id="header-center">
+            <img
+                src="assets/icons/02_sans_saint_logos_wordmark.svg"
+                alt=""
+                class="header-wordmark"
+                id="header-wordmark"
+                fetchpriority="low"
+            >
+        </div>
+
+
+        <!-- Right column: right line half + controls -->
+        <div class="header-col header-col-right">
+
+            <!-- Right half-line: left-cap | body | right-cap -->
+            <div class="header-line header-line-right">
+
+                <!-- Left serif cap (fixed proportions) -->
+                <svg class="line-cap-left"
+                    viewBox="0 0 5 8.4"
+                    xmlns="http://www.w3.org/2000/svg"
+                    aria-hidden="true">
+                    <path fill="white" d="M2.25,8.4c-.6,0-1.12-.2-1.57-.6-.45-.4-.68-.8-.68-1.2,0-.6.1-1.43.3-2.48.2-1.05.6-2,1.2-2.85.6-.85,1.35-1.27,2.25-1.27h66.9c.7,0,1.28.2,1.73.6.45.4.68.85.68,1.35,0,1.5-.48,2.95-1.43,4.35-.95,1.4-2.08,2.1-3.38,2.1H2.25Z"/>
+                </svg>
+
+                <!-- Body: rectangular middle section, stretched horizontally -->
+                <svg class="line-body"
+                    viewBox="4 0 65.05 8.4"
+                    preserveAspectRatio="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    aria-hidden="true">
+                    <path fill="white" d="M2.25,8.4c-.6,0-1.12-.2-1.57-.6-.45-.4-.68-.8-.68-1.2,0-.6.1-1.43.3-2.48.2-1.05.6-2,1.2-2.85.6-.85,1.35-1.27,2.25-1.27h66.9c.7,0,1.28.2,1.73.6.45.4.68.85.68,1.35,0,1.5-.48,2.95-1.43,4.35-.95,1.4-2.08,2.1-3.38,2.1H2.25Z"/>
+                </svg>
+
+                <!-- Right serif cap (fixed proportions) -->
+                <svg class="line-cap-right"
+                    viewBox="68 0 5.05 8.4"
+                    xmlns="http://www.w3.org/2000/svg"
+                    aria-hidden="true">
+                    <path fill="white" d="M2.25,8.4c-.6,0-1.12-.2-1.57-.6-.45-.4-.68-.8-.68-1.2,0-.6.1-1.43.3-2.48.2-1.05.6-2,1.2-2.85.6-.85,1.35-1.27,2.25-1.27h66.9c.7,0,1.28.2,1.73.6.45.4.68.85.68,1.35,0,1.5-.48,2.95-1.43,4.35-.95,1.4-2.08,2.1-3.38,2.1H2.25Z"/>
+                </svg>
+
+            </div>
+
+            <!-- Mute button + language dropdown -->
+            <div class="header-controls">
+
+                <button class="header-mute" id="mute-btn" aria-label="Toggle sound" disabled>
+                    <img
+                        src="assets/icons/04_sound_on_icon.svg"
+                        alt=""
+                        id="mute-icon"
+                        fetchpriority="low"
+                    >
+                </button>
+
+                <div class="header-lang" id="lang-dropdown">
+                    <button class="header-lang-toggle" id="lang-toggle" aria-haspopup="listbox" aria-expanded="false" aria-label="Select language">
+                        <img src="assets/icons/08_language_icon.svg" alt="" aria-hidden="true" fetchpriority="low">
+                        <span id="lang-current">EN</span>
+                    </button>
+                    <ul class="header-lang-dropdown" id="lang-menu" role="listbox">
+    <li><a href="#" data-lang="en">English</a></li>
+    <li><a href="#" data-lang="fr">Français</a></li>
+    <li><a href="#" data-lang="la">Latina</a></li>
+    <li><a href="#" data-lang="lb">Lëtzebuergesch</a></li>
+</ul>
+                </div>
+
+                <!-- Settings panel -->
+                <div class="header-settings" id="settings-panel">
+                    <button class="header-settings-toggle" id="settings-toggle" aria-haspopup="true" aria-expanded="false" aria-label="Display settings">
+                        <img src="assets/icons/07_settings_icon.svg" alt="" aria-hidden="true" fetchpriority="low">
+                    </button>
+                    <div class="header-settings-menu" id="settings-menu" role="dialog" aria-label="Display settings">
+                        <label class="settings-item" for="setting-contrast">
+                            <span class="settings-label">More contrast</span>
+                            <span class="settings-toggle-track">
+                                <input type="checkbox" id="setting-contrast" class="settings-checkbox">
+                                <span class="settings-toggle-thumb" aria-hidden="true"></span>
+                            </span>
+                        </label>
+
+                        <label class="settings-item" for="setting-motion">
+                            <span class="settings-label">Reduce motion</span>
+                            <span class="settings-toggle-track">
+                                <input type="checkbox" id="setting-motion" class="settings-checkbox">
+                                <span class="settings-toggle-thumb" aria-hidden="true"></span>
+                            </span>
+                        </label>
+
+                        <!-- Mobile-only: sound toggle -->
+                        <label class="settings-item settings-mobile-only" for="setting-mute">
+                            <span class="settings-label">Sound</span>
+                            <span class="settings-toggle-track">
+                                <input type="checkbox" id="setting-mute" class="settings-checkbox" checked>
+                                <span class="settings-toggle-thumb" aria-hidden="true"></span>
+                            </span>
+                        </label>
+
+                        <!-- Mobile-only: language selector -->
+                        <div class="settings-lang-mobile settings-mobile-only">
+                            <span class="settings-label">Language</span>
+                            <ul class="settings-lang-list" id="settings-lang-menu">
+                                <li><a href="#" data-lang="en">English</a></li>
+                                <li><a href="#" data-lang="fr">Français</a></li>
+                                <li><a href="#" data-lang="la">Latina</a></li>
+                                <li><a href="#" data-lang="lb">Lëtzebuergesch</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </header>
+
+    <!-- =====================================================================
+         MAIN SCROLL CONTAINER
+    ====================================================================== -->
+    <main class="scroll-container">
+
+        <!-- Section 1: Hero -->
+        <section class="section hero-section" id="hero">
+
+            <div class="parallax-layer bg-layer" id="hero-bg"></div>
+
+            <div class="parallax-layer particles-back" id="particles-back"></div>
+
+            <div class="center-container relative-content">
+                <img src="assets/icons/01_sans_saint_logos_wholemark.svg" alt="" class="hero-logo" fetchpriority="low" data-i18n-src="wholemark">
+                <div class="button-wrapper">
+                    <a href="#portfolio-slideshow" class="btn btn-black" data-i18n="hero.explore">Explore</a>
+                    <a href="#contact" class="btn btn-white" data-i18n="hero.contact_btn">Get in touch</a>
+                </div>
+            </div>
+
+            <div class="hero-footer relative-content">
+                <p data-i18n="hero.footer_established">Est. 2025 in the city of Trier.</p>
+                <p data-i18n="hero.footer_copyright">© 2025–2026 SANS SAINT. All rights reserved.</p>
+            </div>
+
+            <div class="parallax-layer particles-front" id="particles-front"></div>
+
+        </section>
+
+
+        <!-- Section 2: Creation / Split panels -->
+        <section class="section split-section" id="creation">
+
+            <div class="panel panel-left" id="panel-left">
+                <div class="parallax-layer bg-layer-creation"></div>
+                <div class="gradient-overlay gradient-top"></div>
+                <div class="gradient-overlay gradient-bottom"></div>
+
+                <div class="thirds-grid">
+                    <div class="grid-center-content text-noir text-left">
+                        <p data-i18n="creation.quote">
+                            "Art must make ... attractive<br>
+                            the world of the spirit,<br>
+                            of the invisible,<br>
+                            of <span class="highlight-viola">God.</span>"
+                        </p>
+
+                        <br>
+
+                        <p data-i18n="creation.attribution">St. John Paul II<br>
+                            <span class="citation">Letter to Artists, Apr 4, 1999</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel panel-right" id="panel-right">
+                <div class="parallax-layer bg-layer-eden"></div>
+
+                <div class="thirds-grid">
+                    <div class="grid-center-content text-blanc text-left">
+                        <p data-i18n="creation.panel_right_1"><span class="highlight-malve">Sans Saint</span> emerged<br>
+                            out of the city of Trier<br>
+                            in the Jubilee Year of 2025
+                        </p>
+
+                        <br>
+
+                        <p class="align-right" data-i18n="creation.panel_right_2">— shaped by tradition,<br>
+                            ready to reform.
+                        </p>
+
+                        <br>
+
+                        <p data-i18n="creation.panel_right_3">We want to make art that is<br>
+                            eternal, ethereal, ever-present.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+
+        </section>
+
+
+        <section class="section portfolio-section" id="portfolio-slideshow">
+
+            <div class="parallax-layer bg-layer" id="portfolio-bg"></div>
+
+            <div class="parallax-layer particles-back" id="portfolio-particles-back"></div>
+
+            <div class="center-container relative-content">
+                <h2 class="portfolio-heading">
+                    <span class="portfolio-heading-top"  data-i18n="portfolio.heading_top">Port-</span>
+                    <span class="portfolio-heading-bottom" data-i18n="portfolio.heading_bottom">folio</span>
+                </h2>
+                <div class="button-wrapper button-wrapper-portfolio">
+
+                    <!-- Download group: labels + black button, left-aligned -->
+                    <div class="portfolio-btn-group portfolio-btn-group-left">
+                        <div class="portfolio-btn-labels">
+                            <p class="portfolio-btn-label portfolio-btn-label-main"  data-i18n="portfolio.download_title">SELECTED WORKS</p>
+                            <p class="portfolio-btn-label portfolio-btn-label-small" data-i18n="portfolio.download_file">Franz-Felix_Schwan_Portfolio_v1en.pdf</p>
+                        </div>
+                        <a href="assets/Franz-Felix_Schwan_Portfolio_v1en.pdf" download class="btn btn-black" data-i18n="portfolio.download">Download</a>
+                    </div>
+
+                    <!-- Visit group: labels + white button, right-aligned -->
+                    <div class="portfolio-btn-group portfolio-btn-group-right">
+                        <div class="portfolio-btn-labels">
+                            <p class="portfolio-btn-label portfolio-btn-label-main"  data-i18n="portfolio.visit_title">Instagram</p>
+                            <p class="portfolio-btn-label portfolio-btn-label-small" data-i18n="portfolio.visit_url">www.instagram.com/sanssaintco/</p>
+                        </div>
+                        <a href="https://www.instagram.com/sanssaintco/" target="_blank" rel="noopener noreferrer" class="btn btn-white" data-i18n="portfolio.visit">Visit</a>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="parallax-layer particles-front" id="portfolio-particles-front"></div>
+
+        </section>
+
+        <section class="section split-section" id="contact">
+
+            <div class="panel panel-left" id="contact-panel-left">
+                <div class="parallax-layer bg-layer-eden"></div>
+                
+                <div class="parallax-layer portrait-layer">
+                    <picture>
+                        <source media="(max-width: 1920px)" type="image/avif" srcset="assets/images/09_portrait_photo_by_noya_1920px.avif">
+                        <source media="(max-width: 1920px)" type="image/jpeg" srcset="assets/images/09_portrait_photo_by_noya_1920px.jpeg">
+                        
+                        <source type="image/avif" srcset="assets/images/09_portrait_photo_by_noya.avif">
+                        <img src="assets/images/09_portrait_photo_by_noya.jpeg" alt="" class="portrait-img" fetchpriority="low">
+                    </picture>
+                </div>
+            </div>
+
+            <div class="panel panel-right" id="contact-panel-right">
+                <div class="parallax-layer bg-layer-creation"></div>
+                <div class="gradient-overlay gradient-top"></div>
+                <div class="gradient-overlay gradient-bottom"></div>
+
+                <div class="thirds-grid">
+                    <div class="grid-center-content text-noir">
+                        
+                        <p class="highlight-viola" data-i18n="contact.name">Franz-Felix Schwan O.C.D.S.</p>
+                        
+                        <br>
+                        
+                        <p class="text-left" data-i18n="contact.role_1">Graphic Designer</p>
+                        <p class="text-left" data-i18n="contact.role_2">and Secular Carmelite</p>
+                        <p class="align-right" data-i18n="contact.location_1">—based in Mannheim,</p>
+                        <p class="align-right" data-i18n="contact.location_2">Mainz, and Trier.</p>
+                        
+                        <div class="button-wrapper button-wrapper-portfolio">
+                            
+                            <div class="portfolio-btn-group portfolio-btn-group-right">
+                                <div class="portfolio-btn-labels">
+                                    <p class="portfolio-btn-label portfolio-btn-label-main" data-i18n="contact.resume_title">RESUME</p>
+                                    <p class="portfolio-btn-label portfolio-btn-label-small" data-i18n="contact.resume_file">Franz-Felix_Schwan_Resume_v1de.pdf</p>
+                                </div>
+                                <a href="assets/Franz-Felix_Schwan_Resume_v1de.pdf" download class="btn btn-white" data-i18n="contact.download">Download</a>
+                            </div>
+
+                            <div class="portfolio-btn-group portfolio-btn-group-left">
+                                <div class="portfolio-btn-labels">
+                                    <p class="portfolio-btn-label portfolio-btn-label-main" data-i18n="contact.email_title">CONTACT</p>
+                                    <p class="portfolio-btn-label portfolio-btn-label-small" data-i18n="contact.email_address">contact@sanssaint.eu</p>
+                                </div>
+                                <a href="mailto:contact@sanssaint.eu" class="btn btn-black" data-i18n="contact.email_btn">E-mail</a>
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- Footer Section -->
+        <footer class="section footer-section" id="footer">
+            <div class="footer-inner">
+
+                <!-- Page 1: Imprint + Downloads/Links -->
+                <div class="footer-page footer-page-1">
+
+                    <!-- Left: Imprint & Contact -->
+                    <div class="footer-col">
+                        <h2 data-i18n="footer.heading_imprint">Imprint &amp;<br>Privacy Policy</h2>
+                        <div class="footer-address-block">
+                            <p data-i18n="footer.address_gdpr">Responsibility for data processing on this website, within the meaning of the General Data Protection Regulation (GDPR/DSGVO), lies with:</p>
+                            <p>Franz-Felix Schwan<br>
+                            68169 Mannheim<br>
+                            Germany</p>
+                        </div>
+                        <p><a href="impressum-datenschutz.html" target="_blank" rel="noopener"><l data-i18n="footer.more_info">More info…</l></a></p>
+
+                        <h2 data-i18n="footer.heading_contact">Contact</h2>
+                        <p><span data-i18n="footer.email_label">E-mail</span><br>
+                        <a href="mailto:contact@sanssaint.eu"><l>contact@sanssaint.eu</l></a></p>
+                    </div>
+
+                    <!-- Middle: Links -->
+                    <div class="footer-col">
+                        <h2 data-i18n="footer.heading_links">Links</h2>
+                        <p><span data-i18n="footer.portfolio_label">Portfolio</span><br>
+                        <a href="assets/Franz-Felix_Schwan_Portfolio_v1en.pdf" download><l>Franz-Felix_Schwan_Portfolio_v1en.pdf</l></a></p>
+                        <p><span data-i18n="footer.resume_label">Resume</span><br>
+                        <a href="assets/Franz-Felix_Schwan_Resume_v1de.pdf" download><l>Franz-Felix_Schwan_Resume_v1de.pdf</l></a></p>
+                        <p>Instagram<br>
+                        <a href="https://www.instagram.com/sanssaintco/" target="_blank" rel="noopener"><l>www.instagram.com/sanssaintco/</l></a></p>
+                        <br>
+                        <p data-i18n="footer.tithe">A tithe of 10 % of our profit is donated to the Carmelite community or to charity causes, as per Leviticus 27:30 and Deuteronomy 14:22.</p>
+                    </div>
+
+                </div><!-- /footer-page-1 -->
+
+                <!-- Page 2: Credits -->
+                <div class="footer-page footer-page-2">
+
+                    <!-- Right: Credits -->
+                    <div class="footer-col">
+                        <h2 data-i18n="footer.heading_credits">Credits</h2>
+                        <p><span data-i18n="footer.credits_font">Text set in EB Garamond font by Georg Duffner.</span><br>
+                        <a href="https://github.com/georgd/EB-Garamond" target="_blank" rel="noopener"><i>https://github.com/georgd/EB-Garamond</i></a></p>
+                        <p><span data-i18n="footer.credits_images">Public Domain images provided by Wikimedia Commons.</span><br>
+                        <a href="https://creativecommons.org/public-domain/" target="_blank" rel="noopener"><i>https://creativecommons.org/public-domain/</i></a></p>
+                        <p data-i18n="footer.credits_domain">Custom domain by Infomaniak. Coded with Anthropic PBC's Claude AI.</p>
+                        <p><span data-i18n="footer.credits_hosting">This website is hosted via GitHub.</span><br>
+                        <a href="https://github.com/fraterfranzfelix/sanssaint" target="_blank" rel="noopener"><i>https://github.com/fraterfranzfelix/sanssaint</i></a></p>
+                        <p data-i18n="footer.credits_origin">Mostly made in Europe.</p>
+                        <p data-i18n="footer.credits_version">Beta v0.6.2. Last update April 3, 2026.</p>
+                    </div>
+
+                </div><!-- /footer-page-2 -->
+
+            </div>
+        </footer>
+
+    </main>
+
+    <script src="sound.js"></script>
+    <script src="script.js"></script>
+
+</body>
+</html>
