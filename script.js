@@ -25,7 +25,8 @@ document.addEventListener('DOMContentLoaded', () => {
    SHARED HELPERS
 ============================================================================= */
 
-const angelWrapper = document.querySelector('.center-image-wrapper');
+const balduinWrapper = document.querySelector('.balduin-image-wrapper');
+const balduinMobile  = document.querySelector('.balduin-mobile');
 
 // Viewport dimensions — cached once and refreshed on resize so per-frame
 // code never needs to read window.innerWidth/Height directly.
@@ -34,6 +35,10 @@ let vpHeight = window.innerHeight;
 
 // Parallax movement multiplier — 1 = full, 0.333 = reduced motion
 let motionScale = 1;
+
+// Tilt multiplier for balduin-mobile: lerp(2→1) as scroll progresses from
+// stage 1 (large/blurred) to stage 2 (sharp). Updated each frame by updateBalduin.
+let balduinTiltMultiplier = 1;
 
 // Tracks which sections are currently intersecting the viewport.
 // Used by parallax functions to skip off-screen layers.
@@ -57,41 +62,32 @@ function getSpeed(layer) {
     if (layer.classList.contains('particles-front'))      return -15;
     if (layer.classList.contains('weapons-also-right'))   return -35;
     if (layer.classList.contains('weapons-layer'))        return -15;
-    if (layer.classList.contains('center-image-wrapper')) return -35;
     if (layer.classList.contains('particles-back'))       return -35;
     
-    /* --- NEW LINE HERE --- */
-    if (layer.classList.contains('portrait-layer'))       return -35;
+    if (layer.classList.contains('portrait-background-layer')) return  50;
+    if (layer.classList.contains('portrait-foreground-layer')) return -15;
     
-    if (layer.classList.contains('bg-layer-creation'))    return  50;  // Inverted
-    if (layer.classList.contains('bg-layer-eden'))        return  50;  // Inverted
-    return  50;  // Default: hero background — inverted
+    if (layer.classList.contains('bg-layer-creation'))    return  50;
+    if (layer.classList.contains('bg-layer-eden'))        return  50;
+    
+    // Apply fast particle-like speed to both Balduin wrappers
+    if (layer.classList.contains('balduin-image-wrapper')) return -35;
+    if (layer.classList.contains('balduin-mobile'))        return -35;
+    
+    return  50;
 }
 
-/**
- * Applies a translate transform to a layer, correctly composing it on top
- * of whatever CSS base transform the element needs.
- *
- * The angel has two possible base states set by CSS:
- *   — Desktop (> 768px): translate(-50%, -50%)   — centered on both axes
- *   — Mobile  (≤ 768px): translate(-55%, -50%)   — shifted left (left: 0)
- *
- * Without this awareness, JS would overwrite the mobile CSS rule with -50%,
- * re-centering the angel and covering the panel text on narrow screens.
- *
- * Movement is also clamped so the parallax can never push the angel fully
- * out of frame. The angel is intended to partially obscure text — revealing
- * it through parallax is the experience — but it should never vanish entirely.
- */
 function applyTransform(layer, xMove, yMove) {
-    if (layer === angelWrapper) {
-        const isMobileLayout = vpWidth <= 768;
-        const baseX          = isMobileLayout ? '-55%' : '-50%';
-        const clampedX       = Math.max(-40, Math.min(40, xMove));
-        const clampedY       = Math.max(-30, Math.min(30, yMove));
-
-        layer.style.transform =
-            `translate(calc(${baseX} + ${clampedX}px), calc(-50% + ${clampedY}px))`;
+    if (layer === balduinMobile) {
+        // Directly map parallax to the mobile fixed element without clamping.
+        // balduinTiltMultiplier scales the effect: 2× at stage 1, 1× at stage 2.
+        layer.style.setProperty('--tilt-x', `${xMove * balduinTiltMultiplier}px`);
+        layer.style.setProperty('--tilt-y', `${yMove * balduinTiltMultiplier}px`);
+        
+    } else if (layer === balduinWrapper) {
+        // Unclamped movement for the desktop element
+        layer.style.transform = `translate(calc(-50% + ${xMove}px), ${yMove}px)`;
+        
     } else {
         layer.style.transform = `translate(${xMove}px, ${yMove}px)`;
     }
@@ -103,48 +99,45 @@ function applyTransform(layer, xMove, yMove) {
 ============================================================================= */
 
 function initMouseParallax() {
-    // 1. Cache the elements ONCE so the browser isn't searching the DOM 60 times a second
     const selectors = [
         '.parallax-layer',
         '.bg-layer-creation',
         '.bg-layer-eden',
-        '.center-image-wrapper'
+        '.center-image-wrapper',
+        '.balduin-image-wrapper',
+        '.balduin-mobile' // <-- Added explicitly
     ];
-    const layers = document.querySelectorAll(selectors.join(', '));
+    const layers = [...document.querySelectorAll(selectors.join(', '))]
+        .filter(l => !l.classList.contains('halftone-top') && !l.classList.contains('halftone-bottom'));
 
-    // 2. Pre-compute each layer's speed divisor once — getSpeed() uses
-    //    classList.contains() checks that don't need to run every frame.
     const speedCache = new Map();
     layers.forEach(layer => speedCache.set(layer, getSpeed(layer)));
 
-    // Pre-cache each layer's parent section for fast visibility lookup.
     const sectionCache = new Map();
     layers.forEach(layer => sectionCache.set(layer, layer.closest('.section')));
 
-    // 3. Set up variables to hold our target coordinates and a lock (ticking)
     let targetX = 0;
     let targetY = 0;
     let ticking = false;
 
-    // 4. The function that actually updates the screen
     function updateScreen() {
         layers.forEach(layer => {
-            if (!visibleSections.has(sectionCache.get(layer))) return;
+            const section = sectionCache.get(layer);
+            // Fix: Only skip elements that actually have a section, and the section is hidden
+            if (section && !visibleSections.has(section)) return;
+            
+            // Fix: Save CPU by skipping balduin-mobile if it's currently hidden by the scroll logic
+            if (layer === balduinMobile && balduinMobile.style.visibility === 'hidden') return;
+
             const speed = speedCache.get(layer);
             applyTransform(layer, (targetX / speed) * motionScale, (targetY / speed) * motionScale);
         });
-
-        // Unlock the frame so the next mouse movement can queue up a new draw
         ticking = false;
     }
 
-    // 5. The event listener that tracks the mouse
     document.addEventListener('mousemove', (e) => {
-        // Just do the math here
         targetX = e.clientX - vpWidth  / 2;
         targetY = e.clientY - vpHeight / 2;
-
-        // If an animation frame isn't already queued up, queue one!
         if (!ticking) {
             window.requestAnimationFrame(updateScreen);
             ticking = true;
@@ -158,72 +151,57 @@ function initMouseParallax() {
 ============================================================================= */
 
 function initTiltParallax() {
-
-    // TODO: On iOS 13+, DeviceOrientationEvent.requestPermission() must be called
-    // from a user gesture before this listener will fire. 
-
-    // 1. Cache elements once
     const selectors = [
         '.parallax-layer',
         '.bg-layer-creation',
         '.bg-layer-eden',
-        '.center-image-wrapper'
+        '.center-image-wrapper',
+        '.balduin-image-wrapper',
+        '.balduin-mobile' // <-- Added explicitly
     ];
-    const layers = document.querySelectorAll(selectors.join(', '));
+    const layers = [...document.querySelectorAll(selectors.join(', '))]
+        .filter(l => !l.classList.contains('halftone-top') && !l.classList.contains('halftone-bottom'));
 
-    // Pre-compute each layer's speed divisor once.
     const speedCache = new Map();
     layers.forEach(layer => speedCache.set(layer, getSpeed(layer)));
 
-    // Pre-cache each layer's parent section for fast visibility lookup.
     const sectionCache = new Map();
     layers.forEach(layer => sectionCache.set(layer, layer.closest('.section')));
 
     let baseGamma = null;
     let baseBeta  = null;
-
-    // These represent where the elements SHOULD be based on the tilt
     let targetX = 0;
     let targetY = 0;
-
-    // These represent where the elements CURRENTLY are
     let smoothX = 0;
     let smoothY = 0;
-
     const SMOOTHING = 0.12;
     const MAX_TILT = 10;
-
     let ticking = false;
 
-    // 2. The animation loop that runs at 60 FPS
     function updateScreen() {
-        // Move the smoothing math here. It ensures the easing looks buttery
-        // smooth because it calculates per-frame, not per-sensor-twitch.
         smoothX += (targetX - smoothX) * SMOOTHING;
         smoothY += (targetY - smoothY) * SMOOTHING;
 
         layers.forEach(layer => {
-            if (!visibleSections.has(sectionCache.get(layer))) return;
+            const section = sectionCache.get(layer);
+            if (section && !visibleSections.has(section)) return;
+            if (layer === balduinMobile && balduinMobile.style.visibility === 'hidden') return;
+
             const speed = speedCache.get(layer);
             applyTransform(layer, (smoothX / speed) * motionScale, (smoothY / speed) * motionScale);
         });
 
-        // Optimization: If the current position is extremely close to the target, 
-        // stop requesting frames to save battery. Otherwise, keep animating.
         const diffX = Math.abs(targetX - smoothX);
         const diffY = Math.abs(targetY - smoothY);
 
         if (diffX > 0.05 || diffY > 0.05) {
             window.requestAnimationFrame(updateScreen);
         } else {
-            // The elements have settled. Unlock the loop.
             ticking = false;
         }
     }
 
-    // 3. The event listener that tracks the gyroscope
     window.addEventListener('deviceorientation', (e) => {
-
         const gamma = e.gamma ?? 0;
         const beta  = e.beta  ?? 0;
 
@@ -241,11 +219,9 @@ function initTiltParallax() {
         const rangeX = vpWidth  / 2;
         const rangeY = vpHeight / 2;
 
-        // Update the target coordinates
         targetX = normX * rangeX;
         targetY = normY * rangeY;
 
-        // If the animation loop is resting, wake it up
         if (!ticking) {
             ticking = true;
             window.requestAnimationFrame(updateScreen);
@@ -394,25 +370,33 @@ function initMuteToggle() {
 
     if (!btn || !icon) return;
 
-    let muted = false;
+    // stage 0 = normal, 1 = reduced, 2 = off
+    let stage = 0;
 
-    function applyMute(isMuted) {
-        muted = isMuted;
-        icon.src = muted ? 'assets/icons/03_sound_off_icon.svg' : 'assets/icons/04_sound_on_icon.svg';
-        icon.alt = muted ? 'Sound off' : 'Sound on';
-        btn.setAttribute('aria-label', muted ? 'Unmute' : 'Mute');
-        if (window.audioEngine) window.audioEngine.toggleMute(muted);
+    const STAGES = [
+        { src: 'assets/icons/13_volume_on_icon.svg',      alt: 'Sound on',      label: 'Reduce volume', volume: 0.6667 },
+        { src: 'assets/icons/12_volume_reduced_icon.svg', alt: 'Sound reduced', label: 'Mute',          volume: 0.3333 },
+        { src: 'assets/icons/14_volume_off_icon.svg',   alt: 'Sound off',      label: 'Unmute',        volume: 0      },
+    ];
+
+    function applyStage(newStage) {
+        stage = newStage;
+        const s = STAGES[stage];
+        icon.src = s.src;
+        icon.alt = s.alt;
+        btn.setAttribute('aria-label', s.label);
+        if (window.audioEngine) window.audioEngine.setVolume(s.volume);
     }
 
     btn.addEventListener('click', () => {
-        applyMute(!muted);
-        if (checkbox) checkbox.checked = !muted; // checked = sound on
+        applyStage((stage + 1) % 3);
+        if (checkbox) checkbox.checked = (stage !== 2); // checked = any audible stage
     });
 
-    // Mobile settings checkbox: checked = sound on, unchecked = muted
+    // Mobile settings checkbox: checked = normal, unchecked = off
     if (checkbox) {
         checkbox.addEventListener('change', () => {
-            applyMute(!checkbox.checked);
+            applyStage(checkbox.checked ? 0 : 2);
         });
     }
 }
@@ -485,36 +469,52 @@ function getNestedValue(obj, path) {
 
 function initLangDropdown() {
 
-    const current = document.getElementById('lang-current');
-    const menu    = document.getElementById('lang-menu');
+    const current  = document.getElementById('lang-current');
+    const menu     = document.getElementById('lang-menu');
+    const toggle   = document.getElementById('lang-toggle');
+    const dropdown = document.getElementById('lang-dropdown');
 
     if (!menu || !current) return;
 
-    // --- NEW: Sync the initial label on page load ---
-    // Reads the language set by your <head> script and updates the label
+    // Sync the initial label on page load
     const activeLang = document.documentElement.lang || 'en';
     current.textContent = activeLang.toUpperCase();
 
-    // Open/close is handled purely by CSS :hover on .header-lang.
-    // This function handles selection, persistence, and triggering translation.
+    // Click-toggle open/close
+    if (toggle && dropdown) {
+        toggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            // Close settings panel if open
+            const settingsMenuEl = document.getElementById('settings-menu');
+            const settingsToggleEl = document.getElementById('settings-toggle');
+            if (settingsMenuEl) settingsMenuEl.classList.remove('is-open');
+            if (settingsToggleEl) settingsToggleEl.setAttribute('aria-expanded', 'false');
+            const isOpen = menu.classList.toggle('is-open');
+            toggle.setAttribute('aria-expanded', isOpen);
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!dropdown.contains(e.target)) {
+                menu.classList.remove('is-open');
+                toggle.setAttribute('aria-expanded', 'false');
+            }
+        });
+    }
+
     function bindLangLinks(container) {
         container.querySelectorAll('a[data-lang]').forEach(link => {
             link.addEventListener('click', (e) => {
                 e.preventDefault();
                 const lang = link.dataset.lang;
 
-                // Persist so the inline <head> script picks it up on the next visit
-                // and sets document.documentElement.lang before first paint.
                 localStorage.setItem('sanssaint-lang', lang);
-
-                // Update <html lang> so CSS selectors (loading screen CTA variants)
-                // and the next initLanguage() call both use the new language.
                 document.documentElement.lang = lang;
-
-                // Update the visible language code in the header toggle.
                 current.textContent = lang.toUpperCase();
 
-                // Fetch and apply the new language file.
+                // Close the dropdown after selection
+                menu.classList.remove('is-open');
+                if (toggle) toggle.setAttribute('aria-expanded', 'false');
+
                 initLanguage();
             });
         });
@@ -538,29 +538,30 @@ function initSettingsPanel() {
 
     if (!contrastBox) return;
 
-    // On mobile, hover is unreliable — wire a click-toggle for the settings button.
-    const toggle = document.getElementById('settings-toggle');
-    const panel  = document.getElementById('settings-panel');
+    // Click-toggle on all viewport sizes
+    const toggle      = document.getElementById('settings-toggle');
+    const panel       = document.getElementById('settings-panel');
+    const settingsMenu = document.getElementById('settings-menu');
 
-    if (toggle && panel) {
+    if (toggle && panel && settingsMenu) {
         toggle.addEventListener('click', (e) => {
-            if (window.innerWidth > 768) return; // desktop uses CSS :hover
             e.stopPropagation();
-            const isOpen = panel.classList.toggle('is-open');
+            // Close language dropdown if open
+            const langMenuEl = document.getElementById('lang-menu');
+            const langToggleEl = document.getElementById('lang-toggle');
+            if (langMenuEl) langMenuEl.classList.remove('is-open');
+            if (langToggleEl) langToggleEl.setAttribute('aria-expanded', 'false');
+            const isOpen = settingsMenu.classList.toggle('is-open');
             toggle.setAttribute('aria-expanded', isOpen);
         });
 
         document.addEventListener('click', (e) => {
-            if (window.innerWidth > 768) return;
             if (!panel.contains(e.target)) {
-                panel.classList.remove('is-open');
+                settingsMenu.classList.remove('is-open');
                 toggle.setAttribute('aria-expanded', 'false');
             }
         });
     }
-
-    // Open/close on desktop is handled purely by CSS :hover on .header-settings.
-    // This function only handles preference restoration and the contrast toggle.
 
     // --- Restore saved preference ---
     // The class on <html> is already applied by the inline script in <head>.
@@ -579,6 +580,25 @@ function initSettingsPanel() {
             localStorage.setItem('sanssaint-contrast', 'normal');
         }
     });
+
+    // --- Larger text toggle ---
+    const textBox = document.getElementById('setting-text');
+
+    if (textBox) {
+        if (localStorage.getItem('sanssaint-text-size') === 'large') {
+            textBox.checked = true;
+        }
+
+        textBox.addEventListener('change', () => {
+            if (textBox.checked) {
+                document.documentElement.classList.add('larger-text');
+                localStorage.setItem('sanssaint-text-size', 'large');
+            } else {
+                document.documentElement.classList.remove('larger-text');
+                localStorage.setItem('sanssaint-text-size', 'normal');
+            }
+        });
+    }
 
     // --- Reduce motion toggle ---
     const motionBox = document.getElementById('setting-motion');
@@ -626,22 +646,6 @@ function initSettingsPanel() {
         if (localStorage.getItem('sanssaint-motion') === null) evaluateAutoMotion();
     });
 
-    // Battery monitoring — Chrome/Edge only, silent elsewhere
-    if (typeof navigator.getBattery === 'function') {
-        navigator.getBattery().then(battery => {
-            function onBatteryChange() {
-                if (localStorage.getItem('sanssaint-motion') !== null) return;
-                if (battery.level < 0.05 && !battery.charging) {
-                    applyReduceMotion(true);
-                } else {
-                    evaluateAutoMotion(); // Re-evaluate when battery recovers
-                }
-            }
-            battery.addEventListener('levelchange',    onBatteryChange);
-            battery.addEventListener('chargingchange', onBatteryChange);
-            onBatteryChange(); // Check current state immediately
-        }).catch(() => {}); // Silent fail if API unavailable or denied
-    }
 }
 
 /* =============================================================================
@@ -689,6 +693,10 @@ document.getElementById('mute-btn').removeAttribute('disabled');
         }
         // -------------------------------------------------
 
+        const remPx = parseFloat(getComputedStyle(document.documentElement).fontSize);
+        const targetPx = 2 * Math.max(window.innerWidth, window.innerHeight);
+        star.style.setProperty('--expand-scale', Math.ceil(targetPx / remPx));
+
         loader.classList.add('is-expanding');
 
         if (window.audioEngine) {
@@ -710,34 +718,146 @@ document.getElementById('mute-btn').removeAttribute('disabled');
 });
 
 /* =============================================================================
-   CREATION SECTION — MOBILE SNAP RESTRUCTURE
-   On mobile the two creation panels must be direct children of .scroll-container
-   to register as individual scroll-snap targets. This function promotes them on
-   mobile and restores them inside #creation on desktop.
+   CREATION SECTION — MOBILE SNAP + SCROLL-DRIVEN BALDUIN ANIMATION
+   On mobile the two creation panels are promoted to direct .scroll-container
+   children so each is an individual scroll-snap target.
+
+   A single .balduin-mobile element (position:fixed) replaces the old two-image
+   setup. Its appearance is driven entirely by scroll progress:
+
+   State 1 (at #panel-left): scale=3.5, blur=18px — massive close-up, right side
+   Transition: scroll progress t ∈ [0,1] smoothly interpolates all values
+   State 2 (at #panel-right): scale=1, blur=0 — sharp 75vh portrait, right side
+   Exit (past #panel-right): image translates up with the page so it scrolls away
+
+   Tilt parallax (--tilt-x / --tilt-y) is merged by CSS; JS sets both safely.
 ============================================================================= */
 
 function initCreationMobileSnap() {
-    const creation  = document.getElementById('creation');
+    const creation   = document.getElementById('creation');
     const panelLeft  = document.getElementById('panel-left');
     const panelRight = document.getElementById('panel-right');
     const scroller   = document.querySelector('.scroll-container');
+    const mobileImg  = document.querySelector('.balduin-mobile');
 
     if (!creation || !panelLeft || !panelRight || !scroller) return;
+
+    // CRITICAL FIX: Automatically rescue the image from the scroll container trap.
+    // This ensures position: fixed anchors to the true screen glass, not the scrolling content.
+    if (mobileImg && mobileImg.parentElement !== document.body) {
+        document.body.appendChild(mobileImg);
+    }
+
+    // Tear down any previous mobile animation
+    if (initCreationMobileSnap._cleanup) {
+        initCreationMobileSnap._cleanup();
+        initCreationMobileSnap._cleanup = null;
+    }
 
     const isMobile   = window.innerWidth <= 768;
     const isPromoted = panelLeft.parentElement === scroller;
 
     if (isMobile && !isPromoted) {
-        // Promote: insert both panels before #creation, then hide the wrapper
         scroller.insertBefore(panelLeft,  creation);
         scroller.insertBefore(panelRight, creation);
         creation.hidden = true;
     } else if (!isMobile && isPromoted) {
-        // Restore: put panels back inside #creation in their original order
         creation.prepend(panelRight);
         creation.prepend(panelLeft);
         creation.hidden = false;
     }
+
+    if (!isMobile || !mobileImg) return;
+
+    let panelLeftTop  = 0;
+    let panelRightTop = 0;
+    let distance      = 1;
+    let rafPending    = false;
+    let cancelled     = false;
+
+    function lerp(a, b, t)  { return a + (b - a) * t; }
+    function smooth(t)      { return t * t * (3 - 2 * t); }
+    function clamp01(t)     { return Math.max(0, Math.min(1, t)); }
+
+    function updateBalduin() {
+        rafPending = false;
+
+        const scrollTop = scroller.scrollTop;
+        const vph       = vpHeight;
+        const vpw       = vpWidth;
+
+        // Interpolate safely based on the exact pixel distance between the two panels
+        const t = smooth(clamp01((scrollTop - panelLeftTop) / distance));
+
+        // Double tilt parallax at stage 1, fade back to 1× by stage 2
+        balduinTiltMultiplier = 3 - t;
+
+        // --- NEW: INDEPENDENT OFFSETS FOR STATE 1 (PANEL LEFT) ---
+        // Adjust these multipliers to move the large, blurred Balduin!
+        // vpw * 0.33 means "push him right by 33% of the screen width"
+        const extraRight = vpw * 0.33; 
+        
+        // vph * 0.10 means "push him down by 10% of the screen height"
+        const extraDown  = vph * 0.25; 
+
+        // Interpolate offsets so they smoothly slide back to 0 at the second panel
+        const currentDx = lerp(extraRight, 0, t);
+        const currentDy = lerp(extraDown,  0, t);
+
+        let dy = 0;
+        let op = 1;
+        let visibility = 'visible';
+
+        if (scrollTop < panelLeftTop) {
+            // Entering from Hero: Push down so he scrolls up into view.
+            dy = (panelLeftTop - scrollTop) * 1.5;
+            op = clamp01((scrollTop - (panelLeftTop - vph * 0.3)) / (vph * 0.3));
+        } else if (scrollTop > panelRightTop) {
+            // Exiting to Portfolio: Push up so he scrolls away naturally.
+            dy = panelRightTop - scrollTop;
+            op = clamp01(1 - (scrollTop - panelRightTop) / (vph * 0.3));
+        } else {
+            // Pinned between the two panels
+            dy = 0;
+        }
+
+        if (op === 0 && dy > vph) visibility = 'hidden';
+
+        // Apply the values, injecting our currentDx and currentDy
+        mobileImg.style.setProperty('--scroll-dx', `${currentDx}px`);
+        mobileImg.style.setProperty('--scroll-dy', `${dy + currentDy}px`); // Combine base dy with extraDown
+        mobileImg.style.setProperty('--scroll-scale', lerp(1.6, 1, t));
+        mobileImg.style.setProperty('--blur-val',  `${lerp(12, 0, t)}px`);
+        mobileImg.style.opacity = op;
+        mobileImg.style.visibility = visibility;
+    }
+
+    function scheduleUpdate() {
+        if (rafPending) return;
+        rafPending = true;
+        requestAnimationFrame(updateBalduin);
+    }
+
+    scroller.addEventListener('scroll', scheduleUpdate, { passive: true });
+
+    // Wait for CSS reflow to finish before measuring absolute offsets
+    requestAnimationFrame(() => {
+        setTimeout(() => {
+            if (cancelled) return;
+            const scrollerTop = scroller.getBoundingClientRect().top;
+            panelLeftTop  = panelLeft.getBoundingClientRect().top  - scrollerTop + scroller.scrollTop;
+            panelRightTop = panelRight.getBoundingClientRect().top - scrollerTop + scroller.scrollTop;
+            distance      = Math.max(1, panelRightTop - panelLeftTop);
+            
+            updateBalduin();
+        }, 100);
+    });
+
+    initCreationMobileSnap._cleanup = () => {
+        cancelled = true;
+        scroller.removeEventListener('scroll', scheduleUpdate);
+        mobileImg.style.visibility = 'hidden';
+    };
 }
 
 
@@ -799,11 +919,16 @@ function initUISounds() {
             opus.src  = `assets/ui/${name}.opus`;
             opus.type = 'audio/ogg; codecs=opus';
 
+            const ogg = document.createElement('source');
+            ogg.src  = `assets/ui/${name}.ogg`;
+            ogg.type = 'audio/ogg';
+
             const wav = document.createElement('source');
             wav.src  = `assets/ui/${name}.wav`;
             wav.type = 'audio/wav';
 
             audio.appendChild(opus);
+            audio.appendChild(ogg);
             audio.appendChild(wav);
             return audio;
         });
@@ -853,6 +978,17 @@ function initUISounds() {
     document.querySelectorAll('.footer-section a').forEach(link => {
         link.addEventListener('mouseenter', () => playUISound('text_hover'));
         link.addEventListener('click',      () => playUISound(hasDownload(link) ? 'text_download' : 'text_click'));
+    });
+
+    // --- Info links: citation (injected by i18n) + portfolio/contact label rows ---
+    // Event delegation handles links that don't exist in the DOM when this runs.
+    document.addEventListener('mouseover', e => {
+        const link = e.target.closest('.info-link');
+        if (link && !link.contains(e.relatedTarget)) playUISound('text_hover');
+    });
+    document.addEventListener('click', e => {
+        const link = e.target.closest('.info-link');
+        if (link) playUISound(hasDownload(link) ? 'text_download' : 'text_click');
     });
 
     // --- Settings panel toggle checkboxes ---

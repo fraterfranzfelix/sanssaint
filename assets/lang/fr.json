@@ -14,18 +14,16 @@
     },
 
     "creation": {
-        "quote":         "\"L'art doit rendre attrayant<br>le monde de l'esprit,<br>de l'invisible,<br>de <span class=\"highlight-viola\">Dieu.</span>\"",
-        "attribution":   "Saint Jean-Paul II<br><span class=\"citation\">Lettre aux artistes, Apr 4, 1999</span>",
-        "panel_right_1": "<span class=\"highlight-malve\">Sans Saint</span> a émergé<br>de la ville de Trèves<br>en l'Année Jubilaire de 2025",
-        "panel_right_2": "\u2014 façonné par la tradition,<br>prêt à réformer.",
-        "panel_right_3": "Nous voulons créer un art qui soit<br>eternal, éternel, éthéré, omniprésent."
+        "quote":         "\"L'art doit rendre attrayant<br>le monde de <span class=\"highlight-viola\">l'Esprit.</span>\"",
+        "attribution":   "\u2014 Saint Jean-Paul II<br><a class=\"info-link\" href=\"https://www.vatican.va/content/john-paul-ii/fr/letters/1999/documents/hf_jp-ii_let_23041999_artists.html\" target=\"_blank\" rel=\"noopener noreferrer\"><span class=\"citation\">Lettre aux artistes, 4 avril 1999</span></a>",
+        "panel_right_1": "<span class=\"highlight-malve\">Sans Saint</span> est un studio créatif<br>fondé à Trèves en 2025<br><span style=\"display:block;text-align:right\">\u2014 pour concevoir un monde<br>avec c\u0153ur, âme et intention.<br><span class=\"citation\">cf. Friedrich Overbeck, Lettre, 27\u00a0avril 1808</span></span>"
     },
 
     "portfolio": {
         "heading_top":    "Port-",
         "heading_bottom": "folio",
         "download_title": "TRAVAUX SÉLECTIONNÉS",
-        "download_file":  "Franz-Felix_Schwan_Portfolio_v1en.pdf",
+        "download_file":  "Franz-Felix_Schwan_Portfolio_v2en.pdf",
         "download":       "Télécharger",
         "visit_title":    "Instagram",
         "visit_url":      "www.instagram.com/sanssaintco/",
@@ -36,14 +34,22 @@
         "name":          "François Félicien Schwan O.C.D.S.",
         "role_1":        "Graphiste",
         "role_2":        "et Carme séculier",
-        "location_1":    "—basé à Mannheim,",
-        "location_2":    "Mayence et Trèves.",
+        "location_1":    "—basé à Mannheim.",
         "resume_title":  "CV",
         "resume_file":   "Franz-Felix_Schwan_Resume_v1de.pdf",
         "download":      "Télécharger",
         "email_title":   "CONTACT",
         "email_address": "contact@sanssaint.eu",
         "email_btn":     "E-mail"
+    },
+
+    "settings": {
+        "aria_label":    "Paramètres d'affichage",
+        "more_contrast": "Plus de contraste",
+        "reduce_motion": "Réduire les animations",
+        "larger_text":   "Texte plus grand",
+        "sound":         "Son",
+        "language":      "Langue"
     },
 
     "footer": {
@@ -62,6 +68,6 @@
         "credits_domain":   "Domaine personnalis\u00e9 par Infomaniak. Con\u00e7u avec l\u2019IA Claude d\u2019Anthropic PBC.",
         "credits_hosting":  "Ce site est h\u00e9berg\u00e9 via GitHub.",
         "credits_origin":   "Principalement r\u00e9alis\u00e9 en Europe.",
-        "credits_version":  "B\u00eata v0.6.3. Derni\u00e8re mise \u00e0 jour le 14 avril 2026."
+        "credits_version":  "v1.0.0. Sortie le 20 avril 2026."
     }
 }

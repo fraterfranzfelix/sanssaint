@@ -96,7 +96,7 @@
 
         .loading-cta {
             color: var(--noir-tres-leger);
-            font-size: var(--font-size-body);
+            font-size: 0;
             font-weight: 400;
             letter-spacing: 0.02rem;
             opacity: 0;
@@ -107,9 +107,9 @@
             opacity: 1;
         }
 
-        /* Anchor: keeps the flex layout at 1rem × 1rem while the SVG
-           overflows absolutely — so the star's vector paths are always
-           rasterized at full resolution and scale: never scales up a tiny bitmap. */
+        /* Anchor: keeps the flex layout at 1rem × 1rem.
+           The star is exactly 1rem; CSS scale expands it on click without
+           affecting layout. */
         #loading-star-anchor {
             width: 1rem;
             height: 1rem;
@@ -122,12 +122,12 @@
             top: 50%;
             left: 50%;
             translate: -50% -50%;
-            height: 100vmax;
-            width: 100vmax;
+            height: 1rem;
+            width: 1rem;
             color: var(--blanc-leger);
             transform-origin: center;
             animation: spin-jump 2.5s infinite;
-            scale: 0.01;
+            scale: 1;
             transition: scale 2s cubic-bezier(0.5, -0.3, 0.1, 1), opacity 1.2s ease-out;
         }
 
@@ -157,12 +157,8 @@
         }
 
         #loading-screen.is-expanding #loading-star {
-            scale: 2.0; /* 200vmax covers all corners of any screen */
+            scale: var(--expand-scale, 300);
         }
-
-        .loading-cta {
-    font-size: 0;
-}
 
 .loading-cta::after {
     content: 'Click anywhere to enter\2026';
@@ -222,6 +218,11 @@ html[lang="lb"] .loading-cta::after {
         // Contrast
         if (localStorage.getItem('sanssaint-contrast') === 'high') {
             document.documentElement.classList.add('high-contrast');
+        }
+
+        // Larger text
+        if (localStorage.getItem('sanssaint-text-size') === 'large') {
+            document.documentElement.classList.add('larger-text');
         }
 
         // Language detection
@@ -395,80 +396,91 @@ html[lang="lb"] .loading-cta::after {
 
             </div>
 
-            <!-- Mute button + language dropdown -->
+            <!-- Toggle buttons: inside header so mix-blend-mode: difference makes them adaptive -->
             <div class="header-controls">
 
                 <button class="header-mute" id="mute-btn" aria-label="Toggle sound" disabled>
                     <img
-                        src="assets/icons/04_sound_on_icon.svg"
-                        alt=""
+                        src="assets/icons/13_volume_on_icon.svg"
+                        alt="Sound on"
                         id="mute-icon"
                         fetchpriority="low"
                     >
                 </button>
 
-                <div class="header-lang" id="lang-dropdown">
-                    <button class="header-lang-toggle" id="lang-toggle" aria-haspopup="listbox" aria-expanded="false" aria-label="Select language">
-                        <img src="assets/icons/08_language_icon.svg" alt="" aria-hidden="true" fetchpriority="low">
-                        <span id="lang-current">EN</span>
-                    </button>
-                    <ul class="header-lang-dropdown" id="lang-menu" role="listbox">
-    <li><a href="#" data-lang="en">English</a></li>
-    <li><a href="#" data-lang="fr">Français</a></li>
-    <li><a href="#" data-lang="la">Latina</a></li>
-    <li><a href="#" data-lang="lb">Lëtzebuergesch</a></li>
-</ul>
-                </div>
+                <button class="header-lang-toggle" id="lang-toggle" aria-haspopup="listbox" aria-expanded="false" aria-label="Select language">
+                    <img src="assets/icons/08_language_icon.svg" alt="" aria-hidden="true" fetchpriority="low">
+                    <span id="lang-current">EN</span>
+                </button>
 
-                <!-- Settings panel -->
-                <div class="header-settings" id="settings-panel">
-                    <button class="header-settings-toggle" id="settings-toggle" aria-haspopup="true" aria-expanded="false" aria-label="Display settings">
-                        <img src="assets/icons/07_settings_icon.svg" alt="" aria-hidden="true" fetchpriority="low">
-                    </button>
-                    <div class="header-settings-menu" id="settings-menu" role="dialog" aria-label="Display settings">
-                        <label class="settings-item" for="setting-contrast">
-                            <span class="settings-label">More contrast</span>
-                            <span class="settings-toggle-track">
-                                <input type="checkbox" id="setting-contrast" class="settings-checkbox">
-                                <span class="settings-toggle-thumb" aria-hidden="true"></span>
-                            </span>
-                        </label>
-
-                        <label class="settings-item" for="setting-motion">
-                            <span class="settings-label">Reduce motion</span>
-                            <span class="settings-toggle-track">
-                                <input type="checkbox" id="setting-motion" class="settings-checkbox">
-                                <span class="settings-toggle-thumb" aria-hidden="true"></span>
-                            </span>
-                        </label>
-
-                        <!-- Mobile-only: sound toggle -->
-                        <label class="settings-item settings-mobile-only" for="setting-mute">
-                            <span class="settings-label">Sound</span>
-                            <span class="settings-toggle-track">
-                                <input type="checkbox" id="setting-mute" class="settings-checkbox" checked>
-                                <span class="settings-toggle-thumb" aria-hidden="true"></span>
-                            </span>
-                        </label>
-
-                        <!-- Mobile-only: language selector -->
-                        <div class="settings-lang-mobile settings-mobile-only">
-                            <span class="settings-label">Language</span>
-                            <ul class="settings-lang-list" id="settings-lang-menu">
-                                <li><a href="#" data-lang="en">English</a></li>
-                                <li><a href="#" data-lang="fr">Français</a></li>
-                                <li><a href="#" data-lang="la">Latina</a></li>
-                                <li><a href="#" data-lang="lb">Lëtzebuergesch</a></li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
+                <button class="header-settings-toggle" id="settings-toggle" aria-haspopup="true" aria-expanded="false" aria-label="Display settings" data-i18n-aria="settings.aria_label">
+                    <img src="assets/icons/07_settings_icon.svg" alt="" aria-hidden="true" fetchpriority="low">
+                </button>
 
             </div>
 
         </div>
 
     </header>
+
+    <!-- Dropdown panels sit outside <header> so mix-blend-mode: difference on the
+         header does not invert their blanc-leger background. -->
+    <div class="header-lang" id="lang-dropdown">
+        <ul class="header-lang-dropdown" id="lang-menu" role="listbox">
+            <li><a href="#" data-lang="en">English</a></li>
+            <li><a href="#" data-lang="fr">Français</a></li>
+            <li><a href="#" data-lang="la">Latina</a></li>
+            <li><a href="#" data-lang="lb">Lëtzebuergesch</a></li>
+        </ul>
+    </div>
+
+    <div class="header-settings" id="settings-panel">
+        <div class="header-settings-menu" id="settings-menu" role="dialog" aria-label="Display settings" data-i18n-aria="settings.aria_label">
+            <label class="settings-item" for="setting-contrast">
+                <span class="settings-label" data-i18n="settings.more_contrast">More contrast</span>
+                <span class="settings-toggle-track">
+                    <input type="checkbox" id="setting-contrast" class="settings-checkbox">
+                    <span class="settings-toggle-thumb" aria-hidden="true"></span>
+                </span>
+            </label>
+
+            <label class="settings-item" for="setting-motion">
+                <span class="settings-label" data-i18n="settings.reduce_motion">Reduce motion</span>
+                <span class="settings-toggle-track">
+                    <input type="checkbox" id="setting-motion" class="settings-checkbox">
+                    <span class="settings-toggle-thumb" aria-hidden="true"></span>
+                </span>
+            </label>
+
+            <label class="settings-item" for="setting-text">
+                <span class="settings-label" data-i18n="settings.larger_text">Larger text</span>
+                <span class="settings-toggle-track">
+                    <input type="checkbox" id="setting-text" class="settings-checkbox">
+                    <span class="settings-toggle-thumb" aria-hidden="true"></span>
+                </span>
+            </label>
+
+            <!-- Mobile-only: sound toggle -->
+            <label class="settings-item settings-mobile-only" for="setting-mute">
+                <span class="settings-label" data-i18n="settings.sound">Sound</span>
+                <span class="settings-toggle-track">
+                    <input type="checkbox" id="setting-mute" class="settings-checkbox" checked>
+                    <span class="settings-toggle-thumb" aria-hidden="true"></span>
+                </span>
+            </label>
+
+            <!-- Mobile-only: language selector -->
+            <div class="settings-lang-mobile settings-mobile-only">
+                <span class="settings-label" data-i18n="settings.language">Language</span>
+                <ul class="settings-lang-list" id="settings-lang-menu">
+                    <li><a href="#" data-lang="en">English</a></li>
+                    <li><a href="#" data-lang="fr">Français</a></li>
+                    <li><a href="#" data-lang="la">Latina</a></li>
+                    <li><a href="#" data-lang="lb">Lëtzebuergesch</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
 
     <!-- =====================================================================
          MAIN SCROLL CONTAINER
@@ -486,7 +498,7 @@ html[lang="lb"] .loading-cta::after {
                 <img src="assets/icons/01_sans_saint_logos_wholemark.svg" alt="" class="hero-logo" fetchpriority="low" data-i18n-src="wholemark">
                 <div class="button-wrapper">
                     <a href="#portfolio-slideshow" class="btn btn-black" data-i18n="hero.explore">Explore</a>
-                    <a href="#contact" class="btn btn-white" data-i18n="hero.contact_btn">Get in touch</a>
+                    <a href="#contact-panel-right" class="btn btn-white" data-i18n="hero.contact_btn">Get in touch</a>
                 </div>
             </div>
 
@@ -505,22 +517,22 @@ html[lang="lb"] .loading-cta::after {
 
             <div class="panel panel-left" id="panel-left">
                 <div class="parallax-layer bg-layer-creation"></div>
-                <div class="gradient-overlay gradient-top"></div>
-                <div class="gradient-overlay gradient-bottom"></div>
+                <div class="parallax-layer halftone-top halftone-white">
+                    <div class="halftone-inner"></div>
+                </div>
+                <div class="parallax-layer halftone-bottom halftone-white"></div>
 
                 <div class="thirds-grid">
                     <div class="grid-center-content text-noir text-left">
                         <p data-i18n="creation.quote">
-                            "Art must make ... attractive<br>
-                            the world of the spirit,<br>
-                            of the invisible,<br>
-                            of <span class="highlight-viola">God.</span>"
+                            "Art must make attractive<br>
+                            the world of the <span class="highlight-viola">Spirit.</span>"
                         </p>
 
                         <br>
 
-                        <p data-i18n="creation.attribution">St. John Paul II<br>
-                            <span class="citation">Letter to Artists, Apr 4, 1999</span>
+                        <p class="attribution" data-i18n="creation.attribution">St. John Paul II<br>
+                            <a class="info-link" href="https://www.vatican.va/content/john-paul-ii/en/letters/1999/documents/hf_jp-ii_let_23041999_artists.html" target="_blank" rel="noopener noreferrer"><span class="citation">Letter to Artists, April 4th, 1999</span></a>
                         </p>
                     </div>
                 </div>
@@ -528,32 +540,43 @@ html[lang="lb"] .loading-cta::after {
 
             <div class="panel panel-right" id="panel-right">
                 <div class="parallax-layer bg-layer-eden"></div>
+                <div class="parallax-layer halftone-top halftone-black">
+                    <div class="halftone-inner"></div>
+                </div>
+                <div class="parallax-layer halftone-bottom halftone-black"></div>
 
                 <div class="thirds-grid">
                     <div class="grid-center-content text-blanc text-left">
-                        <p data-i18n="creation.panel_right_1"><span class="highlight-malve">Sans Saint</span> emerged<br>
-                            out of the city of Trier<br>
-                            in the Jubilee Year of 2025
-                        </p>
-
-                        <br>
-
-                        <p class="align-right" data-i18n="creation.panel_right_2">— shaped by tradition,<br>
-                            ready to reform.
-                        </p>
-
-                        <br>
-
-                        <p data-i18n="creation.panel_right_3">We want to make art that is<br>
-                            eternal, ethereal, ever-present.
+                        <p data-i18n="creation.panel_right_1"><span class="highlight-malve">Sans Saint</span> is a creative studio<br>
+                            founded in Trier in 2025<br>
+                            <span style="display:block;text-align:right">— to design a world<br>
+                            with heart, soul, and purpose.<br>
+                            <span class="citation">cf. Friedrich Overbeck, Letter, April&nbsp;27th, 1808</span></span>
                         </p>
                     </div>
                 </div>
             </div>
 
+            <div class="balduin-image-wrapper">
+                <picture>
+                    <source media="(max-width: 1920px)" type="image/avif" srcset="assets/images/07_balduin_von_luxemburg_1920px.avif">
+                    <source media="(max-width: 1920px)" type="image/png" srcset="assets/images/07_balduin_von_luxemburg_1920px.png">
+                    <source type="image/avif" srcset="assets/images/07_balduin_von_luxemburg.avif">
+                    <img src="assets/images/07_balduin_von_luxemburg.png" alt="" class="balduin-img" fetchpriority="low">
+                </picture>
+            </div>
 
         </section>
 
+        <!-- Single scroll-driven Balduin image for mobile (position:fixed, JS-animated) -->
+        <div class="balduin-mobile" aria-hidden="true">
+        <picture>
+            <source media="(max-width: 1920px)" type="image/avif" srcset="assets/images/07_balduin_von_luxemburg_1920px.avif">
+            <source media="(max-width: 1920px)" type="image/png" srcset="assets/images/07_balduin_von_luxemburg_1920px.png">
+            <source type="image/avif" srcset="assets/images/07_balduin_von_luxemburg.avif">
+            <img src="assets/images/07_balduin_von_luxemburg.png" alt="" fetchpriority="low">
+        </picture>
+    </div>
 
         <section class="section portfolio-section" id="portfolio-slideshow">
 
@@ -572,16 +595,16 @@ html[lang="lb"] .loading-cta::after {
                     <div class="portfolio-btn-group portfolio-btn-group-left">
                         <div class="portfolio-btn-labels">
                             <p class="portfolio-btn-label portfolio-btn-label-main"  data-i18n="portfolio.download_title">SELECTED WORKS</p>
-                            <p class="portfolio-btn-label portfolio-btn-label-small" data-i18n="portfolio.download_file">Franz-Felix_Schwan_Portfolio_v1en.pdf</p>
+                            <a href="assets/Franz-Felix_Schwan_Portfolio_v2en.pdf" download class="portfolio-btn-label portfolio-btn-label-small info-link" data-i18n="portfolio.download_file">Franz-Felix_Schwan_Portfolio_v2en.pdf</a>
                         </div>
-                        <a href="assets/Franz-Felix_Schwan_Portfolio_v1en.pdf" download class="btn btn-black" data-i18n="portfolio.download">Download</a>
+                        <a href="assets/Franz-Felix_Schwan_Portfolio_v2en.pdf" download class="btn btn-black" data-i18n="portfolio.download">Download</a>
                     </div>
 
                     <!-- Visit group: labels + white button, right-aligned -->
                     <div class="portfolio-btn-group portfolio-btn-group-right">
                         <div class="portfolio-btn-labels">
                             <p class="portfolio-btn-label portfolio-btn-label-main"  data-i18n="portfolio.visit_title">Instagram</p>
-                            <p class="portfolio-btn-label portfolio-btn-label-small" data-i18n="portfolio.visit_url">www.instagram.com/sanssaintco/</p>
+                            <a href="https://www.instagram.com/sanssaintco/" target="_blank" rel="noopener noreferrer" class="portfolio-btn-label portfolio-btn-label-small info-link" data-i18n="portfolio.visit_url">www.instagram.com/sanssaintco/</a>
                         </div>
                         <a href="https://www.instagram.com/sanssaintco/" target="_blank" rel="noopener noreferrer" class="btn btn-white" data-i18n="portfolio.visit">Visit</a>
                     </div>
@@ -597,22 +620,33 @@ html[lang="lb"] .loading-cta::after {
 
             <div class="panel panel-left" id="contact-panel-left">
                 <div class="parallax-layer bg-layer-eden"></div>
-                
-                <div class="parallax-layer portrait-layer">
+                <div class="parallax-layer portrait-background-layer">
                     <picture>
-                        <source media="(max-width: 1920px)" type="image/avif" srcset="assets/images/09_portrait_photo_by_noya_1920px.avif">
-                        <source media="(max-width: 1920px)" type="image/jpeg" srcset="assets/images/09_portrait_photo_by_noya_1920px.jpeg">
-                        
-                        <source type="image/avif" srcset="assets/images/09_portrait_photo_by_noya.avif">
-                        <img src="assets/images/09_portrait_photo_by_noya.jpeg" alt="" class="portrait-img" fetchpriority="low">
+                        <source media="(max-width: 1920px)" type="image/avif" srcset="assets/images/05_portrait_photo_by_noya_background_1920px.avif">
+                        <source media="(max-width: 1920px)" type="image/jpeg" srcset="assets/images/05_portrait_photo_by_noya_background_1920px.jpg">
+
+                        <source type="image/avif" srcset="assets/images/05_portrait_photo_by_noya_background.avif">
+                        <img src="assets/images/05_portrait_photo_by_noya_background.jpg" alt="" class="portrait-img" fetchpriority="low">
+                    </picture>
+                </div>
+
+                <div class="parallax-layer portrait-foreground-layer">
+                    <picture>
+                        <source media="(max-width: 1920px)" type="image/avif" srcset="assets/images/04_portrait_photo_by_noya_foreground_1920px.avif">
+                        <source media="(max-width: 1920px)" type="image/png" srcset="assets/images/04_portrait_photo_by_noya_foreground_1920px.png">
+
+                        <source type="image/avif" srcset="assets/images/04_portrait_photo_by_noya_foreground.avif">
+                        <img src="assets/images/04_portrait_photo_by_noya_foreground.png" alt="" class="portrait-img" fetchpriority="low">
                     </picture>
                 </div>
             </div>
 
             <div class="panel panel-right" id="contact-panel-right">
                 <div class="parallax-layer bg-layer-creation"></div>
-                <div class="gradient-overlay gradient-top"></div>
-                <div class="gradient-overlay gradient-bottom"></div>
+                <div class="parallax-layer halftone-top halftone-white">
+                    <div class="halftone-inner"></div>
+                </div>
+                <div class="parallax-layer halftone-bottom halftone-white"></div>
 
                 <div class="thirds-grid">
                     <div class="grid-center-content text-noir">
@@ -623,15 +657,14 @@ html[lang="lb"] .loading-cta::after {
                         
                         <p class="text-left" data-i18n="contact.role_1">Graphic Designer</p>
                         <p class="text-left" data-i18n="contact.role_2">and Secular Carmelite</p>
-                        <p class="align-right" data-i18n="contact.location_1">—based in Mannheim,</p>
-                        <p class="align-right" data-i18n="contact.location_2">Mainz, and Trier.</p>
+                        <p class="align-right" data-i18n="contact.location_1">—based in Mannheim.</p>
                         
                         <div class="button-wrapper button-wrapper-portfolio">
                             
                             <div class="portfolio-btn-group portfolio-btn-group-right">
                                 <div class="portfolio-btn-labels">
                                     <p class="portfolio-btn-label portfolio-btn-label-main" data-i18n="contact.resume_title">RESUME</p>
-                                    <p class="portfolio-btn-label portfolio-btn-label-small" data-i18n="contact.resume_file">Franz-Felix_Schwan_Resume_v1de.pdf</p>
+                                    <a href="assets/Franz-Felix_Schwan_Resume_v1de.pdf" download class="portfolio-btn-label portfolio-btn-label-small info-link" data-i18n="contact.resume_file">Franz-Felix_Schwan_Resume_v1de.pdf</a>
                                 </div>
                                 <a href="assets/Franz-Felix_Schwan_Resume_v1de.pdf" download class="btn btn-white" data-i18n="contact.download">Download</a>
                             </div>
@@ -639,7 +672,7 @@ html[lang="lb"] .loading-cta::after {
                             <div class="portfolio-btn-group portfolio-btn-group-left">
                                 <div class="portfolio-btn-labels">
                                     <p class="portfolio-btn-label portfolio-btn-label-main" data-i18n="contact.email_title">CONTACT</p>
-                                    <p class="portfolio-btn-label portfolio-btn-label-small" data-i18n="contact.email_address">contact@sanssaint.eu</p>
+                                    <a href="mailto:contact@sanssaint.eu" class="portfolio-btn-label portfolio-btn-label-small info-link" data-i18n="contact.email_address">contact@sanssaint.eu</a>
                                 </div>
                                 <a href="mailto:contact@sanssaint.eu" class="btn btn-black" data-i18n="contact.email_btn">E-mail</a>
                             </div>
@@ -655,7 +688,7 @@ html[lang="lb"] .loading-cta::after {
         <footer class="section footer-section" id="footer">
             <div class="footer-inner">
 
-                <!-- Page 1: Imprint + Downloads/Links -->
+                <!-- Page 1: Imprint + Links -->
                 <div class="footer-page footer-page-1">
 
                     <!-- Left: Imprint & Contact -->
@@ -678,7 +711,7 @@ html[lang="lb"] .loading-cta::after {
                     <div class="footer-col">
                         <h2 data-i18n="footer.heading_links">Links</h2>
                         <p><span data-i18n="footer.portfolio_label">Portfolio</span><br>
-                        <a href="assets/Franz-Felix_Schwan_Portfolio_v1en.pdf" download><l>Franz-Felix_Schwan_Portfolio_v1en.pdf</l></a></p>
+                        <a href="assets/Franz-Felix_Schwan_Portfolio_v2en.pdf" download><l>Franz-Felix_Schwan_Portfolio_v2en.pdf</l></a></p>
                         <p><span data-i18n="footer.resume_label">Resume</span><br>
                         <a href="assets/Franz-Felix_Schwan_Resume_v1de.pdf" download><l>Franz-Felix_Schwan_Resume_v1de.pdf</l></a></p>
                         <p>Instagram<br>

@@ -14,18 +14,16 @@
     },
 
     "creation": {
-        "quote":         "\"Ars mundum spiritus,<br>invisibilium,<br>rerum non visibilium,<br><span class=\"highlight-viola\">Dei</span> amabilem reddere debet.\"",
-        "attribution":   "S. Ioannes Paulus II<br><span class=\"citation\">Epistula ad Artifices, IV Apr. MCMXCIX</span>",
-        "panel_right_1": "<span class=\"highlight-malve\">Sans Saint</span> ex urbe<br>Treverorum orta est<br>anno Iubilaei MMXXV",
-        "panel_right_2": "\u2014 traditione formata,<br>ad reformandum parata.",
-        "panel_right_3": "Artem facere volumus<br>aeternam, aetheream, semper praesentem."
+        "quote":         "\"Ars amabilem reddere debet<br>mundum <span class=\"highlight-viola\">Spiritus.</span>\"",
+        "attribution":   "\u2014 S. Ioannes Paulus II<br><a class=\"info-link\" href=\"https://www.vatican.va/content/john-paul-ii/en/letters/1999/documents/hf_jp-ii_let_23041999_artists.html\" target=\"_blank\" rel=\"noopener noreferrer\"><span class=\"citation\">Epistula ad Artifices, IV Apr. MCMXCIX</span></a>",
+        "panel_right_1": "<span class=\"highlight-malve\">Sans Saint</span> officina creativa est<br>Treveris anno MMXXV fundata<br><span style=\"display:block;text-align:right\">\u2014 mundum designare<br>corde, anima et proposito.<br><span class=\"citation\">cf. Fridericus Overbeck, Epistula, XXVII\u00a0Apr.\u00a0MDCCCVIII</span></span>"
     },
 
     "portfolio": {
         "heading_top":    "Porta-",
         "heading_bottom": "folium",
         "download_title": "OPERA SELECTA",
-        "download_file":  "Franz-Felix_Schwan_Portfolio_v1en.pdf",
+        "download_file":  "Franz-Felix_Schwan_Portfolio_v2en.pdf",
         "download":       "Extrahe",
         "visit_title":    "Instagram",
         "visit_url":      "www.instagram.com/sanssaintco/",
@@ -36,14 +34,22 @@
         "name":          "Franciscus Felix Schwan O.C.D.S.",
         "role_1":        "Artifex Graphicus",
         "role_2":        "et Carmelita Saecularis",
-        "location_1":    "\u2014degit Mannhemii,",
-        "location_2":    "Moguntiae et Treveris.",
+        "location_1":    "\u2014degit Mannhemii.",
         "resume_title":  "CURRICULUM VITAE",
         "resume_file":   "Franz-Felix_Schwan_Resume_v1de.pdf",
         "download":      "Extrahe",
         "email_title":   "CONTACTUS",
         "email_address": "contact@sanssaint.eu",
         "email_btn":     "Epistula"
+    },
+
+    "settings": {
+        "aria_label":    "Optiones exhibitionis",
+        "more_contrast": "Plus contrasti",
+        "reduce_motion": "Motum minue",
+        "larger_text":   "Textus maior",
+        "sound":         "Sonus",
+        "language":      "Lingua"
     },
 
     "footer": {
@@ -62,6 +68,6 @@
         "credits_domain":   "Dominium proprium ab Infomaniak. Codice scripto ab Anthropic PBC per machinam Claude.",
         "credits_hosting":  "Hic situs per GitHub hospitatur.",
         "credits_origin":   "Maxima ex parte in Europa factum.",
-        "credits_version":  "Beta v0.6.3. Ultima renovatio die XVI Aprilis MMXXVI."
+        "credits_version":  "v1.0.0. Edita die XX Aprilis MMXXVI."
     }
 }

@@ -14,18 +14,16 @@
     },
 
     "creation": {
-        "quote":         "\"Art must make attractive<br>the world of the spirit,<br>of the invisible,<br>of <span class=\"highlight-viola\">God.</span>\"",
-        "attribution":   "St. John Paul II<br><span class=\"citation\">Letter to Artists, Apr 4, 1999</span>",
-        "panel_right_1": "<span class=\"highlight-malve\">Sans Saint</span> emerged<br>out of the city of Trier<br>in the Jubilee Year of 2025",
-        "panel_right_2": "\u2014 shaped by tradition,<br>ready to reform.",
-        "panel_right_3": "We want to make art that is<br>eternal, ethereal, ever-present."
+        "quote":         "\"Art must make attractive<br>the world of the <span class=\"highlight-viola\">Spirit.</span>\"",
+        "attribution":   "\u2014 St. John Paul II<br><a class=\"info-link\" href=\"https://www.vatican.va/content/john-paul-ii/en/letters/1999/documents/hf_jp-ii_let_23041999_artists.html\" target=\"_blank\" rel=\"noopener noreferrer\"><span class=\"citation\">Letter to Artists, April 4th, 1999</span></a>",
+        "panel_right_1": "<span class=\"highlight-malve\">Sans Saint</span> is a creative studio<br>founded in Trier in 2025<br><span style=\"display:block;text-align:right\">\u2014 to design a world<br>with heart, soul, and purpose.<br><span class=\"citation\">cf. Friedrich Overbeck, Letter, April\u00a027th, 1808</span></span>"
     },
 
     "portfolio": {
         "heading_top":    "Port-",
         "heading_bottom": "folio",
         "download_title": "SELECTED WORKS",
-        "download_file":  "Franz-Felix_Schwan_Portfolio_v1en.pdf",
+        "download_file":  "Franz-Felix_Schwan_Portfolio_v2en.pdf",
         "download":       "Download",
         "visit_title":    "Instagram",
         "visit_url":      "www.instagram.com/sanssaintco/",
@@ -36,14 +34,22 @@
         "name":          "Franz-Felix Schwan O.C.D.S.",
         "role_1":        "Graphic Designer",
         "role_2":        "and Secular Carmelite",
-        "location_1":    "—based in Mannheim,",
-        "location_2":    "Mainz, and Trier.",
+        "location_1":    "—based in Mannheim.",
         "resume_title":  "RESUME",
         "resume_file":   "Franz-Felix_Schwan_Resume_v1de.pdf",
         "download":      "Download",
         "email_title":   "CONTACT",
         "email_address": "contact@sanssaint.eu",
         "email_btn":     "E-mail"
+    },
+
+    "settings": {
+        "aria_label":    "Display settings",
+        "more_contrast": "More contrast",
+        "reduce_motion": "Reduce motion",
+        "larger_text":   "Larger text",
+        "sound":         "Sound",
+        "language":      "Language"
     },
 
     "footer": {
@@ -62,6 +68,6 @@
         "credits_domain":   "Custom domain by Infomaniak. Coded with Anthropic PBC\u2019s Claude AI.",
         "credits_hosting":  "This website is hosted via GitHub.",
         "credits_origin":   "Mostly made in Europe.",
-        "credits_version":  "Beta v0.6.3. Last update April 16, 2026."
+        "credits_version":  "v1.0.0. Released April 20, 2026."
     }
 }

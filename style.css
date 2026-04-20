@@ -105,10 +105,31 @@ html.high-contrast {
     --noir-leger:  #000000;
 }
 
+/* Larger-text mode — toggled by adding .larger-text to <html>.
+   Scales the root font-size to 1.2rem so all rem-based sizes increase uniformly. */
+html {
+    transition: font-size 0.3s ease;
+}
+
+html.larger-text {
+    font-size: 1.2rem;
+}
+
+.bg-layer,
+.halftone-top,
+.halftone-bottom,
+.particles-back,
+.particles-front {
+    transition: opacity 0.5s ease;
+}
+
 html.high-contrast .bg-layer,
-html.high-contrast .bg-layer-creation,
-html.high-contrast .bg-layer-eden {
-    opacity: 0.667;
+html.high-contrast .halftone-top,
+html.high-contrast .halftone-bottom,
+html.high-contrast .particles-back,
+html.high-contrast .particles-front {
+    opacity: 0;
+    pointer-events: none;
 }
 
 /* Reduce-motion mode — toggled by adding .reduce-motion to <html>, or
@@ -169,7 +190,8 @@ body {
     background-color: var(--blanc-leger);
     overflow: hidden;
     font-kerning: normal;
-  text-rendering: optimizeLegibility;
+    text-rendering: optimizeLegibility;
+    transition: background-color 0.5s ease, color 0.5s ease;
 }
 
 
@@ -384,6 +406,7 @@ body {
 
 /* --- Right controls ------------------------------------------------------- */
 
+/* Toggle buttons flex-row inside .header-col-right */
 .header-controls {
     display: flex;
     align-items: center;
@@ -412,9 +435,13 @@ body {
     cursor: not-allowed;
 }
 
-/* Language dropdown */
+/* Language dropdown panel anchor — fixed outside <header> to avoid blend-mode inversion */
 .header-lang {
-    position: relative;
+    position: fixed;
+    top: 0;
+    right: 3rem;
+    height: 3rem;
+    z-index: 200;
 }
 
 .header-lang-toggle {
@@ -446,26 +473,83 @@ body {
 
 /* No chevron — the language icon is self-explanatory */
 
-/* The gap between button and menu lives as padding-top inside the menu,
-   keeping the hover zone continuous so the menu doesn't close in transit. */
 .header-lang-dropdown {
     position: absolute;
-    top: 100%;
+    top: calc(100% + 0.5rem);
     right: 0;
-    display: none;
+    display: flex;
     flex-direction: column;
     gap: 0.5rem;
     list-style: none;
-    padding: 0.75rem 1rem;
-    background: var(--blanc-leger);
+    padding: 1rem 1.25rem;
+    background: var(--btn-white-bg);
     white-space: nowrap;
-    mix-blend-mode: normal;
     z-index: 200;
+
+    /* Vesica piscis quarter-cap corners — same arc geometry as buttons, 1.732rem × 1rem per corner */
+    -webkit-mask-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 86.6025 50'%3E%3Cpath d='M 86.6025 0 A 100 100 0 0 0 0 50 L 86.6025 50 Z'/%3E%3C/svg%3E"),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 86.6025 50'%3E%3Cpath d='M 0 0 A 100 100 0 0 1 86.6025 50 L 0 50 Z'/%3E%3C/svg%3E"),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 86.6025 50'%3E%3Cpath d='M 0 0 A 100 100 0 0 0 86.6025 50 L 86.6025 0 Z'/%3E%3C/svg%3E"),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 86.6025 50'%3E%3Cpath d='M 86.6025 0 A 100 100 0 0 1 0 50 L 0 0 Z'/%3E%3C/svg%3E"),
+        linear-gradient(black, black),
+        linear-gradient(black, black),
+        linear-gradient(black, black);
+    mask-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 86.6025 50'%3E%3Cpath d='M 86.6025 0 A 100 100 0 0 0 0 50 L 86.6025 50 Z'/%3E%3C/svg%3E"),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 86.6025 50'%3E%3Cpath d='M 0 0 A 100 100 0 0 1 86.6025 50 L 0 50 Z'/%3E%3C/svg%3E"),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 86.6025 50'%3E%3Cpath d='M 0 0 A 100 100 0 0 0 86.6025 50 L 86.6025 0 Z'/%3E%3C/svg%3E"),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 86.6025 50'%3E%3Cpath d='M 86.6025 0 A 100 100 0 0 1 0 50 L 0 0 Z'/%3E%3C/svg%3E"),
+        linear-gradient(black, black),
+        linear-gradient(black, black),
+        linear-gradient(black, black);
+    -webkit-mask-size:
+        1.732rem 1rem,                       /* top-left corner */
+        1.732rem 1rem,                       /* top-right corner */
+        1.732rem 1rem,                       /* bottom-left corner */
+        1.732rem 1rem,                       /* bottom-right corner */
+        calc(100% - 3.464rem + 2px) 100%,   /* center strip */
+        1.732rem calc(100% - 2rem + 2px),   /* left side strip */
+        1.732rem calc(100% - 2rem + 2px);   /* right side strip */
+    mask-size:
+        1.732rem 1rem,
+        1.732rem 1rem,
+        1.732rem 1rem,
+        1.732rem 1rem,
+        calc(100% - 3.464rem + 2px) 100%,
+        1.732rem calc(100% - 2rem + 2px),
+        1.732rem calc(100% - 2rem + 2px);
+    -webkit-mask-position:
+        top left, top right, bottom left, bottom right,
+        center, left center, right center;
+    mask-position:
+        top left, top right, bottom left, bottom right,
+        center, left center, right center;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat:         no-repeat;
+    -webkit-mask-composite: source-over, source-over, source-over, source-over, source-over, source-over;
+    mask-composite:         add, add, add, add, add, add;
+
+    filter: var(--btn-white-shadow);
+
+    /* Smooth open/close — opacity+translate, no display toggling */
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+    pointer-events: none;
+    transition: opacity 0.25s ease,
+                transform 0.25s ease,
+                visibility 0s linear 0.25s;
 }
 
-/* Opens on hover of the parent wrapper, not a click */
-.header-lang:hover .header-lang-dropdown {
-    display: flex;
+.header-lang-dropdown.is-open {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    pointer-events: auto;
+    transition: opacity 0.25s ease,
+                transform 0.25s ease,
+                visibility 0s;
 }
 
 .header-lang-dropdown a {
@@ -486,8 +570,13 @@ body {
 
 /* --- Settings panel ------------------------------------------------------- */
 
+/* Settings panel anchor — fixed outside <header> to avoid blend-mode inversion */
 .header-settings {
-    position: relative;
+    position: fixed;
+    top: 0;
+    right: 3rem;
+    height: 3rem;
+    z-index: 200;
 }
 
 /* The toggle button mirrors the mute and lang buttons exactly */
@@ -508,25 +597,83 @@ body {
     flex-shrink: 0;
 }
 
-/* Gap lives as padding-top so the hover zone is continuous */
 .header-settings-menu {
     position: absolute;
-    top: 100%;
+    top: calc(100% + 0.5rem);
     right: 0;
-    display: none;
+    display: flex;
     flex-direction: column;
     gap: 0.75rem;
     list-style: none;
-    padding: 0.75rem 1rem;
-    background: var(--blanc-leger);
+    padding: 1rem 1.25rem;
+    background: var(--btn-white-bg);
     white-space: nowrap;
-    mix-blend-mode: normal;
     z-index: 200;
+
+    /* Vesica piscis quarter-cap corners — same arc geometry as buttons, 1.732rem × 1rem per corner */
+    -webkit-mask-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 86.6025 50'%3E%3Cpath d='M 86.6025 0 A 100 100 0 0 0 0 50 L 86.6025 50 Z'/%3E%3C/svg%3E"),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 86.6025 50'%3E%3Cpath d='M 0 0 A 100 100 0 0 1 86.6025 50 L 0 50 Z'/%3E%3C/svg%3E"),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 86.6025 50'%3E%3Cpath d='M 0 0 A 100 100 0 0 0 86.6025 50 L 86.6025 0 Z'/%3E%3C/svg%3E"),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 86.6025 50'%3E%3Cpath d='M 86.6025 0 A 100 100 0 0 1 0 50 L 0 0 Z'/%3E%3C/svg%3E"),
+        linear-gradient(black, black),
+        linear-gradient(black, black),
+        linear-gradient(black, black);
+    mask-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 86.6025 50'%3E%3Cpath d='M 86.6025 0 A 100 100 0 0 0 0 50 L 86.6025 50 Z'/%3E%3C/svg%3E"),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 86.6025 50'%3E%3Cpath d='M 0 0 A 100 100 0 0 1 86.6025 50 L 0 50 Z'/%3E%3C/svg%3E"),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 86.6025 50'%3E%3Cpath d='M 0 0 A 100 100 0 0 0 86.6025 50 L 86.6025 0 Z'/%3E%3C/svg%3E"),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 86.6025 50'%3E%3Cpath d='M 86.6025 0 A 100 100 0 0 1 0 50 L 0 0 Z'/%3E%3C/svg%3E"),
+        linear-gradient(black, black),
+        linear-gradient(black, black),
+        linear-gradient(black, black);
+    -webkit-mask-size:
+        1.732rem 1rem,                       /* top-left corner */
+        1.732rem 1rem,                       /* top-right corner */
+        1.732rem 1rem,                       /* bottom-left corner */
+        1.732rem 1rem,                       /* bottom-right corner */
+        calc(100% - 3.464rem + 2px) 100%,   /* center strip */
+        1.732rem calc(100% - 2rem + 2px),   /* left side strip */
+        1.732rem calc(100% - 2rem + 2px);   /* right side strip */
+    mask-size:
+        1.732rem 1rem,
+        1.732rem 1rem,
+        1.732rem 1rem,
+        1.732rem 1rem,
+        calc(100% - 3.464rem + 2px) 100%,
+        1.732rem calc(100% - 2rem + 2px),
+        1.732rem calc(100% - 2rem + 2px);
+    -webkit-mask-position:
+        top left, top right, bottom left, bottom right,
+        center, left center, right center;
+    mask-position:
+        top left, top right, bottom left, bottom right,
+        center, left center, right center;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat:         no-repeat;
+    -webkit-mask-composite: source-over, source-over, source-over, source-over, source-over, source-over;
+    mask-composite:         add, add, add, add, add, add;
+
+    filter: var(--btn-white-shadow);
+
+    /* Smooth open/close */
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+    pointer-events: none;
+    transition: opacity 0.25s ease,
+                transform 0.25s ease,
+                visibility 0s linear 0.25s;
 }
 
-/* Opens on hover of the parent wrapper */
-.header-settings:hover .header-settings-menu {
-    display: flex;
+.header-settings-menu.is-open {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    pointer-events: auto;
+    transition: opacity 0.25s ease,
+                transform 0.25s ease,
+                visibility 0s;
 }
 
 /* Each row: label on the left, toggle switch on the right */
@@ -620,12 +767,6 @@ body {
     font-weight: 700;
 }
 
-/* Click-based open on mobile (toggled via .is-open on .header-settings) */
-@media (max-width: 768px) {
-    .header-settings.is-open .header-settings-menu {
-        display: flex;
-    }
-}
 
 
 /* --- Responsive: tighter padding below 960px ------------------------------ */
@@ -646,6 +787,11 @@ body {
 
     .header-controls {
         gap: 2rem;
+    }
+
+    .header-lang,
+    .header-settings {
+        right: 2rem;
     }
 }
 
@@ -976,7 +1122,8 @@ body {
 
 .weapons-right {
     left: auto;
-    right: clamp(-12.5%, calc((100vw - 1400px) * 0.225), 0%);
+    right: 3rem;
+    height: calc(100vh * 3 / 4);
 }
 
 .weapons-right img {
@@ -1103,81 +1250,135 @@ body {
     background-position: center;
 }
 
-/* Base: Creation (4K) */
+/* Base: Creation */
 .bg-layer-creation {
-    background-color: var(--blanc-leger); /* TODO: Replace with an average color from the engraving */
-    background-image: -webkit-image-set(url('assets/images/03_gustave_dore_creation.jpg') 1x);
+    background-color: var(--blanc-leger);
+}
+
+/* Base: Eden */
+.bg-layer-eden {
+    background-color: var(--noir-leger);
+}
+
+
+/* --- 6b-ii. Halftone Texture Layers --------------------------------------- */
+
+/*
+ * Halftone layers use the same 115%/−7.5% parallax oversizing as bg-layers
+ * so the JS translate never reveals a gap at the edges.
+ *
+ * FLIP NOTE: JS applies transform: translate(x, y) directly on .parallax-layer,
+ * which would overwrite a CSS rotation. The flip therefore lives on a nested
+ * .halftone-inner child div — the outer div carries the JS translate,
+ * the inner div carries scaleY(-1).
+ */
+
+.halftone-top,
+.halftone-bottom {
+    width: 115% !important;
+    height: 115% !important;
+    left: -7.5% !important;
+    top: -7.5% !important;
+    background-color: transparent;
+    background-repeat: no-repeat;
+    background-size: 110vw auto;
+    pointer-events: none;
+    z-index: 2;
+}
+
+/* Bottom: image anchored to the bottom-right of the oversized container */
+.halftone-bottom {
+    background-position: bottom right;
+}
+
+/* Top: no bg on the outer div — image lives on the inner flipped child */
+.halftone-top {
+    background-image: none;
+}
+
+/* Inner div: fills its parallax-layer parent, carries the flip */
+.halftone-inner {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-repeat: no-repeat;
+    background-size: 110vw auto;
+    /* scaleY(-1) swaps top↔bottom; "bottom left" in CSS = top-left visually */
+    background-position: bottom left;
+    transform: scaleY(-1);
+}
+
+/* 1. DEFAULT (4K / >1920px) */
+
+/* White halftone — light panels (bg-layer-creation) */
+.halftone-bottom.halftone-white {
+    background-image: -webkit-image-set(url('assets/images/03_halftone_texture_white.jpg') 1x);
     background-image: image-set(
-        url('assets/images/03_gustave_dore_creation.avif') type('image/avif'),
-        url('assets/images/03_gustave_dore_creation.jpg') type('image/jpg')
+        url('assets/images/03_halftone_texture_white.avif') type('image/avif'),
+        url('assets/images/03_halftone_texture_white.jpg') type('image/jpeg')
+    );
+}
+.halftone-top.halftone-white .halftone-inner {
+    background-image: -webkit-image-set(url('assets/images/03_halftone_texture_white.jpg') 1x);
+    background-image: image-set(
+        url('assets/images/03_halftone_texture_white.avif') type('image/avif'),
+        url('assets/images/03_halftone_texture_white.jpg') type('image/jpeg')
     );
 }
 
-/* Base: Eden (4K) */
-.bg-layer-eden {
-    background-color: var(--noir-leger); /* TODO: Replace with an average color from the engraving */
-    background-image: -webkit-image-set(url('assets/images/04_gustave_dore_jacobs_dream.jpg') 1x);
+/* Black halftone — dark panels (bg-layer-eden) */
+.halftone-bottom.halftone-black {
+    background-image: -webkit-image-set(url('assets/images/02_halftone_texture_black.jpg') 1x);
     background-image: image-set(
-        url('assets/images/04_gustave_dore_jacobs_dream.avif') type('image/avif'),
-        url('assets/images/04_gustave_dore_jacobs_dream.jpg') type('image/jpg')
+        url('assets/images/02_halftone_texture_black.avif') type('image/avif'),
+        url('assets/images/02_halftone_texture_black.jpg') type('image/jpeg')
+    );
+}
+.halftone-top.halftone-black .halftone-inner {
+    background-image: -webkit-image-set(url('assets/images/02_halftone_texture_black.jpg') 1x);
+    background-image: image-set(
+        url('assets/images/02_halftone_texture_black.avif') type('image/avif'),
+        url('assets/images/02_halftone_texture_black.jpg') type('image/jpeg')
     );
 }
 
 /* 2. LAPTOP / STANDARD DESKTOP (1920px and below) */
 @media (max-width: 1920px) {
-    .bg-layer-creation {
-        background-image: -webkit-image-set(url('assets/images/03_gustave_dore_creation_1920px.jpg') 1x);
+    .halftone-bottom.halftone-white {
+        background-image: -webkit-image-set(url('assets/images/03_halftone_texture_white_1920px.jpg') 1x);
         background-image: image-set(
-            url('assets/images/03_gustave_dore_creation_1920px.avif') type('image/avif'),
-            url('assets/images/03_gustave_dore_creation_1920px.jpg') type('image/jpg')
+            url('assets/images/03_halftone_texture_white_1920px.avif') type('image/avif'),
+            url('assets/images/03_halftone_texture_white_1920px.jpg') type('image/jpeg')
         );
     }
-
-    .bg-layer-eden {
-        background-image: -webkit-image-set(url('assets/images/04_gustave_dore_jacobs_dream_1920px.jpg') 1x);
+    .halftone-top.halftone-white .halftone-inner {
+        background-image: -webkit-image-set(url('assets/images/03_halftone_texture_white_1920px.jpg') 1x);
         background-image: image-set(
-            url('assets/images/04_gustave_dore_jacobs_dream_1920px.avif') type('image/avif'),
-            url('assets/images/04_gustave_dore_jacobs_dream_1920px.jpg') type('image/jpg')
+            url('assets/images/03_halftone_texture_white_1920px.avif') type('image/avif'),
+            url('assets/images/03_halftone_texture_white_1920px.jpg') type('image/jpeg')
+        );
+    }
+    .halftone-bottom.halftone-black {
+        background-image: -webkit-image-set(url('assets/images/02_halftone_texture_black_1920px.jpg') 1x);
+        background-image: image-set(
+            url('assets/images/02_halftone_texture_black_1920px.avif') type('image/avif'),
+            url('assets/images/02_halftone_texture_black_1920px.jpg') type('image/jpeg')
+        );
+    }
+    .halftone-top.halftone-black .halftone-inner {
+        background-image: -webkit-image-set(url('assets/images/02_halftone_texture_black_1920px.jpg') 1x);
+        background-image: image-set(
+            url('assets/images/02_halftone_texture_black_1920px.avif') type('image/avif'),
+            url('assets/images/02_halftone_texture_black_1920px.jpg') type('image/jpeg')
         );
     }
 }
-
-/* 3. MOBILE (768px and below) */
-@media (max-width: 768px) {
-    .bg-layer-creation {
-        background-image: url('assets/images/03_gustave_dore_creation_768px.jpg');
-    }
-
-    .bg-layer-eden {
-        background-image: url('assets/images/04_gustave_dore_jacobs_dream_768px.jpg');
-    }
-}
+/* No 768px variants exist — 1920px images are used at all smaller sizes. */
 
 
-/* --- 6c. Gradient Overlays ------------------------------------------------ */
-
-/* Fade edges of the left panel into the page background color */
-.gradient-overlay {
-    position: absolute;
-    left: 0;
-    width: 100%;
-    height: 2rem;
-    z-index: 5;
-    pointer-events: none;
-}
-
-.gradient-top {
-    top: 0;
-    background: linear-gradient(to bottom, var(--blanc-leger), transparent);
-}
-
-.gradient-bottom {
-    bottom: 0;
-    background: linear-gradient(to top, var(--blanc-leger), transparent);
-}
-
-
-/* --- 6d. Rule of Thirds Grid ---------------------------------------------- */
+/* --- 6c. Rule of Thirds Grid ---------------------------------------------- */
 
 /* Three equal columns keep text anchored to the middle third of each panel.
    Column ratio is transitioned so grid tightening at breakpoints feels gradual. */
@@ -1234,30 +1435,49 @@ body {
     display: inline-block;
 }
 
-
-/* --- 6f. Center Image (Angel) --------------------------------------------- */
-
-/* Absolutely centered within the split section, hovering above both panels.
-   JS parallax composes its translate on top of the base -50%/-50% centering.
-   Height is transitioned so breakpoint resizes feel smooth. Transform is
-   intentionally excluded from the transition to keep JS parallax responsive. */
-.center-image-wrapper {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    height: 85.71%;
-    z-index: 15;
-    pointer-events: none;
-    transition: height 0.4s ease;
+.attribution {
+    line-height: 1.3;
 }
 
-.center-angel-img {
+/* Info links — citation and portfolio/contact small labels */
+.info-link {
+    color: inherit;
+    text-decoration: none;
+    transition: color 0.2s ease, font-weight 0.2s ease;
+}
+
+.info-link:hover {
+    color: var(--viola-violet);
+    font-weight: 500;
+}
+
+.portfolio-btn-label-small.info-link:hover {
+    font-weight: 600;
+}
+
+
+/* Balduin von Luxemburg — bottom-centered within the split section, 2/3 vh tall.
+   JS parallax composes its translate on top of the CSS translateX(-50%) centering. */
+.balduin-image-wrapper {
+    position: absolute;
+    bottom: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    height: 75vh;
+    z-index: 15;
+    pointer-events: none;
+}
+
+.balduin-img {
     height: 100%;
     width: auto;
     object-fit: contain;
-    filter: drop-shadow(4px 4px 12px rgba(0, 0, 0, 0.12));
+    display: block;
 }
+
+/* Mobile scroll-driven Balduin (position:fixed, JS-animated via CSS custom props).
+   Hidden on desktop; display:block and all styling applied at ≤ 768px below. */
+.balduin-mobile { display: none; }
 
 
 /* =============================================================================
@@ -1274,14 +1494,12 @@ body {
 
 /* (≤ 1300px) Grid tightens — side padding narrows from 33% to 25% */
 @media (max-width: 1300px) {
-    .thirds-grid          { grid-template-columns: 1fr 2fr 1fr; }
-    .center-image-wrapper { height: 70%; }
+    .thirds-grid { grid-template-columns: 1fr 2fr 1fr; }
 }
 
 /* (≤ 1000px) Grid tightens further — side padding narrows to ~16.6% */
 @media (max-width: 1000px) {
-    .thirds-grid          { grid-template-columns: 1fr 4fr 1fr; }
-    .center-image-wrapper { height: 58%; }
+    .thirds-grid { grid-template-columns: 1fr 4fr 1fr; }
 }
 
 /* (≤ 900px) Secondary strategy begins — primary bleed/overlap is exhausted */
@@ -1309,17 +1527,49 @@ body {
     /* Full panel width restores the spacious 1/3 grid margins */
     .thirds-grid { grid-template-columns: 1fr 1fr 1fr; }
 
-    /* Angel shifts left so only ~45% is visible by default — enough to feel
-       present without blocking text. Parallax (tilt or cursor) reveals the rest. */
-    .center-image-wrapper {
-        left: 0;
-        height: 65%;
-        transform: translate(-55%, -50%);
-    }
-
     /* Weapons yield to percentage sizing on narrow mobile viewports.
        75% width allows up to ~50% overlap between the two images. */
     .weapons-layer { width: 75%; height: 80%; }
+    .weapons-right { height: calc(100vh * 2 / 3); right: -1rem; }
+
+    /* Balduin — hide the desktop centered wrapper; mobile uses .balduin-mobile */
+    .balduin-image-wrapper { display: none; }
+
+    /* Single scroll-driven Balduin for mobile.
+       JS updates --scroll-scale, --blur-val, --scroll-dy each frame.
+       applyTransform() routes tilt parallax here via --tilt-x / --tilt-y. */
+    .balduin-mobile {
+        display: block;
+        position: fixed;
+        bottom: -5vh;     /* Extra bleed so max tilt (+30px up) never reveals a gap */
+        right: -25%;      /* Slight right bleed so image doesn't fully obstruct text */
+        height: 82vh;     /* Slightly taller than the target 75vh for gap safety */
+        width: auto;
+        pointer-events: none;
+        z-index: 15;
+        visibility: hidden; /* JS sets to visible when creation panels are in view */
+
+        --scroll-scale: 1;
+        --scroll-dx:    0px;
+        --scroll-dy:    0px;
+        --tilt-x:       0px;
+        --tilt-y:       0px;
+        --blur-val:     0px;
+
+        /* translate first (screen-space), then scale from bottom-right anchor.
+           Scroll-driven dy and tilt-y are summed in a single axis. */
+        transform:        translate(calc(var(--scroll-dx) + var(--tilt-x)), calc(var(--scroll-dy) + var(--tilt-y))) scale(var(--scroll-scale));
+        transform-origin: bottom right;
+        filter:           blur(var(--blur-val));
+        will-change:      transform, filter;
+    }
+
+    .balduin-mobile img {
+        height: 100%;
+        width: auto;
+        display: block;
+        object-fit: contain;
+    }
 
     /* Header: minimal editorial layout — left column hidden, wordmark takes over */
     .header-col-left {
@@ -1340,7 +1590,8 @@ body {
 
     /* Collapse standalone mute and lang controls — they move into the settings dropdown */
     .header-mute,
-    .header-lang {
+    .header-lang,
+    .header-lang-toggle {
         display: none;
     }
 
@@ -1515,17 +1766,22 @@ body.is-revealed .scroll-container {
 
 /* --- Section 5: Portrait Photo -------------------------------------------- */
 
-.portrait-layer {
-    /* Oversize the container slightly so the parallax movement 
+.portrait-background-layer,
+.portrait-foreground-layer {
+    /* Oversize the container slightly so the parallax movement
        doesn't pull the edges of the image into view */
     top: -7.5% !important;
     left: -7.5% !important;
     width: 115% !important;
     height: 115% !important;
+}
+
+.portrait-background-layer {
+    z-index: 9;
+}
+
+.portrait-foreground-layer {
     z-index: 10;
-    
-    /* The double-exposure effect */
-    mix-blend-mode: lighten;
 }
 
 .portrait-img {
@@ -1739,10 +1995,9 @@ l {
     display: contents;
 }
 
-/* Mobile: two full-screen snap pages */
 @media (max-width: 768px) {
 
-    /* Let the footer grow to hold both pages; hand snap-align to the pages */
+    /* Footer grows to hold both snap pages; snap-align is handed to the pages */
     .footer-section {
         height: auto;
         scroll-snap-align: none;

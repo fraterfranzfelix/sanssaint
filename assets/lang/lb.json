@@ -14,18 +14,16 @@
     },
 
     "creation": {
-        "quote":         "\"D'Konscht muss d'Welt vum Geescht,<br>vum Onsichtbaren,<br>vum Onsiichtlechen,<br>vu <span class=\"highlight-viola\">Gott</span> attraktiv maachen.\"",
-        "attribution":   "Hl. Johannes Paul II<br><span class=\"citation\">Bréif un d'Kënschtler, 4. Abr. 1999</span>",
-        "panel_right_1": "<span class=\"highlight-malve\">Sans Saint</span> ass aus der Stad<br>Tréier entstanen<br>am Jubilée-Joer 2025",
-        "panel_right_2": "\u2014 geprägt vun der Traditioun,<br>prett fir ze reforméieren.",
-        "panel_right_3": "Mir wëlle Konscht maachen,<br>déi éiweg, ätherësch, ëmmer präsent ass."
+        "quote":         "\"D'Konscht muss attraktiv maachen<br>d'Welt vum <span class=\"highlight-viola\">Geescht.</span>\"",
+        "attribution":   "\u2014 Hl. Johannes Paul II<br><a class=\"info-link\" href=\"https://www.vatican.va/content/john-paul-ii/fr/letters/1999/documents/hf_jp-ii_let_23041999_artists.html\" target=\"_blank\" rel=\"noopener noreferrer\"><span class=\"citation\">Bréif un d'Kënschtler, 4. Abrëll 1999</span></a>",
+        "panel_right_1": "<span class=\"highlight-malve\">Sans Saint</span> ass e kreativt Studio<br>gegrënnt zu Tréier am Joer 2025<br><span style=\"display:block;text-align:right\">\u2014 fir eng Welt ze gestalten<br>mat Häerz, Séil a Sënn.<br><span class=\"citation\">cf. Friedrich Overbeck, Bréif, 27.\u00a0Abrëll 1808</span></span>"
     },
 
     "portfolio": {
         "heading_top":    "Port-",
         "heading_bottom": "folio",
         "download_title": "AUSGEWIELTE WIERKER",
-        "download_file":  "Franz-Felix_Schwan_Portfolio_v1en.pdf",
+        "download_file":  "Franz-Felix_Schwan_Portfolio_v2en.pdf",
         "download":       "Eroflueden",
         "visit_title":    "Instagram",
         "visit_url":      "www.instagram.com/sanssaintco/",
@@ -36,14 +34,22 @@
         "name":          "Franz-Felix Schwan O.C.D.S.",
         "role_1":        "Grapheschen Designer",
         "role_2":        "a Sékuläre Karmelit",
-        "location_1":    "\u2014wunnt zu Mannheim,",
-        "location_2":    "Mainz an Tréier.",
+        "location_1":    "\u2014wunnt zu Mannheim.",
         "resume_title":  "CV",
         "resume_file":   "Franz-Felix_Schwan_Resume_v1de.pdf",
         "download":      "Eroflueden",
         "email_title":   "CONTACT",
         "email_address": "contact@sanssaint.eu",
         "email_btn":     "E-Mail"
+    },
+
+    "settings": {
+        "aria_label":    "Affichage-Astellungen",
+        "more_contrast": "Méi Kontrast",
+        "reduce_motion": "Bewegung reduzéieren",
+        "larger_text":   "Méi grousse Schrëft",
+        "sound":         "Toun",
+        "language":      "Sprooch"
     },
 
     "footer": {
@@ -62,6 +68,6 @@
         "credits_domain":   "Eege Domain duerch Infomaniak. Kod\u00e9iert mat dem Claude AI vun Anthropic PBC.",
         "credits_hosting":  "D\u00ebse Websait g\u00ebtt via GitHub gehost.",
         "credits_origin":   "Gr\u00e9isstendeels a Europa gemaach.",
-        "credits_version":  "Beta v0.6.3. Lescht Aktualis\u00e9ierung den 16. Abrëll 2026."
+        "credits_version":  "v1.0.0. Verëffentlecht den 20. Abrëll 2026."
     }
 }
