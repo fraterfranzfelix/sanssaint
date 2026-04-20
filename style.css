@@ -132,29 +132,6 @@ html.high-contrast .particles-front {
     pointer-events: none;
 }
 
-/* Reduce-motion mode — toggled by adding .reduce-motion to <html>, or
-   automatically applied when the OS/browser prefers reduced motion.
-   Doubles background-size on particle layers, halving their density. */
-html.reduce-motion .particles-back::before {
-    background-size: 400px 400px, 400px 400px;
-}
-
-html.reduce-motion .particles-front::before {
-    background-size: 800px 800px, 800px 800px;
-}
-
-/* Retina / high-DPI displays — halve particle density to reduce GPU texture
-   complexity and memory. background-size values match the reduce-motion overrides. */
-@media (min-resolution: 2dppx) {
-    .particles-back::before {
-        background-size: 400px 400px, 400px 400px;
-    }
-
-    .particles-front::before {
-        background-size: 800px 800px, 800px 800px;
-    }
-}
-
 
 /* =============================================================================
    2. RESET & BASE STYLES
@@ -854,12 +831,12 @@ body {
 }
 
 
-/* --- 5b. Particle Animations (Hardware Accelerated) ----------------------- */
+/* --- 5b. Canvas Particle Layers -------------------------------------------- */
 
-/* 1. The parent layers — moved by JavaScript parallax */
 .particles-back,
 .particles-front {
     z-index: 5;
+    display: block;
     position: absolute;
     top: 0;
     left: 0;
@@ -869,75 +846,6 @@ body {
 }
 
 .particles-front { z-index: 20; }
-
-/* 2. The pseudo-elements — handle the infinite GPU scrolling */
-.particles-back::before {
-    content: "";
-    position: absolute;
-    /* Oversize the container so we don't reveal a hard edge when it slides */
-    top: -1000px;
-    left: -200px;
-    width: calc(100% + 200px);
-    height: calc(100% + 1000px);
-
-    /* Unified sizes of exactly 200px to make the loop math perfect */
-    background-image:
-        radial-gradient(var(--blanc-leger) 1px, transparent 2px),
-        radial-gradient(var(--blanc-leger) 1px, transparent 2px);
-    background-size: 200px 200px, 200px 200px;
-    background-position: 0 0, 40px 60px;
-
-    opacity: 1;
-    filter: blur(1px);
-    animation: wind-back 33s linear infinite;
-}
-
-.particles-front::before {
-    content: "";
-    position: absolute;
-    /* Oversize to hide edges during movement */
-    top: -1200px;
-    left: -400px;
-    width: calc(100% + 400px);
-    height: calc(100% + 1200px);
-
-    /* Unified sizes of exactly 400px */
-    background-image:
-        radial-gradient(var(--blanc-leger) 3px, transparent 4px),
-        radial-gradient(var(--blanc-leger) 2px, transparent 3px);
-    background-size: 400px 400px, 400px 400px;
-    background-position: 0 0, 60px 90px;
-
-    opacity: 1;
-    filter: blur(0.5px);
-    animation: wind-front 15s linear infinite;
-}
-
-/* 3. Promote to compositor layers so the blur is rasterized once per GPU texture
-   and only the transform matrix changes each frame — no CPU repaint. */
-.particles-back::before,
-.particles-front::before {
-    will-change: transform;
-}
-
-/* 5. Pause animations on sections that are off-screen (set by IntersectionObserver) */
-.particles-back.is-paused::before,
-.particles-front.is-paused::before {
-    animation-play-state: paused;
-}
-
-/* 4. The perfect GPU loops */
-/* Back moves +200X and +1000Y — both exact multiples of its 200px tile size */
-@keyframes wind-back {
-    0%   { transform: translate3d(0, 0, 0); }
-    100% { transform: translate3d(200px, 1000px, 0); }
-}
-
-/* Front moves +400X and +1200Y — both exact multiples of its 400px tile size */
-@keyframes wind-front {
-    0%   { transform: translate3d(0, 0, 0); }
-    100% { transform: translate3d(400px, 1200px, 0); }
-}
 
 
 /* --- 5c. Center Container ------------------------------------------------- */

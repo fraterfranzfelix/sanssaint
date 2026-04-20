@@ -17,6 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initContactMobileSnap();
     initCreationMobileSnap();
     initSectionVisibilityObserver();
+    initCanvasParticles();
     initUISounds();
 });
 
@@ -256,6 +257,104 @@ function initSectionVisibilityObserver() {
     }, { threshold: 0 }); // fires as soon as any pixel enters/leaves
 
     sections.forEach(section => observer.observe(section));
+}
+
+
+/* =============================================================================
+   CANVAS PARTICLE SYSTEM
+============================================================================= */
+
+function initCanvasParticles() {
+    const configs = {
+        back: {
+            count: 50,
+            minSize: 0.3, maxSize: 1.5,
+            speedMult: 0.1, windMult: 0.1,
+            minOpacity: 1, maxOpacity: 1
+        },
+        front: {
+            count: 25,
+            minSize: 1.5, maxSize: 3.5,
+            speedMult: 0.2, windMult: 0.2,
+            minOpacity: 1, maxOpacity: 1
+        }
+    };
+
+    function createSystem(canvas) {
+        const cfg = canvas.classList.contains('particles-back') ? configs.back : configs.front;
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        class Particle {
+            constructor(initialSpread) {
+                this.size = Math.random() * (cfg.maxSize - cfg.minSize) + cfg.minSize;
+                this.x = Math.random() * canvas.width;
+                this.y = initialSpread ? Math.random() * canvas.height : -this.size;
+                this.speedY = this.size * cfg.speedMult;
+                this.wind = this.size * cfg.windMult;
+                this.angle = Math.random() * Math.PI * 2;
+                this.angleSpeed = Math.random() * 0.02 + 0.01;
+                this.opacity = Math.random() * (cfg.maxOpacity - cfg.minOpacity) + cfg.minOpacity;
+            }
+
+            reset() {
+                this.size = Math.random() * (cfg.maxSize - cfg.minSize) + cfg.minSize;
+                this.x = Math.random() * canvas.width;
+                this.y = -this.size;
+                this.speedY = this.size * cfg.speedMult;
+                this.wind = this.size * cfg.windMult;
+                this.angle = Math.random() * Math.PI * 2;
+                this.angleSpeed = Math.random() * 0.02 + 0.01;
+                this.opacity = Math.random() * (cfg.maxOpacity - cfg.minOpacity) + cfg.minOpacity;
+            }
+
+            update() {
+                this.angle += this.angleSpeed;
+                this.x += this.wind + Math.sin(this.angle) * 1.5;
+                this.y += this.speedY;
+                if (this.y > canvas.height) this.reset();
+                if (this.x > canvas.width + this.size) {
+                    this.x = -this.size;
+                    this.y = Math.random() * canvas.height;
+                }
+            }
+
+            draw() {
+                ctx.fillStyle = `rgba(234, 234, 234, ${this.opacity})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function resize() {
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+            const isReduceMotion = document.documentElement.classList.contains('reduce-motion');
+            const count = isReduceMotion ? Math.floor(cfg.count / 2) : cfg.count;
+            particles = Array.from({ length: count }, () => new Particle(true));
+        }
+
+        function animate() {
+            const isPaused = canvas.classList.contains('is-paused');
+            const isHighContrast = document.documentElement.classList.contains('high-contrast');
+            if (!isPaused && !isHighContrast) {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                for (let i = 0; i < particles.length; i++) {
+                    particles[i].update();
+                    particles[i].draw();
+                }
+            }
+            requestAnimationFrame(animate);
+        }
+
+        window.addEventListener('resize', resize, { passive: true });
+        resize();
+        animate();
+    }
+
+    document.querySelectorAll('canvas.particles-back, canvas.particles-front')
+        .forEach(createSystem);
 }
 
 
