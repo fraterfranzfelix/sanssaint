@@ -259,6 +259,32 @@ html[lang="lb"] .loading-cta::after {
                 .scroll-container { filter: none; opacity: 1; transform: none; }
             </style>
         </noscript>
+
+    <script>
+    (function () {
+        var a = document.createElement('audio');
+        var src = a.canPlayType('audio/ogg; codecs="opus"') !== ''
+            ? 'assets/ui/reveal.opus'
+            : a.canPlayType('audio/ogg; codecs="vorbis"') !== ''
+                ? 'assets/ui/reveal.ogg'
+                : 'assets/ui/reveal.mp3';
+        var revealSnd = new Audio(src);
+        revealSnd.volume = 0.6667;
+        revealSnd.preload = 'auto';
+
+        document.addEventListener('DOMContentLoaded', function () {
+            var loader = document.getElementById('loading-screen');
+            if (!loader) return;
+            loader.addEventListener('click', function onRevealClick() {
+                if (!loader.classList.contains('is-ready')) return;
+                loader.removeEventListener('click', onRevealClick);
+                // Small defer so the browser fully registers the click as a user gesture
+                // before unlocking audio playback.
+                setTimeout(function () { revealSnd.play().catch(function () {}); }, 0);
+            });
+        });
+    })();
+    </script>
 </head>
 <body>
     <div id="loading-screen" aria-label="Loading site">
@@ -479,6 +505,18 @@ html[lang="lb"] .loading-cta::after {
                     <li><a href="#" data-lang="lb">Lëtzebuergesch</a></li>
                 </ul>
             </div>
+        </div>
+    </div>
+
+    <div class="privacy-notice" id="privacy-notice">
+        <div class="privacy-notice-menu" role="dialog" aria-label="Privacy notice">
+            <p class="privacy-notice-text">This website works inside your browser.<br>No cookies are collected. <a href="impressum-datenschutz.html" target="_blank" rel="noopener" class="privacy-notice-link" id="privacy-notice-link">Read more…</a></p>
+            <button class="privacy-notice-close" id="privacy-notice-close" aria-label="Close privacy notice">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 12" width="12" height="12" aria-hidden="true">
+                    <line x1="1.5" y1="1.5" x2="10.5" y2="10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    <line x1="10.5" y1="1.5" x2="1.5" y2="10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+            </button>
         </div>
     </div>
 
@@ -736,7 +774,7 @@ html[lang="lb"] .loading-cta::after {
                         <p><span data-i18n="footer.credits_hosting">This website is hosted via GitHub.</span><br>
                         <a href="https://github.com/fraterfranzfelix/sanssaint" target="_blank" rel="noopener"><i>https://github.com/fraterfranzfelix/sanssaint</i></a></p>
                         <p data-i18n="footer.credits_origin">Mostly made in Europe.</p>
-                        <p data-i18n="footer.credits_version">Beta v0.6.3. Last update April 16, 2026.</p>
+                        <p data-i18n="footer.credits_version">v1.0.2. Last update April 20, 2026.</p>
                     </div>
 
                 </div><!-- /footer-page-2 -->

@@ -653,6 +653,126 @@ body {
                 visibility 0s;
 }
 
+
+/* --- Privacy notice popup ------------------------------------------------- */
+
+.privacy-notice {
+    position: fixed;
+    bottom: 3rem;
+    right: 3rem;
+    z-index: 200;
+}
+
+.privacy-notice-menu {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    max-width: 21rem;
+    background: var(--btn-white-bg);
+    white-space: normal;
+
+    -webkit-mask-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 86.6025 50'%3E%3Cpath d='M 86.6025 0 A 100 100 0 0 0 0 50 L 86.6025 50 Z'/%3E%3C/svg%3E"),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 86.6025 50'%3E%3Cpath d='M 0 0 A 100 100 0 0 1 86.6025 50 L 0 50 Z'/%3E%3C/svg%3E"),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 86.6025 50'%3E%3Cpath d='M 0 0 A 100 100 0 0 0 86.6025 50 L 86.6025 0 Z'/%3E%3C/svg%3E"),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 86.6025 50'%3E%3Cpath d='M 86.6025 0 A 100 100 0 0 1 0 50 L 0 0 Z'/%3E%3C/svg%3E"),
+        linear-gradient(black, black),
+        linear-gradient(black, black),
+        linear-gradient(black, black);
+    mask-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 86.6025 50'%3E%3Cpath d='M 86.6025 0 A 100 100 0 0 0 0 50 L 86.6025 50 Z'/%3E%3C/svg%3E"),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 86.6025 50'%3E%3Cpath d='M 0 0 A 100 100 0 0 1 86.6025 50 L 0 50 Z'/%3E%3C/svg%3E"),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 86.6025 50'%3E%3Cpath d='M 0 0 A 100 100 0 0 0 86.6025 50 L 86.6025 0 Z'/%3E%3C/svg%3E"),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 86.6025 50'%3E%3Cpath d='M 86.6025 0 A 100 100 0 0 1 0 50 L 0 0 Z'/%3E%3C/svg%3E"),
+        linear-gradient(black, black),
+        linear-gradient(black, black),
+        linear-gradient(black, black);
+    -webkit-mask-size:
+        1.732rem 1rem,
+        1.732rem 1rem,
+        1.732rem 1rem,
+        1.732rem 1rem,
+        calc(100% - 3.464rem + 2px) 100%,
+        1.732rem calc(100% - 2rem + 2px),
+        1.732rem calc(100% - 2rem + 2px);
+    mask-size:
+        1.732rem 1rem,
+        1.732rem 1rem,
+        1.732rem 1rem,
+        1.732rem 1rem,
+        calc(100% - 3.464rem + 2px) 100%,
+        1.732rem calc(100% - 2rem + 2px),
+        1.732rem calc(100% - 2rem + 2px);
+    -webkit-mask-position:
+        top left, top right, bottom left, bottom right,
+        center, left center, right center;
+    mask-position:
+        top left, top right, bottom left, bottom right,
+        center, left center, right center;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat:         no-repeat;
+    -webkit-mask-composite: source-over, source-over, source-over, source-over, source-over, source-over;
+    mask-composite:         add, add, add, add, add, add;
+
+    filter: var(--btn-white-shadow);
+
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(8px);
+    pointer-events: none;
+    transition: opacity 0.25s ease,
+                transform 0.25s ease,
+                visibility 0s linear 0.25s;
+}
+
+.privacy-notice.is-open .privacy-notice-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    pointer-events: auto;
+    transition: opacity 0.25s ease,
+                transform 0.25s ease,
+                visibility 0s;
+}
+
+.privacy-notice-text {
+    font-size: var(--font-size-body);
+    color: var(--noir-leger);
+    line-height: 1.5;
+    margin: 0;
+}
+
+.privacy-notice-link {
+    color: var(--noir-tres-leger);
+    text-decoration: none;
+    transition: color 0.2s ease, font-weight 0.2s ease;
+}
+
+.privacy-notice-link:hover {
+    color: var(--viola-violet);
+    font-weight: 600;
+}
+
+.privacy-notice-close {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    color: var(--noir-leger);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    opacity: 0.45;
+    transition: opacity 0.2s ease;
+    margin-top: 0.1rem;
+}
+
+.privacy-notice-close:hover {
+    opacity: 1;
+}
+
+
 /* Each row: label on the left, toggle switch on the right */
 .settings-item {
     display: flex;
@@ -770,6 +890,19 @@ body {
     .header-settings {
         right: 2rem;
     }
+
+    .privacy-notice {
+        right: 2rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .privacy-notice {
+        right: auto;
+        bottom: 2rem;
+        left: 50%;
+        transform: translateX(-50%);
+    }
 }
 
 
@@ -882,6 +1015,7 @@ body {
 .btn {
     position: relative;
     flex: 1 0 150px;
+    white-space: nowrap;
     height: 2rem;
     display: flex;
     justify-content: center;
@@ -1450,7 +1584,7 @@ body {
         display: block;
         position: fixed;
         bottom: -5vh;     /* Extra bleed so max tilt (+30px up) never reveals a gap */
-        right: -25%;      /* Slight right bleed so image doesn't fully obstruct text */
+        right: -33.3%;      /* Slight right bleed so image doesn't fully obstruct text */
         height: 82vh;     /* Slightly taller than the target 75vh for gap safety */
         width: auto;
         pointer-events: none;

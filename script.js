@@ -349,6 +349,7 @@ function initCanvasParticles() {
         }
 
         window.addEventListener('resize', resize, { passive: true });
+        window.addEventListener('load', resize, { once: true });
         resize();
         animate();
     }
@@ -804,15 +805,20 @@ document.getElementById('mute-btn').removeAttribute('disabled');
 
         // We trigger the fade-out the moment the expanding star eclipses the viewport edges.
         setTimeout(() => {
-            
+
             document.body.classList.add('is-revealed');
-            loader.style.opacity = '0'; 
+            loader.style.opacity = '0';
 
             setTimeout(() => {
                 loader.remove();
             }, 1200);
 
         }, 1000);
+
+        setTimeout(() => {
+            const privacyNotice = document.getElementById('privacy-notice');
+            if (privacyNotice) privacyNotice.classList.add('is-open');
+        }, 12000);
     });
 });
 
@@ -1094,6 +1100,22 @@ function initUISounds() {
     document.querySelectorAll('.settings-checkbox').forEach(checkbox => {
         checkbox.addEventListener('change', () => playUISound('text_click'));
     });
+
+    // --- Privacy notice popup ---
+    const privacyLink  = document.getElementById('privacy-notice-link');
+    const privacyClose = document.getElementById('privacy-notice-close');
+
+    if (privacyLink) {
+        privacyLink.addEventListener('mouseenter', () => playUISound('text_hover'));
+        privacyLink.addEventListener('click',      () => playUISound('text_click'));
+    }
+    if (privacyClose) {
+        privacyClose.addEventListener('mouseenter', () => playUISound('text_hover'));
+        privacyClose.addEventListener('click', () => {
+            playUISound('text_click');
+            document.getElementById('privacy-notice').classList.remove('is-open');
+        });
+    }
 }
 
 
