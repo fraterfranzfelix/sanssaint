@@ -31,7 +31,7 @@
     },
 
     "contact": {
-        "name":          "Franz-Felix Schwan O.C.D.S.",
+        "name":          "Franz-Felix Schwan",
         "role_1":        "Grapheschen Designer",
         "role_2":        "a Sékuläre Karmelit",
         "location_1":    "\u2014wunnt zu Mannheim.",
@@ -68,6 +68,6 @@
         "credits_domain":   "Eege Domain duerch Infomaniak. Kod\u00e9iert mat dem Claude AI vun Anthropic PBC.",
         "credits_hosting":  "D\u00ebse Websait g\u00ebtt via GitHub gehost.",
         "credits_origin":   "Gr\u00e9isstendeels a Europa gemaach.",
-        "credits_version":  "v1.0.2. Verëffentlecht den 20. Abrëll 2026."
+        "credits_version":  "v1.0.3. Verëffentlecht den 28. Abrëll 2026."
     }
 }

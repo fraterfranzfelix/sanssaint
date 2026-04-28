@@ -31,7 +31,7 @@
     },
 
     "contact": {
-        "name":          "Franciscus Felix Schwan O.C.D.S.",
+        "name":          "Franciscus Felix Schwan",
         "role_1":        "Artifex Graphicus",
         "role_2":        "et Carmelita Saecularis",
         "location_1":    "\u2014degit Mannhemii.",
@@ -68,6 +68,6 @@
         "credits_domain":   "Dominium proprium ab Infomaniak. Codice scripto ab Anthropic PBC per machinam Claude.",
         "credits_hosting":  "Hic situs per GitHub hospitatur.",
         "credits_origin":   "Maxima ex parte in Europa factum.",
-        "credits_version":  "v1.0.2. Edita die XX Aprilis MMXXVI."
+        "credits_version":  "v1.0.3. Edita die XXVIII Aprilis MMXXVI."
     }
 }

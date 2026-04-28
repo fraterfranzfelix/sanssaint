@@ -31,7 +31,7 @@
     },
 
     "contact": {
-        "name":          "Franz-Felix Schwan O.C.D.S.",
+        "name":          "Franz-Felix Schwan",
         "role_1":        "Graphic Designer",
         "role_2":        "and Secular Carmelite",
         "location_1":    "—based in Mannheim.",
@@ -68,6 +68,6 @@
         "credits_domain":   "Custom domain by Infomaniak. Coded with Anthropic PBC\u2019s Claude AI.",
         "credits_hosting":  "This website is hosted via GitHub.",
         "credits_origin":   "Mostly made in Europe.",
-        "credits_version":  "v1.0.2. Released April 20, 2026."
+        "credits_version":  "v1.0.3. Released April 28, 2026."
     }
 }
